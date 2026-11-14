@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Scratch output from local test runs
+.tmp/
+
+# Local accounts and saved boards (created at runtime, never committed)
+server/data/
+
+# Model weights are downloaded separately (see README), never committed
+*.gguf
+models/

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Econ Coach">
+  <rect width="96" height="96" rx="20" fill="#340002"/>
+  <!-- axes -->
+  <path d="M24 20v54h52" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- demand (downward) and supply (upward) curves -->
+  <path d="M32 28c8 18 20 30 38 36" fill="none" stroke="#f3c969" stroke-width="5" stroke-linecap="round"/>
+  <path d="M32 66c14-4 28-16 38-36" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <!-- equilibrium -->
+  <circle cx="50.5" cy="50.5" r="6.5" fill="#b97d10" stroke="#340002" stroke-width="2.5"/>
+</svg>
