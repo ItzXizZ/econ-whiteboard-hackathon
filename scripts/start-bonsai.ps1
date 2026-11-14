@@ -13,6 +13,8 @@
 #   BONSAI_MODEL  2B | 4B | 9B                  (default 4B)
 #   BONSAI_CTX    context window in tokens      (default 8192)
 #   BONSAI_PIN    0 to skip keeping the model resident in RAM (default 1)
+#   BONSAI_AFFINITY    0 to skip pinning model threads to cores on ARM64 (default 1)
+#   BONSAI_LLAMA_ARGS  extra llama-server options, space separated
 #
 # Only Bonsai-2 2B / 4B / 9B are accepted on purpose: those are the models this
 # project is allowed to use.
@@ -77,7 +79,29 @@ if ($Pin -and (Test-Path $PinScript)) {
     ) | Out-Null
 }
 
+$ExtraArgs = @()
+
+# The tutor keeps one cached system prompt per slot (hints, questions, long
+# answers, vision). By default llama-server empties every idle slot whenever
+# another slot starts work, so a hint that follows handwriting recognition had
+# to re-read its whole 900-token system prompt (measured: 17.6 s instead of
+# 2.7 s). Keep idle slots loaded; four short prompts fit easily in the context.
+$ExtraArgs += "--no-cache-idle-slots"
+
+# Windows on ARM laptops park half of their cores for about a minute when a
+# heavy load starts. llama.cpp still runs one busy-waiting thread per core, so
+# 12 threads fight over 6 cores and the model drops from ~70 to under 1 token
+# per second (measured on a Snapdragon X Elite: a 5 s warm-up took 70 s).
+# Pinning each thread to its own core makes Windows wake the parked cores.
+# Only done on ARM64, where every logical processor is a physical core.
+if ($env:BONSAI_AFFINITY -ne "0" -and $env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
+    $Cores = [Environment]::ProcessorCount
+    if ($Cores -ge 2 -and $Cores -le 64) { $ExtraArgs += @("-Cr", "0-$($Cores - 1)", "--cpu-strict", "1") }
+}
+if ($env:BONSAI_LLAMA_ARGS) { $ExtraArgs += @($env:BONSAI_LLAMA_ARGS -split '\s+' | Where-Object { $_ }) }
+
 Write-Host "[start-bonsai] Starting Bonsai-2 $Model (context $($env:BONSAI_CTX)). First load takes about a minute."
+if ($ExtraArgs.Count) { Write-Host "[start-bonsai] Extra llama-server options: $($ExtraArgs -join ' ')" }
 Write-Host "[start-bonsai] Leave this window open; press Ctrl+C to stop the model."
-& $Launcher
+& $Launcher @ExtraArgs
 exit $LASTEXITCODE

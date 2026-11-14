@@ -150,6 +150,48 @@ Start with "Generally," then 3 to 5 numbered steps giving the method that works 
 ## One-line takeaway
 One memorable sentence.`
 
+const DEBRIEF_HEADINGS = [
+  'Problem type',
+  'Generally, for problems like this',
+  'Signals to recognize it next time',
+  'Common traps',
+  'One-line takeaway',
+]
+
+/**
+ * The small model sometimes drops the "## " from a debrief heading (most often
+ * the first one). Works a line at a time on the stream and puts it back.
+ */
+class HeadingFixer {
+  constructor(titles) {
+    this.titles = titles.map((t) => t.toLowerCase())
+    this.buf = ''
+  }
+
+  fixLine(line) {
+    const bare = line.replace(/^[\s#*]+|[\s*:]+$/g, '')
+    return this.titles.includes(bare.toLowerCase()) ? `## ${bare}` : line
+  }
+
+  push(text) {
+    this.buf += text
+    const end = this.buf.lastIndexOf('\n')
+    if (end < 0) return ''
+    const done = this.buf.slice(0, end + 1)
+    this.buf = this.buf.slice(end + 1)
+    return done
+      .split('\n')
+      .map((l) => this.fixLine(l))
+      .join('\n')
+  }
+
+  flush() {
+    const out = this.fixLine(this.buf)
+    this.buf = ''
+    return out
+  }
+}
+
 const PROBLEM_OCR_PROMPT =
   'This is a screenshot of an economics problem. Transcribe all of its text exactly, keeping equations as plain text. ' +
   'If there is a graph or table, add one sentence describing it with its numbers. Output only that, nothing else.'
@@ -946,15 +988,18 @@ async function handleHint(req, res) {
       maxTokens = kind === 'solve' ? 380 : 420
       temperature = 0.3
       const cleaner = new ProseCleaner({ mode: 'markdown' })
+      const fixer = kind === 'generalize' ? new HeadingFixer(DEBRIEF_HEADINGS) : null
       let shown = ''
       run = {
         onText: (delta) => {
-          const piece = cleaner.push(delta)
+          let piece = cleaner.push(delta)
+          if (fixer) piece = fixer.push(piece)
           shown += piece
           return piece
         },
         onEnd: () => {
-          const tail = cleaner.flush()
+          let tail = cleaner.flush()
+          if (fixer) tail = fixer.push(tail) + fixer.flush()
           shown += tail
           return shown.trim() ? tail : 'I could not read the problem well enough to write this up. Try pasting the problem again.'
         },
