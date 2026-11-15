@@ -376,6 +376,7 @@ interface HintCard {
   togetherStep?: number
   togetherTitle?: string
   togetherTotal?: number
+  successPulse?: boolean
   level: number
   hintType?: HintTypeId
   tracked: boolean
@@ -887,6 +888,39 @@ export default function MathLayer({
   const [prompt, setPrompt] = useState('')
   const [lessonContext, setLessonContext] = useState('')
   const pen = useTutorPen()
+  const [acceptedStepCue, setAcceptedStepCue] = useState<{ id: number; x: number; y: number } | null>(null)
+  const acceptedStepCueIdRef = useRef(0)
+  const acceptedStepCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const acceptedPulseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [freshTutorStrokeIds, setFreshTutorStrokeIds] = useState<ReadonlySet<string>>(new Set())
+  const tutorPenBusyRef = useRef(false)
+  const tutorStrokeBaselineRef = useRef<ReadonlySet<string>>(new Set())
+  const freshTutorInkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (pen.busy && !tutorPenBusyRef.current) {
+      tutorStrokeBaselineRef.current = new Set(pen.strokes.map((stroke) => stroke.id))
+    } else if (!pen.busy && tutorPenBusyRef.current) {
+      const baseline = tutorStrokeBaselineRef.current
+      const freshIds = new Set(
+        pen.strokes.filter((stroke) => !baseline.has(stroke.id)).map((stroke) => stroke.id)
+      )
+      if (freshTutorInkTimerRef.current) clearTimeout(freshTutorInkTimerRef.current)
+      setFreshTutorStrokeIds(freshIds)
+      freshTutorInkTimerRef.current = setTimeout(() => {
+        freshTutorInkTimerRef.current = null
+        setFreshTutorStrokeIds(new Set())
+      }, 600)
+    }
+    tutorPenBusyRef.current = pen.busy
+  }, [pen.busy, pen.strokes])
+  useEffect(
+    () => () => {
+      if (acceptedStepCueTimerRef.current) clearTimeout(acceptedStepCueTimerRef.current)
+      if (acceptedPulseTimerRef.current) clearTimeout(acceptedPulseTimerRef.current)
+      if (freshTutorInkTimerRef.current) clearTimeout(freshTutorInkTimerRef.current)
+    },
+    []
+  )
   const togetherSessionRef = useRef<TogetherSession | null>(null)
   const pendingTogetherRef = useRef<(() => void) | null>(null)
   const exitTogetherRef = useRef<() => void>(() => {})
@@ -3596,6 +3630,11 @@ export default function MathLayer({
     setTogetherStep(null)
     setLessonMenuOpen(false)
     setCards((current) => current.filter((card) => card.id !== session.id))
+    if (acceptedStepCueTimerRef.current) clearTimeout(acceptedStepCueTimerRef.current)
+    if (acceptedPulseTimerRef.current) clearTimeout(acceptedPulseTimerRef.current)
+    acceptedStepCueTimerRef.current = null
+    acceptedPulseTimerRef.current = null
+    setAcceptedStepCue(null)
     speakerRef.current?.cancel()
     speakerRef.current = null
     setHintSpeakingId(null)
@@ -3699,6 +3738,27 @@ export default function MathLayer({
     },
     [pen.remove]
   )
+
+  const showAcceptedStepFeedback = useCallback((sessionId: string, stroke: Stroke) => {
+    const point = strokeCentroid([stroke])
+    const id = ++acceptedStepCueIdRef.current
+    if (point) setAcceptedStepCue({ id, ...point })
+    setCards((current) =>
+      current.map((card) => (card.id === sessionId ? { ...card, successPulse: true } : card))
+    )
+    if (acceptedStepCueTimerRef.current) clearTimeout(acceptedStepCueTimerRef.current)
+    if (acceptedPulseTimerRef.current) clearTimeout(acceptedPulseTimerRef.current)
+    acceptedStepCueTimerRef.current = setTimeout(() => {
+      acceptedStepCueTimerRef.current = null
+      setAcceptedStepCue((current) => (current?.id === id ? null : current))
+    }, 680)
+    acceptedPulseTimerRef.current = setTimeout(() => {
+      acceptedPulseTimerRef.current = null
+      setCards((current) =>
+        current.map((card) => (card.id === sessionId ? { ...card, successPulse: false } : card))
+      )
+    }, 520)
+  }, [])
 
   const beginTogetherStudentTurn = useCallback(
     (step: number) => {
@@ -3828,6 +3888,7 @@ export default function MathLayer({
       }
 
       clearTogetherCorrectionInk(session)
+      showAcceptedStepFeedback(session.id, stroke)
       if (session.lesson.kind === 'market') {
         if (need === 'first') {
           session.first = stroke
@@ -3939,6 +4000,7 @@ export default function MathLayer({
       reflowTogetherLabels,
       runTogetherAdamStep,
       runTogetherOps,
+      showAcceptedStepFeedback,
       speakTogetherStep,
       updateTogetherCard,
     ]
@@ -4871,17 +4933,30 @@ export default function MathLayer({
             />
           )}
           {pen.strokes.map((stroke) => (
-            <path
-              key={stroke.id}
-              d={pointsToPath(stroke.points)}
-              fill="none"
-              stroke={stroke.color}
-              strokeWidth={stroke.width}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray={stroke.dashed ? '6 5' : undefined}
-              opacity={0.95}
-            />
+            <g key={stroke.id}>
+              {freshTutorStrokeIds.has(stroke.id) && (
+                <path
+                  className="math-tutor-ink-glow"
+                  d={pointsToPath(stroke.points)}
+                  fill="none"
+                  stroke={stroke.color}
+                  strokeWidth={stroke.width + 7}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={stroke.dashed ? '6 5' : undefined}
+                />
+              )}
+              <path
+                d={pointsToPath(stroke.points)}
+                fill="none"
+                stroke={stroke.color}
+                strokeWidth={stroke.width}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray={stroke.dashed ? '6 5' : undefined}
+                opacity={0.95}
+              />
+            </g>
           ))}
           {pen.labels.map((label) => (
             <text
@@ -5101,12 +5176,44 @@ export default function MathLayer({
               className="math-adam-cursor-layer"
               style={{ position: 'absolute', inset: 0, zIndex: 46, pointerEvents: 'none' }}
             >
-              <div className="math-adam-cursor" style={{ left: point.x - wrap.left, top: point.y - wrap.top }}>
+              <div
+                className={`math-adam-cursor${cursor.drawing ? ' is-drawing' : ''}`}
+                style={{
+                  left: 0,
+                  top: 0,
+                  transform: `translate3d(${point.x - wrap.left}px, ${point.y - wrap.top}px, 0) translate(-5px, -18px)`,
+                }}
+              >
                 <span className="math-adam-cursor__badge">
                   <PenLine size={15} strokeWidth={2.4} />
                 </span>
                 {cursor.drawing && <span className="math-adam-cursor__name">Adam</span>}
               </div>
+            </div>
+          )
+        })()}
+
+      {acceptedStepCue &&
+        (() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          const point = rf.flowToScreenPosition({ x: acceptedStepCue.x, y: acceptedStepCue.y })
+          return (
+            <div
+              data-html2canvas-ignore
+              className="math-accepted-step-cue-layer"
+              style={{ position: 'absolute', inset: 0, zIndex: 48, pointerEvents: 'none' }}
+            >
+              <svg
+                key={acceptedStepCue.id}
+                className="math-accepted-step-check"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+                style={{ left: point.x - wrap.left, top: point.y - wrap.top }}
+              >
+                <circle cx="16" cy="16" r="14" />
+                <path pathLength="1" d="M8 16.5 13.5 22 24.5 10" />
+              </svg>
             </div>
           )
         })()}

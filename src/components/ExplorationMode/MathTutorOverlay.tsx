@@ -1,4 +1,4 @@
-import { Loader2, Mic, MicOff, X } from 'lucide-react'
+import { Mic, MicOff, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import katex from 'katex'
 import type { ReactFlowInstance } from 'reactflow'
@@ -37,6 +37,7 @@ export interface TutorSession {
   togetherStep?: number
   togetherTitle?: string
   togetherTotal?: number
+  successPulse?: boolean
   hintType?: HintTypeId
   level: number
   tracked: boolean
@@ -275,11 +276,34 @@ function CoachCard({
   onEndTogether: () => void
 }) {
   const [revealing, setRevealing] = useState(false)
+  const [outgoingTogetherText, setOutgoingTogetherText] = useState('')
+  const previousTogetherTextRef = useRef(session.text)
   const bodyRef = useRef<HTMLDivElement>(null)
   const type = session.hintType ? HINT_TYPE_MAP[session.hintType] : null
   const drag = useDragHandle(onDragBy)
   const waiting =
     (session.status === 'loading' || session.status === 'streaming') && !session.text
+  const thinking =
+    session.status === 'loading' ||
+    session.status === 'streaming' ||
+    !!session.reexplaining ||
+    (session.clarifications ?? []).some(
+      (clarification) => clarification.status === 'loading' && !clarification.answer
+    )
+  const togetherTotal = session.togetherTotal ?? 0
+  const togetherStep = Math.min(togetherTotal, Math.max(1, session.togetherStep ?? 1))
+
+  useLayoutEffect(() => {
+    const previous = previousTogetherTextRef.current
+    previousTogetherTextRef.current = session.text
+    if (!session.togetherMode || !previous || previous === session.text) {
+      setOutgoingTogetherText('')
+      return
+    }
+    setOutgoingTogetherText(previous)
+    const timer = window.setTimeout(() => setOutgoingTogetherText(''), 240)
+    return () => window.clearTimeout(timer)
+  }, [session.text, session.togetherMode])
 
   // A multi-step hint pauses after each non-final step until the student
   // confirms it made sense — the typewriter must have fully caught up first,
@@ -294,6 +318,14 @@ function CoachCard({
     !revealing &&
     !session.reexplaining
   const reexplainAttempts = session.reexplainCounts?.[stepIndex] ?? 0
+  const renderCopy = (text: string) =>
+    session.mode === 'voice' ? (
+      <p className="math-coach-say" style={{ marginTop: 0 }}>
+        <RichLine text={text} />
+      </p>
+    ) : (
+      <Markdown size="text-sm">{text}</Markdown>
+    )
 
   useEffect(() => {
     const el = bodyRef.current
@@ -309,14 +341,22 @@ function CoachCard({
         </button>
       </div>
 
-      <div className="math-coach-bubble" style={{ maxWidth: BUBBLE_W }}>
+      <div className="math-coach-bubble" style={{ maxWidth: BUBBLE_W }} aria-busy={thinking}>
         <div
           className="math-coach-meta"
           {...drag}
           style={{ cursor: 'grab', touchAction: 'none' }}
           title="Drag to move"
         >
-          <span className="math-coach-name">Adam</span>
+          <span className={`math-coach-name${thinking ? ' is-thinking' : ''}`}>
+            Adam
+            {thinking && (
+              <span className="math-coach-thinking">
+                thinking
+                <span aria-hidden="true" />
+              </span>
+            )}
+          </span>
           {type && session.mode === 'hint' && (
             <span className="math-coach-type" style={{ color: type.color }} title={type.def}>
               {type.name}
@@ -354,10 +394,30 @@ function CoachCard({
           </span>
         </div>
 
+        {session.togetherMode && togetherTotal > 0 && (
+          <div
+            className="math-coach-progress"
+            role="progressbar"
+            aria-label={`${session.togetherTitle ?? 'Lesson'} progress`}
+            aria-valuemin={1}
+            aria-valuemax={togetherTotal}
+            aria-valuenow={togetherStep}
+            style={{ gridTemplateColumns: `repeat(${togetherTotal}, minmax(0, 1fr))` }}
+          >
+            {Array.from({ length: togetherTotal }, (_, index) => (
+              <span
+                key={index}
+                className={`math-coach-progress-segment${index < togetherStep ? ' is-filled' : ''}`}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        )}
+
         <div className="math-coach-scroll" ref={bodyRef}>
           {waiting && (
             <p className="math-coach-say math-coach-waiting">
-              <Loader2 size={13} className="animate-spin" /> reading your work…
+              reading your work…
             </p>
           )}
 
@@ -379,12 +439,26 @@ function CoachCard({
           ) : (
             session.text && (
               <div className="math-coach-solve">
-                {session.mode === 'voice' ? (
-                  <p className="math-coach-say" style={{ marginTop: 0 }}>
-                    <RichLine text={session.text} />
-                  </p>
+                {session.togetherMode ? (
+                  <div className="math-coach-copy-stack">
+                    {outgoingTogetherText && (
+                      <div
+                        key={`out-${outgoingTogetherText}`}
+                        className="math-coach-copy-layer is-leaving"
+                        aria-hidden="true"
+                      >
+                        {renderCopy(outgoingTogetherText)}
+                      </div>
+                    )}
+                    <div
+                      key={`in-${session.text}`}
+                      className={`math-coach-copy-layer${outgoingTogetherText ? ' is-entering' : ''}`}
+                    >
+                      {renderCopy(session.text)}
+                    </div>
+                  </div>
                 ) : (
-                  <Markdown size="text-sm">{session.text}</Markdown>
+                  renderCopy(session.text)
                 )}
               </div>
             )
@@ -404,9 +478,7 @@ function CoachCard({
                 <div key={cl.id} className="math-coach-clarify">
                   <p className="math-coach-clarify-q">You asked: {cl.question}</p>
                   {cl.status === 'loading' && !cl.answer ? (
-                    <p className="math-coach-say math-coach-waiting">
-                      <Loader2 size={12} className="animate-spin" /> thinking…
-                    </p>
+                    <p className="math-coach-say math-coach-waiting">thinking…</p>
                   ) : (
                     <p className="math-coach-clarify-a">
                       <RichLine text={cl.answer} />
@@ -470,7 +542,7 @@ function CoachCard({
 
           {session.reexplaining && !waiting && (
             <p className="math-coach-say math-coach-waiting">
-              <Loader2 size={13} className="animate-spin" /> let me put that another way…
+              let me put that another way…
             </p>
           )}
 
@@ -863,7 +935,7 @@ export function MathTutorScreenLayer({
           <div
             key={session.id}
             ref={(el) => measure(session.id, el)}
-            className="math-tutor-presence"
+            className={`math-tutor-presence${session.successPulse ? ' is-success' : ''}`}
             style={{ position: 'absolute', left, top, pointerEvents: 'none' }}
           >
             <CoachCard

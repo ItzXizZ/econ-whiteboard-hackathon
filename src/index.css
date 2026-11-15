@@ -31,13 +31,24 @@
   }
 
   :root {
-    --font-sans: Arial, Helvetica, sans-serif;
-    /* Inter — open substitute for Anthropic Sans / Claude product UI */
-    --font-claude: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-claude: var(--font-sans);
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --motion-fast: 160ms;
+    --motion-base: 240ms;
+    --motion-slow: 320ms;
+    --econ-bg: #faf9f5;
+    --econ-surface: #fffefa;
+    --econ-border: #e8e6dc;
+    --econ-text: #302f35;
+    --econ-muted: #77757d;
+    --econ-accent: #5b52c3;
+    --econ-accent-soft: #f2f1fb;
+    --econ-success: #2f855a;
     --claude-text: #3d3d3a;
     --claude-text-muted: #5e5d59;
-    --anim--hover-time: 400ms;
-    --anim--hover-ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --anim--hover-time: var(--motion-fast);
+    --anim--hover-ease: var(--ease-out);
     --glass-border-width: clamp(1px, 0.0625em, 4px);
     --glass-bg: linear-gradient(-75deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
     --glass-shadow: inset 0 0.125em 0.125em rgba(0,0,0,0.05),
@@ -54,8 +65,8 @@
   }
 
   body {
-    background-color: rgb(215, 215, 215);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ccircle cx='15' cy='15' r='1' fill='rgba(0%2C0%2C0%2C0.15)'/%3E%3C/svg%3E");
+    background-color: var(--econ-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ccircle cx='15' cy='15' r='1' fill='rgba(48%2C47%2C53%2C0.08)'/%3E%3C/svg%3E");
     color: var(--text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -10896,5 +10907,409 @@ kbd {
 
   .econ-empty-sub {
     font-size: 13px;
+  }
+}
+
+.econ-shell {
+  background: var(--econ-bg);
+  color: var(--econ-text);
+}
+
+.math-coach-bubble {
+  border-color: var(--econ-border);
+  background: rgba(255, 254, 250, 0.94);
+  box-shadow: 0 16px 44px rgba(44, 41, 33, 0.14), 0 2px 8px rgba(44, 41, 33, 0.06);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+
+.math-coach-scroll {
+  border-color: var(--econ-border);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 1px 3px rgba(44, 41, 33, 0.04);
+}
+
+.math-coach-name {
+  color: var(--econ-text);
+}
+
+.math-coach-name.is-thinking {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.math-coach-thinking {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  color: var(--econ-accent);
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+}
+
+.math-coach-thinking > span {
+  position: absolute;
+  inset: -1px auto -1px -24px;
+  width: 16px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.92), transparent);
+  opacity: 0.75;
+  animation: math-thinking-sweep 1200ms linear infinite;
+  pointer-events: none;
+}
+
+.math-coach-progress {
+  display: grid;
+  gap: 4px;
+  margin: 2px 4px 0;
+  height: 4px;
+}
+
+.math-coach-progress-segment {
+  min-width: 0;
+  border-radius: 999px;
+  background: var(--econ-border);
+  opacity: 0.78;
+  transform: scaleX(0.55);
+  transform-origin: left center;
+  transition:
+    transform var(--motion-slow) var(--ease-out),
+    opacity var(--motion-slow) var(--ease-out);
+}
+
+.math-coach-progress-segment.is-filled {
+  background: var(--econ-accent);
+  opacity: 0.9;
+  transform: scaleX(1);
+}
+
+.math-coach-copy-stack {
+  display: grid;
+  min-width: 0;
+}
+
+.math-coach-copy-layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.math-coach-copy-layer.is-leaving {
+  animation: math-coach-copy-out var(--motion-base) var(--ease-out) both;
+  pointer-events: none;
+}
+
+.math-coach-copy-layer.is-entering {
+  animation: math-coach-copy-in var(--motion-base) var(--ease-out) both;
+}
+
+.math-tutor-presence {
+  animation: math-coach-enter var(--motion-slow) var(--ease-out) both;
+}
+
+.math-tutor-presence.is-success .math-coach-bubble::after {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border: 1px solid rgba(47, 133, 90, 0.62);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  animation: math-coach-success 520ms var(--ease-out) both;
+}
+
+.math-tutor-ink-glow {
+  filter: blur(2.5px);
+  opacity: 0.42;
+  animation: math-tutor-ink-glow 600ms var(--ease-out) forwards;
+}
+
+.math-adam-cursor {
+  left: 0;
+  top: 0;
+  will-change: transform;
+  transition: none;
+  filter: drop-shadow(0 2px 4px rgba(42, 39, 66, 0.2));
+}
+
+.math-adam-cursor::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: -7px;
+  top: -7px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 82, 195, 0.22), rgba(91, 82, 195, 0.08) 44%, transparent 72%);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.math-adam-cursor.is-drawing::before {
+  opacity: 1;
+}
+
+.math-adam-cursor__badge,
+.math-adam-cursor__name {
+  position: relative;
+  z-index: 1;
+}
+
+.math-adam-cursor__badge {
+  background: var(--econ-accent);
+}
+
+.math-adam-cursor__name {
+  border-color: var(--econ-border);
+  color: var(--econ-accent);
+  background: var(--econ-surface);
+}
+
+.math-accepted-step-check {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+  transform: translate(-50%, -50%) scale(0.94);
+  animation: math-accepted-check-out 680ms var(--ease-out) both;
+}
+
+.math-accepted-step-check circle {
+  fill: var(--econ-surface);
+  stroke: rgba(47, 133, 90, 0.28);
+  stroke-width: 1;
+}
+
+.math-accepted-step-check path {
+  fill: none;
+  stroke: var(--econ-success);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: math-accepted-check-draw 340ms var(--ease-out) 40ms forwards;
+}
+
+.math-toolbar-body,
+.math-toolbar-more-menu,
+.math-local-status__popover,
+.math-draw-together-menu {
+  border-color: var(--econ-border);
+  background: rgba(255, 254, 250, 0.96);
+  box-shadow: 0 12px 32px rgba(44, 41, 33, 0.12);
+}
+
+.math-toolbar-body {
+  border: 1px solid var(--econ-border);
+  border-radius: 16px;
+}
+
+.math-toolbar-more-button,
+.math-draw-together-btn,
+.math-draw-together-menu-button {
+  border-color: rgba(91, 82, 195, 0.18);
+  color: var(--econ-accent);
+  background: var(--econ-accent-soft);
+}
+
+.math-draw-together-btn[aria-pressed='true'] {
+  color: white;
+  background: var(--econ-accent);
+}
+
+.math-draw-together-menu button {
+  color: var(--econ-text);
+  border-radius: 9px;
+}
+
+.math-draw-together-menu button:hover,
+.math-draw-together-menu button[aria-checked='true'] {
+  color: var(--econ-accent);
+  background: var(--econ-accent-soft);
+}
+
+.math-local-status__pill {
+  border-color: var(--econ-border);
+  color: var(--econ-accent);
+  background: rgba(255, 254, 250, 0.96);
+  box-shadow: 0 5px 16px rgba(44, 41, 33, 0.08);
+}
+
+.math-local-status__popover {
+  border-radius: 16px;
+  color: var(--econ-text);
+}
+
+.math-local-status__popover p {
+  border-color: var(--econ-border);
+  color: var(--econ-muted);
+}
+
+.math-graph-tag {
+  border-color: var(--econ-border);
+  border-radius: 999px;
+  background: rgba(255, 254, 250, 0.97);
+  color: var(--econ-text);
+  box-shadow: 0 4px 12px rgba(44, 41, 33, 0.08);
+  animation-duration: var(--motion-base);
+  animation-timing-function: var(--ease-out);
+}
+
+.math-ocr-read-chip button,
+.math-ocr-read-chip input {
+  border-color: var(--econ-border);
+  border-radius: 10px;
+  background: var(--econ-surface);
+  color: var(--econ-text);
+  box-shadow: 0 3px 10px rgba(44, 41, 33, 0.08);
+}
+
+.math-ocr-read-chip input {
+  outline-color: rgba(91, 82, 195, 0.35);
+}
+
+.math-toolbar-body button,
+.math-local-status__pill,
+.math-draw-together-menu button,
+.math-toolbar-more-menu button,
+.math-ocr-read-chip button,
+.econ-board-trigger {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out);
+}
+
+.math-toolbar-body button:hover:not(:disabled),
+.math-local-status__pill:hover,
+.math-draw-together-menu button:hover,
+.math-toolbar-more-menu button:hover,
+.math-ocr-read-chip button:hover,
+.econ-board-trigger:hover {
+  transform: translateY(-1px);
+}
+
+.math-toolbar-body button:active:not(:disabled),
+.math-local-status__pill:active,
+.math-draw-together-menu button:active,
+.math-toolbar-more-menu button:active,
+.math-ocr-read-chip button:active,
+.econ-board-trigger:active {
+  transform: scale(0.97);
+}
+
+.math-coach-caret {
+  animation-duration: 900ms;
+}
+
+@keyframes math-coach-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes math-coach-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes math-coach-copy-out {
+  to {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes math-coach-success {
+  18% {
+    opacity: 0.72;
+  }
+  72% {
+    opacity: 0.22;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes math-thinking-sweep {
+  to {
+    transform: translateX(74px);
+  }
+}
+
+@keyframes math-tutor-ink-glow {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes math-accepted-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes math-accepted-check-out {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  58% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@media (max-width: 600px) {
+  .math-toolbar-body {
+    border-radius: 18px 18px 0 0;
+    background: rgba(255, 254, 250, 0.98);
+    box-shadow: 0 -8px 28px rgba(44, 41, 33, 0.12);
+  }
+
+  .math-tutor-presence {
+    transform-origin: bottom center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .math-coach-copy-layer.is-leaving {
+    display: none;
+  }
+
+  .math-tutor-ink-glow {
+    display: none;
   }
 }
