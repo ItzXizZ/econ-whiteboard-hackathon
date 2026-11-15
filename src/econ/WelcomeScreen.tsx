@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, ChevronRight, ImagePlus, LineChart, MessageCircle, Sparkles } from 'lucide-react'
+import { ChevronDown, ChevronRight, ImagePlus, LineChart, MessageCircle } from 'lucide-react'
 import { TOGETHER_LESSONS } from '../lib/drawTogether'
 import adamPortrait from '../math/assets/talking-frames/frame-01.png'
 
@@ -96,16 +96,13 @@ export default function WelcomeScreen({
             <header className="econ-welcome-hero">
               <div className="econ-welcome-portrait-wrap">
                 <img src={adamPortrait} alt="Adam" className="econ-welcome-portrait" />
-                <span className="econ-welcome-sparkle" aria-hidden="true">
-                  <Sparkles size={16} />
-                </span>
               </div>
               <div className="econ-welcome-intro">
-                <p className="econ-welcome-eyebrow">YOUR ON-DEVICE ECONOMICS TUTOR</p>
-                <h1 id="econ-welcome-title">Draw economics with a tutor that draws back.</h1>
+                <p className="econ-welcome-eyebrow">Adam · works offline</p>
+                <h1 id="econ-welcome-title">What are we working on today?</h1>
                 <p className="econ-welcome-subtitle">
-                  Adam reads your problem, draws with you, and fixes mistakes on the board. Runs
-                  entirely on this laptop, no WiFi needed.
+                  Bring a problem or start drawing. Adam reads the board, draws with you, and points
+                  out mistakes.
                 </p>
               </div>
             </header>
@@ -191,12 +188,11 @@ export default function WelcomeScreen({
               <button type="button" className="econ-welcome-blank" onClick={onDismiss}>
                 Start with a blank board
               </button>
-              <p className="econ-welcome-footer">On-device · Bonsai-2 · Argmax</p>
+              <p className="econ-welcome-footer">Runs on this laptop · Bonsai-2 · Argmax</p>
             </div>
           </div>
 
           <div className="econ-welcome-demo" aria-hidden="true">
-            <div className="econ-welcome-demo-kicker">A little of how we work</div>
             <svg viewBox="0 0 440 300" className="econ-welcome-demo-board">
               <defs>
                 <pattern id="econ-welcome-dots" width="18" height="18" patternUnits="userSpaceOnUse">
@@ -241,9 +237,6 @@ export default function WelcomeScreen({
                 <path d="M-3 -10 8 3 2 3 0 9 -3 8 -1 2 -6 3Z" />
               </g>
             </svg>
-            <div className="econ-welcome-demo-check">
-              <span>✓</span> Nice work
-            </div>
           </div>
         </div>
       </div>

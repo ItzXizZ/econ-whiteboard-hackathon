@@ -2,8 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import ReactFlow, { Background, BackgroundVariant, Controls, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
 import {
+  ArrowLeft,
   Check,
   ChevronDown,
+  Home,
   CloudOff,
   Loader2,
   LogOut,
@@ -41,12 +43,20 @@ import {
 } from '../lib/mathBoardStorage'
 import MathLayer from '../components/ExplorationMode/MathLayer'
 import { useStore } from '../store/useStore'
-import econLogo from './assets/econ-logo.svg'
 import WelcomeScreen from './WelcomeScreen'
+import LandingPage from './LandingPage'
+
+const LANDING_SEEN_KEY = 'econ-landing-seen'
 
 /* ────────────────────────── Login / Register ────────────────────────── */
 
-function EconLogin({ onSignedIn }: { onSignedIn: (s: EconSession) => void }) {
+function EconLogin({
+  onSignedIn,
+  onBack,
+}: {
+  onSignedIn: (s: EconSession) => void
+  onBack: () => void
+}) {
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -70,11 +80,13 @@ function EconLogin({ onSignedIn }: { onSignedIn: (s: EconSession) => void }) {
 
   return (
     <div className="econ-login">
+      <button type="button" className="econ-login-back" onClick={onBack}>
+        <ArrowLeft size={15} aria-hidden="true" /> Home
+      </button>
       <form className="econ-login-card" onSubmit={submit}>
-        <img src={econLogo} alt="Econ Coach" className="econ-login-logo" />
-        <h1 className="econ-login-title">Econ Coach</h1>
+        <h1 className="econ-login-title">Adam</h1>
         <p className="econ-login-sub">
-          Your personal economics whiteboard. Paste a problem, work it out by hand, and get coached by a tutor that runs entirely on this computer.
+          {mode === 'login' ? 'Log in to your whiteboard.' : 'Make an account on this laptop.'}
         </p>
 
         <label className="econ-field">
@@ -141,6 +153,8 @@ function BoardMenu({
   onCreate,
   onRename,
   onDelete,
+  username,
+  onSignOut,
 }: {
   boards: EconBoard[]
   activeId: string
@@ -148,6 +162,8 @@ function BoardMenu({
   onCreate: () => void
   onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
+  username: string
+  onSignOut: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [renamingId, setRenamingId] = useState<string | null>(null)
@@ -261,6 +277,18 @@ function BoardMenu({
               )
             })}
           </div>
+          <div className="econ-board-pop-foot">
+            <span>{username}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                onSignOut()
+              }}
+            >
+              <LogOut size={12} /> Sign out
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -289,6 +317,7 @@ function EconBoardCanvas({
         panOnDrag={[0, 1]}
         panOnScroll
         zoomOnScroll={false}
+        proOptions={{ hideAttribution: true }}
         zoomOnPinch
         // Board content persists per boardId — remount cleanly on switch.
         key={boardId}
@@ -320,7 +349,15 @@ function EconBoardCanvas({
 
 /* ────────────────────────── Signed-in shell ────────────────────────── */
 
-function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: () => void }) {
+function EconStudio({
+  session,
+  onSignOut,
+  onGoHome,
+}: {
+  session: EconSession
+  onSignOut: () => void
+  onGoHome: () => void
+}) {
   const [boards, setBoards] = useState<EconBoard[] | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const welcomeStorageKey = `econ-welcome-seen:${session.username.toLowerCase()}`
@@ -335,9 +372,7 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
   // The board id whose server snapshot has been pulled into local storage.
   // MathLayer only mounts once its board is ready, so it never restores stale ink.
   const [readyBoardId, setReadyBoardId] = useState<string | null>(null)
-  const [userOpen, setUserOpen] = useState(false)
   const [syncStatus, setSyncStatus] = useState<BoardSyncStatus | 'idle'>('idle')
-  const userRef = useRef<HTMLDivElement>(null)
   const boardIdsRef = useRef<Set<string>>(new Set())
   const savedHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Boards known to have real content this session (from the server snapshot or
@@ -445,15 +480,6 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
     if (activeId) writeActiveBoardId(session.username, activeId)
   }, [session.username, activeId])
 
-  useEffect(() => {
-    if (!userOpen) return
-    const onDown = (e: MouseEvent) => {
-      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [userOpen])
-
   const handleCreate = useCallback(() => {
     setBoards((prev) => {
       const next = createBoard(session, prev ?? [])
@@ -508,8 +534,6 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
     )
   }, [])
 
-  const initial = session.username.charAt(0).toUpperCase()
-
   return (
     <div className="econ-shell">
       <main className="econ-main">
@@ -517,12 +541,12 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
           <div className="econ-float-left card">
             <button
               type="button"
-              className="econ-float-logo-button"
-              onClick={() => setWelcomeOpen(true)}
-              aria-label="Open Econ Coach welcome screen"
-              title="Welcome"
+              className="econ-float-home"
+              onClick={onGoHome}
+              aria-label="Home"
+              title="Home"
             >
-              <img src={econLogo} alt="" className="econ-float-logo" />
+              <Home size={16} aria-hidden="true" />
             </button>
             <BoardMenu
               boards={boards ?? []}
@@ -531,10 +555,12 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
               onCreate={handleCreate}
               onRename={handleRename}
               onDelete={handleDelete}
+              username={session.username}
+              onSignOut={onSignOut}
             />
           </div>
 
-          <div className="econ-float-right" ref={userRef}>
+          <div className="econ-float-right">
             {syncStatus !== 'idle' && (
               <div
                 className={`econ-sync-status is-${syncStatus}`}
@@ -567,30 +593,6 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
                 )}
               </div>
             )}
-            <button
-              type="button"
-              className="econ-user-btn"
-              onClick={() => setUserOpen((v) => !v)}
-              aria-label="Account menu"
-            >
-              <span className="econ-user-initial" aria-hidden="true">
-                {initial}
-              </span>
-            </button>
-            {userOpen && (
-              <div className="econ-user-pop">
-                <div className="econ-user-name">{session.username}</div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserOpen(false)
-                    onSignOut()
-                  }}
-                >
-                  <LogOut size={14} /> Sign out
-                </button>
-              </div>
-            )}
           </div>
         </div>
         {activeId && readyBoardId === activeId ? (
@@ -599,7 +601,6 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
           </ReactFlowProvider>
         ) : (
           <div className="econ-board-loading">
-            <img src={econLogo} alt="" style={{ height: 40, opacity: 0.85, borderRadius: 8 }} />
             <span>Loading your whiteboard…</span>
           </div>
         )}
@@ -622,6 +623,27 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
 export default function EconApp() {
   const [session, setSession] = useState<EconSession | null>(() => getStoredSession())
   const [checking, setChecking] = useState(() => !!getStoredSession())
+  const [landingOpen, setLandingOpen] = useState(() => {
+    try {
+      return window.sessionStorage.getItem(LANDING_SEEN_KEY) !== '1'
+    } catch {
+      return true
+    }
+  })
+
+  const handleLandingStart = useCallback(() => {
+    try {
+      window.sessionStorage.setItem(LANDING_SEEN_KEY, '1')
+      Object.keys(window.sessionStorage)
+        .filter((key) => key.startsWith('econ-welcome-seen:'))
+        .forEach((key) => window.sessionStorage.removeItem(key))
+    } catch {
+      // The landing page shows again next load when storage is unavailable.
+    }
+    setLandingOpen(false)
+  }, [])
+
+  const handleGoHome = useCallback(() => setLandingOpen(true), [])
 
   // The store is created with skipHydration (the studio's AuthProvider normally
   // hydrates it). Econ Coach has its own auth, so hydrate here — MathLayer refuses to
@@ -651,13 +673,21 @@ export default function EconApp() {
     setSession(null)
   }, [session])
 
-  if (!session) return <EconLogin onSignedIn={setSession} />
+  if (landingOpen) return <LandingPage onStart={handleLandingStart} />
+  if (!session) return <EconLogin onSignedIn={setSession} onBack={handleGoHome} />
   if (checking) {
     return (
       <div className="econ-login">
-        <img src={econLogo} alt="Econ Coach" style={{ height: 56, opacity: 0.85, borderRadius: 8 }} />
+        <span className="econ-login-title">Adam</span>
       </div>
     )
   }
-  return <EconStudio key={session.username} session={session} onSignOut={handleSignOut} />
+  return (
+    <EconStudio
+      key={session.username}
+      session={session}
+      onSignOut={handleSignOut}
+      onGoHome={handleGoHome}
+    />
+  )
 }

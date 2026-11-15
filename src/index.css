@@ -31,7 +31,9 @@
   }
 
   :root {
-    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Space Grotesk', var(--font-sans);
+    --font-mono-ui: 'IBM Plex Mono', ui-monospace, monospace;
     --font-claude: var(--font-sans);
     --ease-out: cubic-bezier(0.2, 0, 0, 1);
     --motion-fast: 160ms;
@@ -8293,46 +8295,27 @@ kbd {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -5px;
+  inset: -4px;
+  border: 2px solid #3a3a40;
   border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(126, 117, 224, 0.08),
-    #8279df 28%,
-    #c3bdff 42%,
-    rgba(126, 117, 224, 0.08) 68%,
-    rgba(126, 117, 224, 0.3)
-  );
-  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 2px));
   opacity: 0;
-  transform: rotate(0deg) scale(0.98);
   pointer-events: none;
 }
 
 .math-coach-avatar.is-thinking::before {
-  opacity: 0.92;
-  animation: math-avatar-ring-spin 4.8s linear infinite;
+  animation: math-avatar-ring-pulse 1.6s ease-in-out infinite;
 }
 
 .math-coach-avatar.is-speaking::before {
-  opacity: 0.8;
-  animation: math-avatar-ring-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes math-avatar-ring-spin {
-  to {
-    transform: rotate(360deg) scale(0.98);
-  }
+  opacity: 0.85;
 }
 
 @keyframes math-avatar-ring-pulse {
   0%, 100% {
-    opacity: 0.55;
-    transform: scale(0.97);
+    opacity: 0.2;
   }
   50% {
-    opacity: 0.95;
-    transform: scale(1.04);
+    opacity: 0.85;
   }
 }
 
@@ -8578,11 +8561,11 @@ kbd {
 
 .math-coach-end-together {
   align-self: flex-end;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 8px;
   padding: 4px 10px;
-  background: rgba(238, 242, 255, 0.9);
-  color: #4338ca;
+  background: #f1f1f0;
+  color: #3f3f46;
   font: inherit;
   font-size: 12px;
   font-weight: 650;
@@ -8593,10 +8576,10 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 10px 0 0 10px;
-  background: rgba(238, 242, 255, 0.9);
-  color: #4338ca;
+  background: #f1f1f0;
+  color: #3f3f46;
   font-weight: 650;
 }
 
@@ -8611,11 +8594,11 @@ kbd {
   place-items: center;
   min-width: 28px;
   padding: 0 6px;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-left: 0;
   border-radius: 0 10px 10px 0;
-  background: rgba(238, 242, 255, 0.9);
-  color: #4338ca;
+  background: #f1f1f0;
+  color: #3f3f46;
 }
 
 .math-draw-together-menu {
@@ -8626,7 +8609,7 @@ kbd {
   display: grid;
   min-width: 240px;
   padding: 5px;
-  border: 1px solid rgba(79, 70, 229, 0.14);
+  border: 1px solid rgba(63, 63, 70, 0.14);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
@@ -8646,12 +8629,12 @@ kbd {
 
 .math-draw-together-menu button:hover,
 .math-draw-together-menu button[aria-checked='true'] {
-  background: #eef2ff;
-  color: #4338ca;
+  background: #f1f1f0;
+  color: #3f3f46;
 }
 
 .math-draw-together-btn[aria-pressed='true'] {
-  background: #4f46e5;
+  background: #3f3f46;
   color: white;
 }
 
@@ -9089,7 +9072,7 @@ kbd {
 }
 
 .math-tutor-actions-secondary:hover {
-  color: rgba(29, 78, 216, 0.95);
+  color: rgba(24, 24, 27, 0.95);
 }
 
 .math-tutor-actions-primary:disabled,
@@ -9253,10 +9236,10 @@ kbd {
 
 .math-toolbar-more-button {
   padding: 6px 10px;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 10px;
-  color: #4338ca;
-  background: rgba(238, 242, 255, 0.9);
+  color: #3f3f46;
+  background: #f1f1f0;
   font-size: 12px;
   font-weight: 650;
 }
@@ -9271,7 +9254,7 @@ kbd {
   gap: 8px;
   width: min(410px, calc(100vw - 24px));
   padding: 12px;
-  border: 1px solid rgba(79, 70, 229, 0.15);
+  border: 1px solid rgba(63, 63, 70, 0.15);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 14px 36px rgba(15, 23, 42, 0.18);
@@ -9513,7 +9496,7 @@ kbd {
 }
 
 .math-tutor-more button:hover {
-  color: rgba(29, 78, 216, 0.95);
+  color: rgba(24, 24, 27, 0.95);
 }
 
 .math-tutor-dismiss {
@@ -9569,39 +9552,28 @@ kbd {
     max(16px, env(safe-area-inset-bottom))
     max(16px, env(safe-area-inset-left));
   overflow: hidden;
-  background: #faf9f5;
+  color: #1c1c1f;
+  background-color: rgba(209, 209, 207, 0.92);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.11) 1px, transparent 1.6px);
+  background-size: 28px 28px;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
-.econ-welcome::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -24%;
-  background:
-    radial-gradient(ellipse at 24% 20%, rgba(142, 132, 239, 0.19), transparent 38%),
-    radial-gradient(ellipse at 78% 34%, rgba(111, 103, 211, 0.14), transparent 36%),
-    radial-gradient(ellipse at 58% 82%, rgba(222, 201, 169, 0.19), transparent 42%);
-  filter: blur(42px);
-  opacity: 0.86;
-  transform: translate3d(-2%, -1%, 0) scale(1);
-  animation: econ-welcome-mesh 22s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
 .econ-welcome-panel {
   position: relative;
-  width: min(1200px, 100%);
+  width: min(1120px, 100%);
   max-height: 100%;
   overflow: auto;
   padding: clamp(28px, 4vw, 48px);
-  border: 1px solid #e8e6dc;
-  border-radius: 24px;
-  background: rgba(250, 249, 245, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.45);
   box-shadow:
-    0 24px 72px rgba(42, 38, 28, 0.13),
-    0 2px 8px rgba(42, 38, 28, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 20px 48px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
   animation: econ-welcome-enter 320ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
@@ -9633,13 +9605,10 @@ kbd {
   height: 82px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(99, 91, 199, 0.16);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 24px;
-  background: linear-gradient(145deg, #fff 10%, #eeedf8 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 10px 24px rgba(60, 54, 118, 0.11);
-  animation: econ-welcome-enter 360ms cubic-bezier(0.2, 0, 0, 1) both;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .econ-welcome-portrait {
@@ -9649,48 +9618,35 @@ kbd {
   border-radius: 20px;
 }
 
-.econ-welcome-sparkle {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid rgba(99, 91, 199, 0.16);
-  border-radius: 50%;
-  color: #5b52c3;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(52, 48, 104, 0.12);
-}
-
 .econ-welcome-intro {
   min-width: 0;
 }
 
 .econ-welcome-eyebrow {
-  margin: 0 0 8px;
-  color: #655ec0;
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.11em;
+  margin: 0 0 10px;
+  color: #3a3a40;
+  font-family: var(--font-mono-ui);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .econ-welcome-intro h1 {
   margin: 0;
-  color: #25242a;
-  font-size: clamp(32px, 3.5vw, 47px);
-  font-weight: 680;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
+  color: #1c1c1f;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 3.5vw, 46px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .econ-welcome-subtitle {
-  max-width: 560px;
-  margin: 10px 0 0;
-  color: #55545b;
-  font-size: 14px;
-  line-height: 1.6;
+  max-width: 520px;
+  margin: 12px 0 0;
+  color: #303036;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .econ-welcome-actions {
@@ -9702,36 +9658,15 @@ kbd {
 .econ-welcome-action {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #e8e6dc;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow:
-    0 8px 20px rgba(43, 40, 30, 0.045),
-    0 1px 2px rgba(43, 40, 30, 0.04);
-  opacity: 0;
-  animation: econ-welcome-card-enter 420ms cubic-bezier(0.2, 0, 0, 1) both;
-  transition:
-    transform 160ms cubic-bezier(0.2, 0, 0, 1),
-    box-shadow 160ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-.econ-welcome-action:nth-child(1) {
-  animation-delay: 100ms;
-}
-
-.econ-welcome-action:nth-child(2) {
-  animation-delay: 170ms;
-}
-
-.econ-welcome-action:nth-child(3) {
-  animation-delay: 240ms;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 #fff;
+  transition: background 150ms ease;
 }
 
 .econ-welcome-action:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 12px 26px rgba(43, 40, 30, 0.08),
-    0 1px 2px rgba(43, 40, 30, 0.04);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .econ-welcome-action-main {
@@ -9754,10 +9689,10 @@ kbd {
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(99, 91, 199, 0.12);
+  border: 0;
   border-radius: 14px;
-  color: #5b52c3;
-  background: #f2f1fb;
+  color: #fff;
+  background: #3a3a40;
 }
 
 .econ-welcome-action-copy {
@@ -9768,21 +9703,21 @@ kbd {
 }
 
 .econ-welcome-action-copy strong {
-  color: #302f35;
-  font-size: 15px;
-  font-weight: 670;
-  letter-spacing: -0.015em;
+  color: #1c1c1f;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .econ-welcome-action-copy > span {
-  color: #77757d;
-  font-size: 12px;
+  color: #46464d;
+  font-size: 13px;
   line-height: 1.4;
 }
 
 .econ-welcome-action-arrow {
   flex: 0 0 auto;
-  color: #8a8791;
+  color: #46464d;
   transition: transform 160ms cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -9810,13 +9745,17 @@ kbd {
 .econ-welcome-lessons button {
   min-height: 34px;
   padding: 6px 9px;
-  border: 1px solid #e7e5ef;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 999px;
-  color: #514ba5;
-  background: #f6f5fc;
-  font-size: 11px;
-  font-weight: 620;
+  color: #1c1c1f;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
+}
+
+.econ-welcome-lessons button:hover {
+  border-color: #3a3a40;
 }
 
 .econ-welcome-blank {
@@ -9826,20 +9765,21 @@ kbd {
   padding: 8px 14px;
   border: 1px solid transparent;
   border-radius: 12px;
-  color: #5e5b69;
+  color: #303036;
   background: transparent;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
 }
 
 .econ-welcome-blank:hover {
-  background: rgba(99, 91, 199, 0.06);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .econ-welcome-footer {
   margin: 7px 0 0;
-  color: #8a8790;
+  color: #46464d;
+  font-family: var(--font-mono-ui);
   font-size: 11px;
   line-height: 1.4;
   text-align: left;
@@ -9854,14 +9794,10 @@ kbd {
   align-self: stretch;
   overflow: hidden;
   padding: 19px 18px 18px;
-  border: 1px solid rgba(112, 105, 169, 0.16);
-  border-radius: 22px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(246, 245, 252, 0.76)),
-    #f8f7fb;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 14px 34px rgba(56, 51, 104, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  background: #ececea;
+  box-shadow: inset 0 1px 0 #fff;
 }
 
 .econ-welcome-demo-kicker {
@@ -9894,7 +9830,7 @@ kbd {
 }
 
 .econ-welcome-demo-axis {
-  stroke: #5d578f;
+  stroke: #46464d;
   stroke-width: 2.4;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -9905,7 +9841,7 @@ kbd {
 .econ-welcome-demo-demand-clean,
 .econ-welcome-demo-supply-wrong,
 .econ-welcome-demo-supply-clean {
-  stroke: #6259c7;
+  stroke: #1c1c1f;
   stroke-width: 4;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -9949,8 +9885,8 @@ kbd {
 }
 
 .econ-welcome-demo-equilibrium {
-  fill: #5c53c4;
-  stroke: rgba(91, 82, 195, 0.2);
+  fill: #1c1c1f;
+  stroke: rgba(0, 0, 0, 0.12);
   stroke-width: 7;
   opacity: 0;
   transform-box: fill-box;
@@ -9960,9 +9896,9 @@ kbd {
 
 .econ-welcome-demo-cursor {
   fill: #fff;
-  stroke: #4f46b9;
+  stroke: #1c1c1f;
   stroke-width: 1.8;
-  filter: drop-shadow(0 2px 3px rgba(44, 39, 93, 0.24));
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
   animation: econ-welcome-cursor-path 9s cubic-bezier(0.2, 0, 0, 1) infinite;
 }
 
@@ -9998,13 +9934,12 @@ kbd {
   font-size: 11px;
 }
 
-.econ-welcome.is-paused::before,
 .econ-welcome.is-paused .econ-welcome-demo * {
   animation-play-state: paused;
 }
 
 .econ-welcome button:focus-visible {
-  outline: 3px solid rgba(91, 82, 195, 0.48);
+  outline: 3px solid rgba(28, 28, 31, 0.45);
   outline-offset: 3px;
 }
 
@@ -10352,9 +10287,53 @@ kbd {
 .econ-float-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 8px;
+  gap: 2px;
+  padding: 4px;
   max-width: min(100% - 56px, 360px);
+}
+
+.econ-float-home {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #3a3a40;
+  cursor: pointer;
+}
+
+.econ-float-home:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1c1c1f;
+}
+
+.econ-login {
+  position: relative;
+}
+
+.econ-login-back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  color: #1c1c1f;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.econ-login-back:hover {
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .econ-float-logo {
@@ -10383,8 +10362,6 @@ kbd {
 
 .econ-float-left .econ-board-menu {
   min-width: 0;
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
-  padding-left: 6px;
 }
 
 .econ-float-left .econ-board-trigger {
@@ -10634,17 +10611,47 @@ kbd {
   padding: 4px 8px;
   border: none;
   border-radius: 7px;
-  background: rgba(185, 125, 16, 0.12);
+  background: rgba(0, 0, 0, 0.06);
   font-size: 11.5px;
-  font-weight: 700;
-  color: #8a5c0a;
+  font-weight: 600;
+  color: #1c1c1f;
   cursor: pointer;
   text-transform: none;
   letter-spacing: normal;
 }
 
 .econ-board-pop-head button:hover {
-  background: rgba(185, 125, 16, 0.2);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.econ-board-pop-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.econ-board-pop-foot button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.econ-board-pop-foot button:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.85);
 }
 
 .econ-board-pop-list {
@@ -10805,125 +10812,122 @@ kbd {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  color: #1c1c1f;
+  background-color: #d1d1cf;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.11) 1px, transparent 1.6px);
+  background-size: 28px 28px;
 }
 
 .econ-login-card {
-  width: min(100%, 380px);
-  /* Pure white so the logo sits on a clean background. */
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
-  padding: 32px 30px 26px;
+  width: min(100%, 400px);
+  padding: 36px 32px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 20px 48px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
   display: flex;
   flex-direction: column;
 }
 
-.econ-login-logo {
-  height: 56px;
-  width: auto;
-  align-self: center;
-  display: block;
-  border-radius: 8px;
-}
-
 .econ-login-title {
-  margin-top: 12px;
+  margin: 0;
   text-align: center;
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #340002;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1c1c1f;
 }
 
 .econ-login-sub {
-  margin-top: 6px;
-  margin-bottom: 20px;
+  margin: 6px 0 24px;
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
-  color: rgba(0, 0, 0, 0.5);
+  color: #3a3a40;
 }
 
 .econ-field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-bottom: 13px;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
 .econ-field span {
+  font-family: var(--font-mono-ui);
   font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.45);
+  color: #3a3a40;
 }
 
 .econ-field input {
-  padding: 10px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: 10px;
-  background: #fff;
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
   outline: none;
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .econ-field input:focus {
-  border-color: #b97d10;
-  box-shadow: 0 0 0 3px rgba(185, 125, 16, 0.15);
+  border-color: #3a3a40;
+  box-shadow: 0 0 0 3px rgba(28, 28, 31, 0.12);
 }
 
 .econ-login-error {
   margin: -4px 0 10px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: #b91c1c;
   line-height: 1.45;
 }
 
 .econ-login-submit {
-  margin-top: 2px;
-  padding: 11px 14px;
+  margin-top: 4px;
+  padding: 14px 18px;
   border: none;
-  border-radius: 11px;
-  background: #340002;
+  border-radius: 999px;
+  background: #3a3a40;
   color: #fff;
-  font-size: 14.5px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease, transform 0.08s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background 0.12s ease;
 }
 
 .econ-login-submit:hover:not(:disabled) {
-  background: #4d0206;
-}
-
-.econ-login-submit:active:not(:disabled) {
-  transform: scale(0.99);
+  background: #2a2a2f;
 }
 
 .econ-login-submit:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: default;
 }
 
 .econ-login-switch {
-  margin-top: 14px;
+  margin-top: 16px;
   border: none;
   background: none;
-  font-size: 12.5px;
-  color: rgba(0, 0, 0, 0.5);
+  font-size: 13.5px;
+  color: #3a3a40;
   cursor: pointer;
 }
 
 .econ-login-switch:hover {
-  color: rgba(0, 0, 0, 0.75);
+  color: #000;
 }
 
 .econ-login-switch u {
-  color: #8a5c0a;
-  text-underline-offset: 2px;
+  color: #1c1c1f;
+  font-weight: 600;
+  text-underline-offset: 3px;
 }
 
 /* ── Graph recognition tags ─────────────────────────────────────────────── */
@@ -11004,10 +11008,10 @@ kbd {
 .math-tutor-correction-actions button {
   min-height: 36px;
   padding: 7px 11px;
-  border: 1px solid rgba(79, 70, 229, 0.22);
+  border: 1px solid rgba(63, 63, 70, 0.22);
   border-radius: 10px;
-  color: #3730a3;
-  background: #f5f4ff;
+  color: #3f3f46;
+  background: #f1f1f0;
   font: inherit;
   font-size: 12px;
   font-weight: 650;
@@ -11049,7 +11053,7 @@ kbd {
   border: 2px solid #fff;
   border-radius: 50%;
   color: #fff;
-  background: #4f46e5;
+  background: #3f3f46;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
 }
 .math-adam-cursor__badge svg {
@@ -11057,9 +11061,9 @@ kbd {
 }
 .math-adam-cursor__name {
   padding: 3px 8px;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 999px;
-  color: #4338ca;
+  color: #3f3f46;
   background: rgba(255, 255, 255, 0.96);
   font-size: 11px;
   font-weight: 700;
@@ -11067,10 +11071,10 @@ kbd {
 }
 .math-adam-clear {
   padding: 6px 10px;
-  border: 1px solid rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 999px;
-  color: #4338ca;
-  background: #eef2ff;
+  color: #3f3f46;
+  background: #f1f1f0;
   font-size: 11.5px;
   font-weight: 650;
   cursor: pointer;
@@ -11116,10 +11120,9 @@ kbd {
 }
 
 /* ── Toolbar vs. the corner controls ────────────────────────────────────── */
-/* The one-line toolbar is about 1030px wide. On laptop-sized windows that puts
-   it under the board picker (left) and the Saved pill / avatar (right), so it
-   drops to its own row instead of overlapping them. */
-@media (max-width: 1560px) {
+/* The one-line toolbar is about 730px wide and the board picker about 170px.
+   Below this width they would overlap, so the toolbar drops to its own row. */
+@media (max-width: 1140px) {
   .math-toolbar-shell.dock-top,
   .math-toolbar-shell.is-competition.dock-top {
     top: 62px;
@@ -11497,17 +11500,20 @@ kbd {
 }
 
 .math-coach-bubble {
-  border-color: var(--econ-border);
-  background: rgba(255, 254, 250, 0.94);
-  box-shadow: 0 16px 44px rgba(44, 41, 33, 0.14), 0 2px 8px rgba(44, 41, 33, 0.06);
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  border-color: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 20px 48px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
 }
 
 .math-coach-scroll {
-  border-color: var(--econ-border);
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 1px 3px rgba(44, 41, 33, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+  background: #fff;
+  box-shadow: none;
 }
 
 .math-coach-name {
@@ -11623,7 +11629,7 @@ kbd {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(91, 82, 195, 0.22), rgba(91, 82, 195, 0.08) 44%, transparent 72%);
+  background: radial-gradient(circle, rgba(63, 63, 70, 0.22), rgba(63, 63, 70, 0.08) 44%, transparent 72%);
   opacity: 0;
   transition: opacity var(--motion-fast) var(--ease-out);
   pointer-events: none;
@@ -11692,9 +11698,28 @@ kbd {
 .math-toolbar-more-button,
 .math-draw-together-btn,
 .math-draw-together-menu-button {
-  border-color: rgba(91, 82, 195, 0.18);
+  border-color: rgba(63, 63, 70, 0.18);
   color: var(--econ-accent);
   background: var(--econ-accent-soft);
+  box-shadow: none;
+}
+
+/* The btn-ghost glass ring is pill-shaped and shows as a second button inside these squarer buttons. */
+.math-toolbar-more-button::after,
+.math-draw-together-btn::after,
+.math-draw-together-menu-button::after {
+  display: none;
+}
+
+.math-toolbar-more-button:hover,
+.math-draw-together-btn:not([aria-pressed='true']):hover,
+.math-draw-together-menu-button:hover {
+  background: #e7e7e5;
+}
+
+.math-draw-together-menu-button {
+  border: 1px solid rgba(63, 63, 70, 0.18);
+  border-left-color: rgba(63, 63, 70, 0.12);
 }
 
 .math-draw-together-btn[aria-pressed='true'] {
@@ -11750,7 +11775,7 @@ kbd {
 }
 
 .math-ocr-read-chip input {
-  outline-color: rgba(91, 82, 195, 0.35);
+  outline-color: rgba(63, 63, 70, 0.35);
 }
 
 .math-toolbar-body button,
@@ -11900,7 +11925,7 @@ kbd {
 }
 
 .math-ghost-guide {
-  color: #7c3aed;
+  color: #52525b;
   transition: opacity 400ms cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -12025,10 +12050,10 @@ kbd {
   height: 28px;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(63, 63, 70, 0.2);
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.07);
-  color: #6d5bb0;
+  background: rgba(63, 63, 70, 0.07);
+  color: #3f3f46;
   cursor: pointer;
 }
 
@@ -12039,7 +12064,7 @@ kbd {
 .math-together-spoken-copy .is-speaking-word {
   display: inline-block;
   border-radius: 4px;
-  background: rgba(124, 58, 237, 0.12);
+  background: rgba(63, 63, 70, 0.12);
   opacity: 1;
   transform: translateY(-1px);
 }
@@ -12075,7 +12100,7 @@ kbd {
 .math-coach-recap-takeaways li {
   padding: 0.38rem 0.5rem;
   border-radius: 9px;
-  background: rgba(124, 58, 237, 0.055);
+  background: rgba(63, 63, 70, 0.055);
   color: #433f50;
   font-size: 0.76rem;
   line-height: 1.42;
@@ -12115,9 +12140,9 @@ kbd {
 .math-coach-recap-answer-button {
   margin-top: 0.45rem;
   padding: 0.35rem 0.55rem;
-  border: 1px solid rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(63, 63, 70, 0.18);
   border-radius: 8px;
-  background: rgba(124, 58, 237, 0.07);
+  background: rgba(63, 63, 70, 0.07);
   color: #5f507f;
   font: inherit;
   font-size: 0.75rem;
@@ -12213,14 +12238,14 @@ kbd {
 }
 
 .math-ghost-guide-dot-halo {
-  fill: rgba(124, 58, 237, 0.16);
+  fill: rgba(63, 63, 70, 0.16);
   transform-box: fill-box;
   transform-origin: center;
   animation: math-ghost-pulse 1.25s ease-in-out infinite;
 }
 
 .math-ghost-guide-dot {
-  fill: rgba(124, 58, 237, 0.36);
+  fill: rgba(63, 63, 70, 0.36);
   stroke: currentColor;
   stroke-width: 1.5;
 }
@@ -12239,4 +12264,506 @@ kbd {
   .math-ghost-guide-dot-halo {
     animation: none;
   }
+}
+
+/* ── Landing page ─────────────────────────────────────────────────────── */
+
+.adam-landing {
+  --adam-ink: #1c1c1f;
+  --adam-ink-soft: #303036;
+  --adam-ink-muted: #3a3a40;
+  --adam-display: 'Space Grotesk', system-ui, sans-serif;
+  --adam-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: var(--adam-ink);
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.5;
+  background-color: #d1d1cf;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.11) 1px, transparent 1.6px);
+  background-size: 28px 28px;
+}
+
+.adam-landing-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.adam-landing-glow.is-1 {
+  top: -160px;
+  left: -120px;
+  width: 620px;
+  height: 620px;
+  background: #fff;
+  opacity: 0.75;
+  filter: blur(120px);
+}
+
+.adam-landing-glow.is-2 {
+  top: 380px;
+  right: -180px;
+  width: 560px;
+  height: 560px;
+  background: #9a9aa0;
+  opacity: 0.55;
+  filter: blur(130px);
+}
+
+.adam-landing-glow.is-3 {
+  top: 1500px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: #a3a3a8;
+  opacity: 0.5;
+  filter: blur(140px);
+}
+
+.adam-landing-glow.is-4 {
+  top: 2300px;
+  right: -140px;
+  width: 640px;
+  height: 640px;
+  background: #fff;
+  opacity: 0.7;
+  filter: blur(130px);
+}
+
+.adam-glass {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 32px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+}
+
+.adam-glass.is-strong {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 20px 48px rgba(0, 0, 0, 0.1);
+}
+
+.adam-landing-wrap {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-inline: 32px;
+}
+
+.adam-landing-section {
+  padding-bottom: 104px;
+  scroll-margin-top: 24px;
+}
+
+.adam-landing-header {
+  position: relative;
+}
+
+.adam-landing-header > .adam-landing-wrap:first-child {
+  padding-top: 24px;
+}
+
+.adam-landing-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 32px;
+  padding: 10px 10px 10px 28px;
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.adam-landing-brand {
+  padding: 8px 0;
+  color: var(--adam-ink);
+  font-family: var(--adam-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.adam-landing-brand.is-small {
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.adam-landing-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 28px;
+}
+
+.adam-landing-nav-links a {
+  padding: 12px 0;
+  color: var(--adam-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.adam-landing-nav-links a:hover {
+  color: #000;
+}
+
+.adam-landing-btn {
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #3a3a40;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background 150ms ease;
+}
+
+.adam-landing-btn:hover {
+  background: #2a2a2f;
+}
+
+.adam-landing-btn.is-large {
+  padding: 17px 32px;
+  font-size: 17px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.adam-landing-btn.is-light {
+  padding: 18px 32px;
+  background: #f4f4f2;
+  color: var(--adam-ink);
+  font-size: 17px;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.adam-landing-btn.is-light:hover {
+  background: #fff;
+}
+
+.adam-landing-btn:focus-visible,
+.adam-landing a:focus-visible {
+  outline: 3px solid rgba(28, 28, 31, 0.45);
+  outline-offset: 3px;
+}
+
+.adam-landing-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding-top: 88px;
+  padding-bottom: 72px;
+  text-align: center;
+}
+
+.adam-landing-hero h1 {
+  margin: 0;
+  font-family: var(--adam-display);
+  font-size: clamp(44px, 6.4vw, 88px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.adam-landing-hero p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--adam-ink-muted);
+  font-size: 20px;
+}
+
+.adam-landing-shot-wrap {
+  padding-bottom: 96px;
+}
+
+.adam-landing-shot {
+  padding: 12px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 40px 80px rgba(0, 0, 0, 0.18);
+}
+
+.adam-landing-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+}
+
+.adam-landing-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 20px;
+}
+
+.adam-landing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 28px;
+  border-radius: 28px;
+}
+
+.adam-landing-card-title {
+  font-family: var(--adam-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.adam-landing-card-body {
+  color: var(--adam-ink-muted);
+  font-size: 15px;
+}
+
+.adam-landing-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+
+.adam-landing-heading.is-wide {
+  max-width: 680px;
+  margin-bottom: 40px;
+}
+
+.adam-landing-heading p {
+  margin: 0;
+  color: var(--adam-ink-soft);
+  font-size: 17px;
+}
+
+.adam-landing-kicker {
+  color: var(--adam-ink-muted);
+  font-family: var(--adam-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.adam-landing h2 {
+  margin: 0;
+  font-family: var(--adam-display);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.adam-landing h3 {
+  margin: 0;
+  font-family: var(--adam-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.adam-landing-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 20px;
+}
+
+.adam-landing-step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 28px;
+}
+
+.adam-landing-step-num {
+  color: var(--adam-ink-muted);
+  font-family: var(--adam-mono);
+  font-size: 14px;
+}
+
+.adam-landing-step p,
+.adam-landing-faq-item p {
+  margin: 0;
+  color: var(--adam-ink-soft);
+  font-size: 16px;
+}
+
+.adam-landing-faq {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  padding: 56px;
+  border-radius: 32px;
+}
+
+.adam-landing-faq-intro {
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.adam-landing-faq-list {
+  display: flex;
+  flex: 2 1 480px;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.adam-landing-faq-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.adam-landing-faq-item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.adam-landing-faq-item:last-child {
+  padding-bottom: 0;
+}
+
+.adam-landing-faq-item p {
+  font-size: 17px;
+}
+
+.adam-landing-table {
+  overflow-x: auto;
+  border-radius: 28px;
+}
+
+.adam-landing-table table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.adam-landing-table th,
+.adam-landing-table td {
+  padding: 20px 24px;
+  text-align: left;
+}
+
+.adam-landing-table thead th {
+  font-family: var(--adam-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.adam-landing-table thead th.is-adam {
+  background: #3a3a40;
+  color: #fff;
+}
+
+.adam-landing-table tbody tr {
+  border-top: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.adam-landing-table tbody th {
+  font-weight: 500;
+}
+
+.adam-landing-table td.is-adam {
+  background: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+
+.adam-landing-table td.is-no {
+  color: #46464d;
+}
+
+.adam-landing-section.is-cta {
+  padding-bottom: 56px;
+}
+
+.adam-landing-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px 56px;
+  padding: 72px 56px;
+  border-radius: 36px;
+  background: #34343a;
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 32px 64px rgba(0, 0, 0, 0.22);
+}
+
+.adam-landing-cta-copy {
+  display: flex;
+  flex: 1 1 440px;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.adam-landing-cta h2 {
+  font-size: clamp(32px, 3.8vw, 52px);
+  line-height: 1.06;
+}
+
+.adam-landing-cta p {
+  max-width: 520px;
+  margin: 0;
+  color: #dadadd;
+  font-size: 18px;
+}
+
+.adam-landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
+  padding-bottom: 40px;
+  color: var(--adam-ink-soft);
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .adam-landing-wrap {
+    padding-inline: 16px;
+  }
+
+  .adam-landing-faq,
+  .adam-landing-cta {
+    padding: 32px 24px;
+  }
+}
+
+/* The whiteboard page uses a neutral grey accent. */
+.econ-shell {
+  --econ-accent: #3f3f46;
+  --econ-accent-soft: #f1f1f0;
+  --econ-border: #dcdcda;
 }

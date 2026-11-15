@@ -563,7 +563,7 @@ function CoachCard({
           {session.mode === 'generalize' && (
             <span
               className="math-coach-type"
-              style={{ color: '#7c3aed' }}
+              style={{ color: '#52525b' }}
               title="The general playbook for this whole family of problems"
             >
               Generalized
@@ -572,7 +572,7 @@ function CoachCard({
           {session.togetherMode && (
             <span
               className="math-coach-type"
-              style={{ color: '#4f46e5' }}
+              style={{ color: '#3f3f46' }}
               title="Draw together, one turn at a time"
             >
               {session.togetherTitle ?? 'Draw with Adam'} · Step {session.togetherStep ?? 1} of {session.togetherTotal ?? 7}

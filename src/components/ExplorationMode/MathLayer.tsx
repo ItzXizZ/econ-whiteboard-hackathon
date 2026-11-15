@@ -310,14 +310,14 @@ function tutorArrowOps(
     y: to.y - Math.sin(angle) * headLength,
   }
   return [
-    tutorPenStroke([from, to], '#7c3aed', 3.5),
+    tutorPenStroke([from, to], '#475569', 3.5),
     tutorPenStroke(
       [
         { x: base.x + Math.cos(angle + wing) * headLength, y: base.y + Math.sin(angle + wing) * headLength },
         to,
         { x: base.x + Math.cos(angle - wing) * headLength, y: base.y + Math.sin(angle - wing) * headLength },
       ],
-      '#7c3aed',
+      '#475569',
       3.5
     ),
   ]
@@ -1041,15 +1041,8 @@ export default function MathLayer({
   const [lessonOverrideId, setLessonOverrideId] = useState<string | null>(null)
   const [lessonMenuOpen, setLessonMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false)
   const [hubOffline, setHubOffline] = useState(false)
-  const [localServices, setLocalServices] = useState({
-    bonsai: false,
-    argmax: false,
-    graphChecker: false,
-  })
   const moreMenuRef = useRef<HTMLDivElement>(null)
-  const statusPopoverRef = useRef<HTMLDivElement>(null)
   const tutorPenBoundsRef = useRef<BoardBounds[]>([])
   const equationDrawnCardIdsRef = useRef(new Set<string>())
   const drawnGraphKeysRef = useRef(new Set<string>())
@@ -1413,50 +1406,16 @@ export default function MathLayer({
       try {
         const response = await fetch('/api/health', { cache: 'no-store' })
         if (!response.ok) throw new Error('Hub health check failed')
-        const health = (await response.json()) as {
-          bonsai?: { reachable?: boolean }
-          graphChecker?: { state?: string }
-          stt?: string | { ready?: boolean; reachable?: boolean }
-        }
-        let argmax = health.stt === 'argmax' || health.stt === 'ready' || health.stt === 'on'
-        try {
-          const voiceResponse = await fetch('/api/econ/voice/status', { cache: 'no-store' })
-          if (voiceResponse.ok) {
-            const voice = (await voiceResponse.json()) as {
-              stt?: string
-              ready?: boolean
-              reachable?: boolean
-            }
-            argmax =
-              argmax ||
-              voice.ready === true ||
-              voice.reachable === true ||
-              voice.stt === 'argmax' ||
-              voice.stt === 'ready' ||
-              voice.stt === 'on'
-          }
-        } catch {
-          // The health endpoint still indicates whether the rest of the hub is available.
-        }
         if (!active) return
         setHubOffline(false)
-        setLocalServices({
-          bonsai: health.bonsai?.reachable === true,
-          argmax,
-          graphChecker: health.graphChecker?.state === 'ready',
-        })
       } catch {
         if (!active) return
         setHubOffline(true)
-        setLocalServices({ bonsai: false, argmax: false, graphChecker: false })
       }
     }
     void refreshServices()
     const timer = window.setInterval(() => void refreshServices(), 15000)
-    const onOffline = () => {
-      setHubOffline(true)
-      setLocalServices({ bonsai: false, argmax: false, graphChecker: false })
-    }
+    const onOffline = () => setHubOffline(true)
     const onOnline = () => void refreshServices()
     window.addEventListener('offline', onOffline)
     window.addEventListener('online', onOnline)
@@ -1476,15 +1435,6 @@ export default function MathLayer({
     window.addEventListener('pointerdown', closeOutside)
     return () => window.removeEventListener('pointerdown', closeOutside)
   }, [moreMenuOpen])
-
-  useEffect(() => {
-    if (!statusPopoverOpen) return
-    const closeOutside = (event: PointerEvent) => {
-      if (!statusPopoverRef.current?.contains(event.target as Node)) setStatusPopoverOpen(false)
-    }
-    window.addEventListener('pointerdown', closeOutside)
-    return () => window.removeEventListener('pointerdown', closeOutside)
-  }, [statusPopoverOpen])
 
   // Wait for the workspace store to hydrate before touching board storage —
   // pre-hydration the app runs with a throwaway default adventure id, and
@@ -6365,36 +6315,6 @@ export default function MathLayer({
         aria-hidden
       />
 
-      <div className="math-local-status" data-html2canvas-ignore ref={statusPopoverRef}>
-        <button
-          type="button"
-          className="math-local-status__pill"
-          aria-haspopup="dialog"
-          aria-expanded={statusPopoverOpen}
-          onClick={() => setStatusPopoverOpen((open) => !open)}
-        >
-          <span className="math-local-status__pulse" aria-hidden />
-          On-device · works offline
-        </button>
-        {statusPopoverOpen && (
-          <div className="math-local-status__popover" role="dialog" aria-label="On-device services">
-            {[
-              ['bonsai', 'Bonsai-2 4B (tutor)'],
-              ['argmax', 'Argmax (speech)'],
-              ['graphChecker', 'Graph checker (vision model)'],
-            ].map(([key, label]) => (
-              <div className="math-local-status__service" key={key}>
-                <span
-                  className={`math-local-status__dot${localServices[key as keyof typeof localServices] ? ' is-ready' : ''}`}
-                  aria-hidden
-                />
-                <span>{label}</span>
-              </div>
-            ))}
-            <p>All AI runs on this laptop. No cloud or data-center calls, and it works with no internet.</p>
-          </div>
-        )}
-      </div>
       {hubOffline && (
         <div className="math-hub-offline" role="status">
           Hub offline: lessons still work. Graph checking and Bonsai need the hub.
@@ -6878,7 +6798,7 @@ export default function MathLayer({
             className="btn-ghost"
             disabled={!ttsOK}
             style={{
-              ...iconBtnStyle(speakerOn, '#1d4ed8'),
+              ...iconBtnStyle(speakerOn, '#3f3f46'),
               opacity: ttsOK ? 1 : 0.4,
             }}
           >
