@@ -376,6 +376,7 @@ interface HintCard {
   togetherStep?: number
   togetherTitle?: string
   togetherTotal?: number
+  suggestedLesson?: { id: string; title: string }
   successPulse?: boolean
   level: number
   hintType?: HintTypeId
@@ -883,6 +884,8 @@ export default function MathLayer({
   const [images, setImages] = useState<ImgEl[]>([])
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null)
   const [cards, setCards] = useState<HintCard[]>([])
+  const worksheetCardIdRef = useRef<string | null>(null)
+  const worksheetReadSeqRef = useRef(0)
   const [hintSize, setHintSize] = useState<1 | 2 | 4>(2)
   const [sel, setSel] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
   const [prompt, setPrompt] = useState('')
@@ -2211,14 +2214,87 @@ export default function MathLayer({
     [rf, pushHistory, markProblemSet]
   )
 
+  const readWorksheetImage = useCallback(async (image: string) => {
+    const id = uid()
+    const request = ++worksheetReadSeqRef.current
+    const previousId = worksheetCardIdRef.current
+    worksheetCardIdRef.current = id
+    const readingCard: HintCard = {
+      id,
+      anchor: { x: 0, y: 0 },
+      text: '',
+      status: 'loading',
+      history: [],
+      followup: '',
+      mode: 'voice',
+      level: 2,
+      tracked: false,
+      firedMarkers: 0,
+      writeStates: {},
+      writeBoxes: {},
+      steps: [],
+      revealedSteps: 1,
+      reexplainCounts: {},
+    }
+    setCards((current) => [...current.filter((card) => card.id !== previousId), readingCard])
+
+    try {
+      const response = await fetch('/api/econ/problem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image }),
+      })
+      if (!response.ok) throw new Error('Worksheet recognition failed')
+      const result = (await response.json()) as { text?: unknown }
+      const text = typeof result.text === 'string' ? result.text.trim() : ''
+      if (!text) throw new Error('No worksheet text recognized')
+      if (worksheetReadSeqRef.current !== request) return
+
+      const lesson = pickTogetherLesson(text)
+      const excerpt = text.replace(/\s+/g, ' ').slice(0, 110)
+      lessonContextRef.current = text
+      setLessonContext(text)
+      setLessonOverrideId(lesson.id)
+      setCards((current) =>
+        current.map((card) =>
+          card.id === id
+            ? {
+                ...card,
+                text: `I read your worksheet: “${excerpt}${text.length > 110 ? '…' : ''}” This looks like a ${lesson.title.toLowerCase()} problem. Want to draw it together?`,
+                status: 'done',
+                suggestedLesson: { id: lesson.id, title: lesson.title },
+              }
+            : card
+        )
+      )
+    } catch {
+      if (worksheetReadSeqRef.current !== request) return
+      setCards((current) =>
+        current.map((card) =>
+          card.id === id
+            ? {
+                ...card,
+                status: 'error',
+                error: 'I could not read this worksheet. You can still choose a lesson with Draw with Adam.',
+              }
+            : card
+        )
+      )
+    }
+  }, [])
+
   const placeImageFile = useCallback(
     (file: File) => {
       if (!file.type.startsWith('image/')) return
       const reader = new FileReader()
-      reader.onload = () => placeImage(String(reader.result))
+      reader.onload = () => {
+        const image = String(reader.result)
+        placeImage(image)
+        void readWorksheetImage(image)
+      }
       reader.readAsDataURL(file)
     },
-    [placeImage]
+    [placeImage, readWorksheetImage]
   )
 
   useEffect(() => {
@@ -5276,6 +5352,7 @@ export default function MathLayer({
         viewportX={x}
         viewportY={y}
         strokes={strokes}
+        tutorStrokes={pen.strokes}
         images={images}
         occupied={[]}
         chrome={chromeRects}
@@ -5303,6 +5380,10 @@ export default function MathLayer({
         onAdvanceStep={advanceStep}
         onReexplainStep={reexplainStep}
         onEndTogether={endDrawWithAdam}
+        onStartSuggestedLesson={(lessonId) => {
+          const lesson = TOGETHER_LESSONS.find((item) => item.id === lessonId)
+          if (lesson) void startDrawWithAdam(lesson)
+        }}
       />
 
       {/* Dock preview — faint silhouette of where the bar will land */}

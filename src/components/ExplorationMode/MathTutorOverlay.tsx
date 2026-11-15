@@ -63,6 +63,7 @@ export interface TutorSession {
   }>
   /** A graph the tutor drew for this reply (spoken or typed questions). */
   graph?: TutorGraphSpec
+  suggestedLesson?: { id: string; title: string }
   /** Each STEP field parsed from this hint — only the last one may carry a write marker. */
   steps?: string[]
   /** How many of `steps` are currently revealed into `text`. */
@@ -256,6 +257,7 @@ function CoachCard({
   onAdvanceStep,
   onReexplainStep,
   onEndTogether,
+  onStartSuggestedLesson,
 }: {
   session: TutorSession
   talking: boolean
@@ -274,6 +276,7 @@ function CoachCard({
   onAdvanceStep: () => void
   onReexplainStep: () => void
   onEndTogether: () => void
+  onStartSuggestedLesson: (lessonId: string) => void
 }) {
   const [revealing, setRevealing] = useState(false)
   const [outgoingTogetherText, setOutgoingTogetherText] = useState('')
@@ -515,6 +518,17 @@ function CoachCard({
               {clarifyRecording ? 'Tap when done' : 'Ask a question'}
             </button>
           )}
+          {session.suggestedLesson && (
+            <div className="math-tutor-actions">
+              <button
+                type="button"
+                className="math-tutor-actions-primary"
+                onClick={() => onStartSuggestedLesson(session.suggestedLesson!.id)}
+              >
+                Draw {session.suggestedLesson.title} with Adam
+              </button>
+            </div>
+          )}
 
           {awaitingCheckin && (
             <div className="math-tutor-checkin">
@@ -646,6 +660,7 @@ export function MathTutorScreenLayer({
   viewportX,
   viewportY,
   strokes,
+  tutorStrokes = [],
   images = [],
   occupied = [],
   chrome = [],
@@ -664,6 +679,7 @@ export function MathTutorScreenLayer({
   onAdvanceStep,
   onReexplainStep,
   onEndTogether,
+  onStartSuggestedLesson,
 }: {
   sessions: TutorSession[]
   rf: ReactFlowInstance
@@ -671,6 +687,7 @@ export function MathTutorScreenLayer({
   viewportX: number
   viewportY: number
   strokes: { id: string; points: { x: number; y: number }[] }[]
+  tutorStrokes?: { id: string; points: { x: number; y: number }[] }[]
   images?: { x: number; y: number; w: number; h: number }[]
   occupied?: BoardBounds[]
   /** Fixed UI chrome (toolbar, mic button, zoom controls…) in screen space, relative to the pane. */
@@ -690,6 +707,7 @@ export function MathTutorScreenLayer({
   onAdvanceStep: (id: string) => void
   onReexplainStep: (id: string) => void
   onEndTogether: () => void
+  onStartSuggestedLesson: (lessonId: string) => void
 }) {
   const [pane, setPane] = useState<DOMRect | null>(null)
   /** Manual drag offsets per card — once the user moves a bubble, we respect it. */
@@ -755,12 +773,16 @@ export function MathTutorScreenLayer({
       const b = boundsFromPoints(st.points)
       if (b) rects.push(toScreen(b))
     }
+    for (const st of tutorStrokes) {
+      const b = boundsFromPoints(st.points)
+      if (b) rects.push(toScreen(b))
+    }
     for (const im of images) {
       rects.push(toScreen({ minX: im.x, minY: im.y, maxX: im.x + im.w, maxY: im.y + im.h }))
     }
     return rects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [strokes, images, rf, zoom, viewportX, viewportY, pane])
+  }, [strokes, tutorStrokes, images, rf, zoom, viewportX, viewportY, pane])
 
   // Union bounding box of everything drawn/pasted on screen — used to dock
   // the coach BESIDE the student's actual work in open space, rather than a
@@ -956,6 +978,7 @@ export function MathTutorScreenLayer({
               onAdvanceStep={() => onAdvanceStep(session.id)}
               onReexplainStep={() => onReexplainStep(session.id)}
               onEndTogether={onEndTogether}
+              onStartSuggestedLesson={onStartSuggestedLesson}
             />
           </div>
         )
