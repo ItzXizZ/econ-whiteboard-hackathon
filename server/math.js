@@ -846,6 +846,12 @@ function openSse(res) {
   }
 }
 
+function wantsSolutionReveal(text) {
+  return /\b(?:show|give|tell|reveal)\b.{0,48}\b(?:answer|solution|equilibrium|price|quantity|values?)\b/i.test(
+    typeof text === 'string' ? text : ''
+  )
+}
+
 // ── The endpoint ────────────────────────────────────────────────────────────
 
 async function handleHint(req, res) {
@@ -923,10 +929,15 @@ async function handleHint(req, res) {
     }
     if (workText && workNote) sections.push(workNote)
     if (notes) sections.push(`TUTOR NOTES (private):\n${notes}`)
+    const revealRequested = wantsSolutionReveal(req_.studentText)
+    if (revealRequested && solution) {
+      sections.push('The student explicitly asked to see the answer. Give the solved equilibrium values and their short algebra steps.')
+    }
 
     const previous = lastTutorProse(history)
     const kind = req_.kind
-    const revealSolution = !!(transcript.length && workShowsAnswer(solution, workText))
+    const revealSolution =
+      !!(transcript.length && workShowsAnswer(solution, workText)) || revealRequested
     if (solution && ['hint', 'followup', 'check', 'voice', 'clarify'].includes(kind)) {
       sse.equations(solutionLatex(solution, { reveal: revealSolution }))
     } else if (solution && kind === 'solve') {
@@ -998,7 +1009,7 @@ async function handleHint(req, res) {
       }
       system = CHAT_SYSTEM
       slot = SLOT.chat
-      maxTokens = 110
+      maxTokens = solution && kind !== 'reexplain' ? 72 : 110
       const cleaner = new ProseCleaner({
         mode: 'prose',
         highlights: kind === 'reexplain' ? 'none' : validLines.size ? 'event' : 'none',
@@ -1026,8 +1037,10 @@ async function handleHint(req, res) {
           }
           return tail
         },
-        // Spoken answers stay short: stop generating once three sentences are out.
-        shouldStop: () => sentenceCount(shown) >= 3 && shown.length > 60,
+        // Keep solved-market replies shorter while leaving other voice answers conversational.
+        shouldStop: () =>
+          sentenceCount(shown) >= (solution && kind !== 'reexplain' ? 2 : 3) &&
+          shown.length > (solution && kind !== 'reexplain' ? 48 : 60),
       }
     } else {
       // solve / generalize: short markdown
@@ -1156,4 +1169,11 @@ export function warmTutorCaches() {
 }
 
 // Exposed for scripts/selftest.mjs
-export const __test = { HintStream, ProseCleaner, classify, proseOf, WORK_OCR_PROMPT }
+export const __test = {
+  HintStream,
+  ProseCleaner,
+  classify,
+  proseOf,
+  wantsSolutionReveal,
+  WORK_OCR_PROMPT,
+}

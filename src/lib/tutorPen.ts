@@ -169,9 +169,110 @@ export function circleOps(box: BoundsRect, note?: string): PenOp[] {
   return ops
 }
 
-export function correctionOps(graph: GraphInfo): PenOp[] {
+export function isWholeCurveMistake(graph: GraphInfo): boolean {
+  const mistake = graph.mistake?.toLowerCase() ?? ''
+  return /\bcurve\b|\bcurves\b|\bslopes?\b/.test(mistake) && !/\blabels?\b|\baxes?\b/.test(mistake)
+}
+
+export function graphWrongCurveStrokes<T extends { id: string; points: { x: number; y: number }[] }>(
+  graph: GraphInfo,
+  strokeIds: string[],
+  strokes: readonly T[]
+): T[] {
+  if (!isWholeCurveMistake(graph)) return []
+  const selected = strokes.filter((stroke) => strokeIds.includes(stroke.id) && stroke.points.length > 1)
+  if (selected.length === 0) return []
+  const allPoints = selected.flatMap((stroke) => stroke.points)
+  const bounds = graph.errorBox ?? {
+    minX: Math.min(...allPoints.map((point) => point.x)),
+    minY: Math.min(...allPoints.map((point) => point.y)),
+    maxX: Math.max(...allPoints.map((point) => point.x)),
+    maxY: Math.max(...allPoints.map((point) => point.y)),
+  }
+  const width = Math.max(1, bounds.maxX - bounds.minX)
+  const height = Math.max(1, bounds.maxY - bounds.minY)
+  const candidates = selected
+    .map((stroke) => {
+      const xs = stroke.points.map((point) => point.x)
+      const ys = stroke.points.map((point) => point.y)
+      const strokeBounds = {
+        minX: Math.min(...xs),
+        minY: Math.min(...ys),
+        maxX: Math.max(...xs),
+        maxY: Math.max(...ys),
+      }
+      const strokeWidth = strokeBounds.maxX - strokeBounds.minX
+      const strokeHeight = strokeBounds.maxY - strokeBounds.minY
+      const length = pathLength(stroke.points)
+      const edgeHugging = stroke.points.filter(
+        (point) =>
+          point.x <= strokeBounds.minX + strokeWidth * 0.14 ||
+          point.y >= strokeBounds.maxY - strokeHeight * 0.14
+      ).length / stroke.points.length
+      const axisLike =
+        strokeWidth >= width * 0.55 &&
+        strokeHeight >= height * 0.55 &&
+        edgeHugging >= 0.8
+      const overlapWidth = Math.max(
+        0,
+        Math.min(bounds.maxX, strokeBounds.maxX) - Math.max(bounds.minX, strokeBounds.minX)
+      )
+      const overlapHeight = Math.max(
+        0,
+        Math.min(bounds.maxY, strokeBounds.maxY) - Math.max(bounds.minY, strokeBounds.minY)
+      )
+      const intersection = overlapWidth * overlapHeight
+      const union = width * height + strokeWidth * strokeHeight - intersection
+      return {
+        stroke,
+        length,
+        axisLike,
+        overlap: intersection / Math.max(1, union),
+        overlaps:
+          strokeBounds.maxX >= bounds.minX - 8 &&
+          strokeBounds.minX <= bounds.maxX + 8 &&
+          strokeBounds.maxY >= bounds.minY - 8 &&
+          strokeBounds.minY <= bounds.maxY + 8,
+        strokeWidth,
+        strokeHeight,
+      }
+    })
+    .filter(
+      (candidate) =>
+        !candidate.axisLike &&
+        candidate.strokeWidth >= width * 0.25 &&
+        candidate.strokeHeight >= height * 0.2
+    )
+  const overlapping = candidates.filter((candidate) => candidate.overlaps)
+  const ranked = (overlapping.length ? overlapping : candidates).sort(
+    (a, b) => b.overlap - a.overlap || b.length - a.length
+  )
+  const count = /wrong curves/i.test(graph.mistake ?? '') ? 2 : 1
+  return ranked.slice(0, count).map(({ stroke }) => stroke)
+}
+
+export function correctionOps(
+  graph: GraphInfo,
+  wrongCurves: readonly { points: { x: number; y: number }[]; width?: number }[] = []
+): PenOp[] {
   if (graph.status !== 'mistake') return []
-  const ops = graph.errorBox ? circleOps(graph.errorBox, graph.mistake) : []
+  const wholeCurve = isWholeCurveMistake(graph)
+  const ops = !wholeCurve && graph.errorBox ? circleOps(graph.errorBox, graph.mistake) : []
+  if (wholeCurve) {
+    for (const curve of wrongCurves) {
+      const points = resample(curve.points, 4)
+      if (points.length > 1) {
+        ops.push(
+          makeStroke(
+            `wrong-curve-highlight-${ops.length}`,
+            points,
+            'rgba(220,38,38,0.35)',
+            Math.max(12, (curve.width ?? 2) * 5)
+          )
+        )
+      }
+    }
+  }
   let strokeIndex = 0
   let labelIndex = 0
   for (const line of graph.correction?.lines ?? []) {

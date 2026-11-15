@@ -15,7 +15,14 @@ import {
 import { useStore } from '../../store/useStore'
 import { streamMathHint, type HintTurn } from '../../lib/mathHint'
 import type { TutorGraphSpec } from '../../lib/mathHint'
-import { circleOps, correctionOps, specToPenOps, type PenOp } from '../../lib/tutorPen'
+import {
+  circleOps,
+  correctionOps,
+  graphWrongCurveStrokes,
+  isWholeCurveMistake,
+  specToPenOps,
+  type PenOp,
+} from '../../lib/tutorPen'
 import { useTutorPen } from '../../lib/useTutorPen'
 import {
   isCurveShifted,
@@ -23,10 +30,11 @@ import {
   isPpfCurve,
   isPpfGrowth,
   isValidCurveStroke,
-  nearestPolylineApproach,
+  curveEquilibrium,
+  equilibriumLabelPositions,
   pickTogetherLesson,
-  polylineIntersection,
   placeLabelAwayFromStrokes,
+  pointLabelPosition,
   ppfBulgePoint,
   replaceCorrectionOpIds,
   shiftedEquilibriumLabel,
@@ -35,6 +43,7 @@ import {
   type TogetherLesson,
   type TogetherBox,
   type TogetherStroke,
+  type TogetherViewport,
 } from '../../lib/drawTogether'
 import {
   ladderTypeForLevel,
@@ -57,6 +66,7 @@ import {
   carryGraphVerdicts,
   recognizeInk,
   RecognitionUnavailableError,
+  type GraphInfo,
   type InkModel,
 } from '../../lib/inkRecognition'
 import {
@@ -158,9 +168,10 @@ function tutorLabelOp(
   text: string,
   obstacles: TogetherStroke[],
   color = '#2563eb',
-  size = 16
+  size = 16,
+  viewport?: TogetherViewport
 ): PenOp {
-  const position = placeLabelAwayFromStrokes(preferred, text, obstacles, size)
+  const position = placeLabelAwayFromStrokes(preferred, text, obstacles, size, viewport)
   return tutorPenLabel(position.x, position.y, text, color, size)
 }
 
@@ -183,7 +194,8 @@ function tutorAxesOps(
   box: TogetherBox,
   yLabel = 'P',
   xLabel = 'Q',
-  obstacles: TogetherStroke[] = []
+  obstacles: TogetherStroke[] = [],
+  viewport?: TogetherViewport
 ): PenOp[] {
   const left = box.x + 42
   const top = box.y + 22
@@ -197,8 +209,22 @@ function tutorAxesOps(
   const yLabelWidth = yLabel.length * 15 * 0.65
   return [
     tutorPenStroke(axes.points, '#334155', 3),
-    tutorLabelOp({ x: left - yLabelWidth - 10, y: top + 5 }, yLabel, labelObstacles, '#334155', 15),
-    tutorLabelOp({ x: right + 4, y: bottom + 20 }, xLabel, labelObstacles, '#334155', 15),
+    tutorLabelOp(
+      { x: left - yLabelWidth - 10, y: top + 5 },
+      yLabel,
+      labelObstacles,
+      '#334155',
+      15,
+      viewport
+    ),
+    tutorLabelOp(
+      { x: right + 4, y: bottom + 20 },
+      xLabel,
+      labelObstacles,
+      '#334155',
+      15,
+      viewport
+    ),
   ]
 }
 
@@ -206,10 +232,14 @@ function tutorCurveLabel(
   stroke: Stroke,
   text: string,
   obstacles: TogetherStroke[],
-  anchor?: { x: number; y: number }
+  anchor?: { x: number; y: number },
+  viewport?: TogetherViewport
 ): PenOp {
   const point = anchor ?? stroke.points.reduce((right, current) => (current.x > right.x ? current : right))
-  return tutorLabelOp({ x: point.x + 8, y: point.y + 4 }, text, obstacles)
+  const preferred = viewport
+    ? pointLabelPosition(point, text, 16, viewport)
+    : { x: point.x + 8, y: point.y + 4 }
+  return tutorLabelOp(preferred, text, obstacles, '#2563eb', 16, viewport)
 }
 
 function tutorEquilibriumOps(
@@ -217,8 +247,9 @@ function tutorEquilibriumOps(
   point: { x: number; y: number },
   priceLabel: string,
   quantityLabel: string,
-  quantityOffset = -8,
-  obstacles: TogetherStroke[] = []
+  obstacles: TogetherStroke[] = [],
+  otherPoint?: { x: number; y: number },
+  viewport?: TogetherViewport
 ): PenOp[] {
   const left = box.x + 42
   const bottom = box.y + box.h - 26
@@ -231,17 +262,19 @@ function tutorEquilibriumOps(
     return { x: point.x + Math.cos(angle) * 4, y: point.y + Math.sin(angle) * 4 }
   })
   const labelObstacles = [...obstacles, ...guides, { points: dot, width: 2 }]
+  const labels = equilibriumLabelPositions(box, point, priceLabel, quantityLabel, otherPoint)
   return [
     tutorPenStroke(guides[0].points, '#64748b', 2, true),
     tutorPenStroke(guides[1].points, '#64748b', 2, true),
     tutorPenStroke(dot, '#0f172a', 2),
-    tutorLabelOp({ x: left - 31, y: point.y + 4 }, priceLabel, labelObstacles, '#475569', 13),
+    tutorLabelOp(labels.price, priceLabel, labelObstacles, '#475569', 13, viewport),
     tutorLabelOp(
-      { x: point.x + quantityOffset, y: bottom + 19 },
+      labels.quantity,
       quantityLabel,
       labelObstacles,
       '#475569',
-      13
+      13,
+      viewport
     ),
   ]
 }
@@ -288,6 +321,14 @@ interface Stroke {
   /** Width in flow units (so it scales with zoom, like ink on paper). */
   width: number
   points: InkPoint[]
+}
+
+function graphCorrectionOps(
+  graph: GraphInfo,
+  strokeIds: string[],
+  strokes: Stroke[]
+): PenOp[] {
+  return correctionOps(graph, graphWrongCurveStrokes(graph, strokeIds, strokes))
 }
 
 type TogetherNeed =
@@ -1030,13 +1071,13 @@ export default function MathLayer({
       if (!graph || graph.status !== 'mistake') continue
       const key = `${[...line.strokeIds].sort().join(',')}|${graph.mistake ?? ''}`
       if (drawnGraphKeysRef.current.has(key)) continue
-      const ops = correctionOps(graph)
+      const ops = graphCorrectionOps(graph, line.strokeIds, strokesRef.current)
       if (ops.length === 0) continue
       drawnGraphKeysRef.current.add(key)
       setDrawnGraphKeys(new Set(drawnGraphKeysRef.current))
       pen.enqueue(ops)
     }
-  }, [inkModel.lines, pen.enqueue, togetherStep])
+  }, [inkModel.lines, pen.enqueue, strokes, togetherStep])
 
   /**
    * Glow the strokes behind the given recognized line numbers. Stays lit
@@ -1238,7 +1279,7 @@ export default function MathLayer({
       const lines = equations.map(equationToBoardText).filter(Boolean)
       if (lines.length === 0) return
       const width = Math.max(380, Math.min(900, Math.max(...lines.map((line) => line.length * 10 + 24))))
-      const box = placeTutorContent(width, lines.length * 30 + 20)
+      const box = placeTutorContent(width, lines.length * 30 + 20, false)
       const id = uid()
       const ops: PenOp[] = lines.map((text, index) => ({
         kind: 'label',
@@ -1670,6 +1711,18 @@ export default function MathLayer({
   }, [undo, redo, selectedImageId, pushHistory])
 
   const paneRect = () => overlayRef.current?.getBoundingClientRect() ?? null
+  const getViewportFlowBounds = useCallback((): TogetherViewport | undefined => {
+    const pane = overlayRef.current?.getBoundingClientRect()
+    if (!pane) return undefined
+    const topLeft = rf.screenToFlowPosition({ x: pane.left + 8, y: pane.top + 8 })
+    const bottomRight = rf.screenToFlowPosition({ x: pane.right - 8, y: pane.bottom - 8 })
+    return {
+      minX: topLeft.x,
+      minY: topLeft.y,
+      maxX: bottomRight.x,
+      maxY: bottomRight.y,
+    }
+  }, [rf])
 
   useEffect(() => {
     const overlay = overlayRef.current
@@ -3744,7 +3797,8 @@ export default function MathLayer({
           { x: label.x, y: label.y },
           label.text,
           [...ink, ...labelObstacles],
-          label.size
+          label.size,
+          getViewportFlowBounds()
         )
         if (position.x === label.x && position.y === label.y) continue
         pen.remove([label.id])
@@ -3765,7 +3819,13 @@ export default function MathLayer({
         rememberTutorPenBounds([op])
       }
     },
-    [getTogetherObstacles, pen.enqueue, pen.remove, rememberTutorPenBounds]
+    [
+      getTogetherObstacles,
+      getViewportFlowBounds,
+      pen.enqueue,
+      pen.remove,
+      rememberTutorPenBounds,
+    ]
   )
 
   const runTogetherOps = useCallback(
@@ -3875,9 +3935,9 @@ export default function MathLayer({
       session.step = step
       session.awaiting = null
       session.completed = false
-      updateTogetherCard(session.id, step, say)
       runTogetherOps(ops, () => {
         if (togetherSessionRef.current !== session) return
+        updateTogetherCard(session.id, step, say)
         speakTogetherStep(session.id, say)
         if (step >= session.lesson.steps.length) {
           session.completed = true
@@ -3929,13 +3989,13 @@ export default function MathLayer({
       } else if (
         need === 'inside-point' &&
         (!session.frontier ||
-          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'inside'))
+          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'inside', zoom))
       ) {
         feedback = session.lesson.wrongMessages.inside
       } else if (
         need === 'outside-point' &&
         (!session.frontier ||
-          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'outside'))
+          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'outside', zoom))
       ) {
         feedback = session.lesson.wrongMessages.outside
       } else if (
@@ -3947,10 +4007,10 @@ export default function MathLayer({
 
       if (feedback) {
         clearTogetherCorrectionInk(session)
-        updateTogetherCard(session.id, step, feedback)
         const strokeBounds = tutorStrokeBounds(stroke)
         const correction = runTogetherOps(strokeBounds ? circleOps(strokeBounds) : [], () => {
           if (togetherSessionRef.current !== session) return
+          updateTogetherCard(session.id, step, feedback)
           speakTogetherStep(session.id, feedback)
           session.baselineIds = new Set(strokesRef.current.map((item) => item.id))
           session.awaiting = need
@@ -3970,31 +4030,38 @@ export default function MathLayer({
           session.first = stroke
           runTogetherAdamStep(
             3,
-            [tutorCurveLabel(stroke, session.lesson.first.label, getTogetherObstacles([stroke]))]
+            [
+              tutorCurveLabel(
+                stroke,
+                session.lesson.first.label,
+                getTogetherObstacles([stroke]),
+                undefined,
+                getViewportFlowBounds()
+              ),
+            ]
           )
           return
         }
         if (need === 'second') {
           session.second = stroke
-          const crossing =
-            session.first &&
-            (polylineIntersection(session.first.points, stroke.points) ??
-              nearestPolylineApproach(session.first.points, stroke.points))
-          const equilibrium =
-            crossing ?? {
-              x: session.box.x + session.box.w / 2,
-              y: session.box.y + session.box.h / 2,
-            }
+          const equilibrium = curveEquilibrium(session.first?.points ?? null, stroke.points, session.box)
           session.equilibrium = equilibrium
           runTogetherAdamStep(5, [
-            tutorCurveLabel(stroke, session.lesson.second.label, getTogetherObstacles([stroke])),
+            tutorCurveLabel(
+              stroke,
+              session.lesson.second.label,
+              getTogetherObstacles([stroke]),
+              undefined,
+              getViewportFlowBounds()
+            ),
             ...tutorEquilibriumOps(
               session.box,
               equilibrium,
               session.lesson.eqLabels.y,
               session.lesson.eqLabels.x,
-              -8,
-              getTogetherObstacles([stroke])
+              getTogetherObstacles([stroke]),
+              undefined,
+              getViewportFlowBounds()
             ),
           ])
           return
@@ -4002,32 +4069,29 @@ export default function MathLayer({
 
         if (need === 'shift') {
           session.shifted = stroke
-          const shiftedCurve =
-            session.lesson.shift.curve === 'first' ? stroke : session.first
-          const steadyCurve =
-            session.lesson.shift.curve === 'first' ? session.second : stroke
-          const crossing =
-            shiftedCurve &&
-            steadyCurve &&
-            (polylineIntersection(shiftedCurve.points, steadyCurve.points) ??
-              nearestPolylineApproach(shiftedCurve.points, steadyCurve.points))
           const newEquilibrium =
-            crossing ?? {
-              x: session.box.x + session.box.w / 2,
-              y: session.box.y + session.box.h / 2,
-            }
+            session.lesson.shift.curve === 'first'
+              ? curveEquilibrium(stroke.points, session.second?.points ?? null, session.box)
+              : curveEquilibrium(session.first?.points ?? null, stroke.points, session.box)
           const oldEquilibrium = session.equilibrium
           session.equilibrium = newEquilibrium
           runTogetherAdamStep(7, [
-            tutorCurveLabel(stroke, session.lesson.shift.newLabel, getTogetherObstacles([stroke])),
+            tutorCurveLabel(
+              stroke,
+              session.lesson.shift.newLabel,
+              getTogetherObstacles([stroke]),
+              undefined,
+              getViewportFlowBounds()
+            ),
             ...(oldEquilibrium ? tutorArrowOps(oldEquilibrium, newEquilibrium) : []),
             ...tutorEquilibriumOps(
               session.box,
               newEquilibrium,
               shiftedEquilibriumLabel(session.lesson.eqLabels.y),
               shiftedEquilibriumLabel(session.lesson.eqLabels.x),
-              24,
-              getTogetherObstacles([stroke])
+              getTogetherObstacles([stroke]),
+              oldEquilibrium,
+              getViewportFlowBounds()
             ),
           ])
         }
@@ -4043,20 +4107,36 @@ export default function MathLayer({
             tutorCurveLabel(stroke, 'PPF', getTogetherObstacles([stroke]), {
               x: start.x + 4,
               y: start.y - 28,
-            }),
+            }, getViewportFlowBounds()),
           ]
         )
       } else if (need === 'inside-point') {
         session.insidePoint = stroke
         runTogetherAdamStep(
           5,
-          [tutorCurveLabel(stroke, 'A: inefficient', getTogetherObstacles([stroke]))]
+          [
+            tutorCurveLabel(
+              stroke,
+              'A: inefficient',
+              getTogetherObstacles([stroke]),
+              undefined,
+              getViewportFlowBounds()
+            ),
+          ]
         )
       } else if (need === 'outside-point') {
         session.outsidePoint = stroke
         runTogetherAdamStep(
           6,
-          [tutorCurveLabel(stroke, 'B: unattainable for now', getTogetherObstacles([stroke]))],
+          [
+            tutorCurveLabel(
+              stroke,
+              'B: unattainable for now',
+              getTogetherObstacles([stroke]),
+              undefined,
+              getViewportFlowBounds()
+            ),
+          ],
           'Now show economic growth: draw the new PPF.'
         )
       } else if (need === 'ppf-growth') {
@@ -4064,7 +4144,13 @@ export default function MathLayer({
         const oldBulge = session.frontier && ppfBulgePoint(session.frontier)
         const newBulge = ppfBulgePoint(stroke)
         runTogetherAdamStep(8, [
-          tutorCurveLabel(stroke, 'PPF₂', getTogetherObstacles([stroke])),
+          tutorCurveLabel(
+            stroke,
+            'PPF₂',
+            getTogetherObstacles([stroke]),
+            undefined,
+            getViewportFlowBounds()
+          ),
           ...(oldBulge && newBulge ? tutorArrowOps(oldBulge, newBulge) : []),
         ])
       }
@@ -4072,7 +4158,9 @@ export default function MathLayer({
     [
       clearTogetherCorrectionInk,
       getTogetherObstacles,
+      getViewportFlowBounds,
       isValidCurveStroke,
+      zoom,
       reflowTogetherLabels,
       runTogetherAdamStep,
       runTogetherOps,
@@ -4151,8 +4239,18 @@ export default function MathLayer({
       points: stroke.points,
       width: stroke.width,
     }))
-    runTogetherAdamStep(1, tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes))
-  }, [clearTutorPen, fitMobileLessonFrame, placeTutorContent, runTogetherAdamStep, selectedLesson])
+    runTogetherAdamStep(
+      1,
+      tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes, getViewportFlowBounds())
+    )
+  }, [
+    clearTutorPen,
+    fitMobileLessonFrame,
+    getViewportFlowBounds,
+    placeTutorContent,
+    runTogetherAdamStep,
+    selectedLesson,
+  ])
 
   useEffect(() => {
     const onStartLesson = (event: Event) => {
@@ -5131,7 +5229,13 @@ export default function MathLayer({
             if (!g) return []
             const tl = rf.flowToScreenPosition({ x: line.bounds.minX, y: line.bounds.minY })
             const graphKey = `${[...line.strokeIds].sort().join(',')}|${g.mistake ?? ''}`
-            const replayable = g.status === 'mistake' && correctionOps(g).length > 0
+            const wholeCurve = g.status === 'mistake' && isWholeCurveMistake(g)
+            const wrongCurves = wholeCurve
+              ? graphWrongCurveStrokes(g, line.strokeIds, strokesRef.current)
+              : []
+            const replayable =
+              g.status === 'mistake' &&
+              graphCorrectionOps(g, line.strokeIds, strokesRef.current).length > 0
             const label =
               g.status === 'mistake'
                 ? `${g.name}: check ${g.mistake ?? 'this graph'}`
@@ -5151,7 +5255,11 @@ export default function MathLayer({
                 key={`gtag-${line.strokeIds[0]}`}
                 className={`math-graph-tag is-${g.status}${g.checked ? ' is-checked' : ''}${replayable ? ' is-replayable' : ''}`}
                 title={tip}
-                onClick={replayable ? () => pen.enqueue(correctionOps(g)) : undefined}
+                onClick={
+                  replayable
+                    ? () => pen.enqueue(graphCorrectionOps(g, line.strokeIds, strokesRef.current))
+                    : undefined
+                }
                 style={{ left: Math.max(4, tl.x - wrap.left), top: Math.max(4, tl.y - wrap.top - 30) }}
               >
                 {g.status === 'mistake' ? (
@@ -5164,7 +5272,36 @@ export default function MathLayer({
                 <span>{label}</span>
               </div>,
             ]
-            if (g.status === 'mistake' && g.errorBox && !drawnGraphKeys.has(graphKey)) {
+            if (
+              wholeCurve &&
+              wrongCurves[0] &&
+              g.explanation
+            ) {
+              const endpoint = wrongCurves[0].points[wrongCurves[0].points.length - 1]
+              if (endpoint) {
+                const point = rf.flowToScreenPosition(endpoint)
+                const noteWidth = Math.min(250, wrap.width - 24)
+                out.push(
+                  <div
+                    key={`gexplain-${line.strokeIds[0]}`}
+                    className="math-graph-explanation"
+                    style={{
+                      left: Math.max(8, Math.min(point.x - wrap.left + 12, wrap.width - noteWidth - 8)),
+                      top: Math.max(8, Math.min(point.y - wrap.top + 8, wrap.height - 88)),
+                      width: noteWidth,
+                    }}
+                  >
+                    {g.explanation}
+                  </div>
+                )
+              }
+            }
+            if (
+              g.status === 'mistake' &&
+              g.errorBox &&
+              !wholeCurve &&
+              !drawnGraphKeys.has(graphKey)
+            ) {
               const a = rf.flowToScreenPosition({ x: g.errorBox.minX, y: g.errorBox.minY })
               const b = rf.flowToScreenPosition({ x: g.errorBox.maxX, y: g.errorBox.maxY })
               const pad = 14

@@ -10457,6 +10457,20 @@ kbd {
   pointer-events: none;
   animation: math-graph-tag-in 0.25s ease;
 }
+.math-graph-explanation {
+  position: absolute;
+  z-index: 1;
+  padding: 7px 10px;
+  border: 1px solid rgba(220, 38, 38, 0.22);
+  border-radius: 10px;
+  color: #991b1b;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 14px rgba(127, 29, 29, 0.12);
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: none;
+  animation: math-graph-tag-in 0.25s ease;
+}
 .math-adam-cursor {
   position: absolute;
   display: flex;
@@ -10530,7 +10544,8 @@ kbd {
 }
 @media (prefers-reduced-motion: reduce) {
   .math-graph-tag,
-  .math-graph-error-ring {
+  .math-graph-error-ring,
+  .math-graph-explanation {
     animation: none;
   }
 }

@@ -22,12 +22,14 @@ import { describeGraph, graphTranscriptLine } from '../server/graphCheck.js'
 import { linesToStrokes, toRecognizePayload } from './strokeFont.mjs'
 import { supplyDemandStrokes } from './graphFixture.mjs'
 
-const { HintStream, ProseCleaner, classify } = __test
+const { HintStream, ProseCleaner, classify, wantsSolutionReveal } = __test
 const drawTogetherSource = await readFile(new URL('../src/lib/drawTogether.ts', import.meta.url), 'utf8')
 const drawTogetherJs = ts.transpileModule(drawTogetherSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
 }).outputText
 const {
+  curveEquilibrium,
+  equilibriumLabelPositions,
   hasStrokeSlope,
   isBowedOut,
   isCurveShifted,
@@ -36,6 +38,7 @@ const {
   isPpfGrowth,
   labelOverlapsStroke,
   placeLabelAwayFromStrokes,
+  pointLabelPosition,
   polylineIntersection,
   pickTogetherLesson,
   ppfBulgePoint,
@@ -44,6 +47,13 @@ const {
   SUPPLY_DEMAND_LESSON,
   TOGETHER_LESSONS,
 } = await import(`data:text/javascript;base64,${Buffer.from(drawTogetherJs).toString('base64')}`)
+const tutorPenSource = await readFile(new URL('../src/lib/tutorPen.ts', import.meta.url), 'utf8')
+const tutorPenJs = ts.transpileModule(tutorPenSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText
+const { correctionOps, graphWrongCurveStrokes, isWholeCurveMistake } = await import(
+  `data:text/javascript;base64,${Buffer.from(tutorPenJs).toString('base64')}`
+)
 
 /** Feed `raw` in chunks of `size` characters, like a token stream. */
 function runHint(raw, opts = {}, size = 3) {
@@ -164,6 +174,8 @@ check('request classification', () => {
   assert.equal(classify({ mode: 'hint', prompt: 'REEXPLAIN STEP: the student is confused by this part of your last hint: "Set them equal". Re-explain it.' }).confusing, 'Set them equal')
   assert.equal(classify({ mode: 'hint', prompt: 'Please show the full step-by-step solution and the final answer.' }).kind, 'solve')
   assert.equal(classify({ mode: 'hint', prompt: 'Read my work first.' }).studentText, '')
+  assert.equal(wantsSolutionReveal('Can you show me the answer?'), true)
+  assert.equal(wantsSolutionReveal('Why did the curve shift?'), false)
 })
 
 check('linear market solver', () => {
@@ -426,6 +438,32 @@ check('draw-together distinguishes shifted equilibrium labels', () => {
   )
 })
 
+check('draw-together computes the shifted market equilibrium from the new curve', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const demand = { points: [{ x: 42, y: 22 }, { x: 346, y: 254 }] }
+  const originalSupply = { points: [{ x: 42, y: 254 }, { x: 346, y: 22 }] }
+  const shiftedSupply = { points: [{ x: 42, y: 220 }, { x: 312, y: 22 }] }
+  const original = curveEquilibrium(demand.points, originalSupply.points, box)
+  const shifted = curveEquilibrium(demand.points, shiftedSupply.points, box)
+  assert.ok(shifted.x < original.x)
+  assert.ok(shifted.y < original.y)
+})
+
+check('draw-together keeps shifted equilibrium labels aligned to their own guides', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const original = { x: 220, y: 150 }
+  const shifted = { x: 200, y: 145 }
+  const originalLabels = equilibriumLabelPositions(box, original, 'r*', 'Q*')
+  const shiftedLabels = equilibriumLabelPositions(box, shifted, 'r₂', 'Q₂', original)
+  const quantityWidth = 'Q₂'.length * 13 * 0.65
+  assert.equal(originalLabels.quantity.x + quantityWidth / 2, original.x)
+  assert.equal(shiftedLabels.quantity.x + quantityWidth / 2, shifted.x)
+  assert.ok(shiftedLabels.quantity.y > originalLabels.quantity.y)
+  assert.equal(originalLabels.price.y - 4, original.y)
+  assert.equal(shiftedLabels.price.y - 4, shifted.y)
+  assert.ok(shiftedLabels.price.x < originalLabels.price.x)
+})
+
 check('draw-together classifies dash marks around a bowed-out PPF', () => {
   const box = { x: 0, y: 0, w: 360, h: 280 }
   const bowedOut = {
@@ -443,7 +481,8 @@ check('draw-together classifies dash marks around a bowed-out PPF', () => {
   const onCurveDash = { points: [{ x: 159, y: 95 }, { x: 229, y: 95 }] }
   const leftOfAxisDash = { points: [{ x: -10, y: 60 }, { x: 60, y: 60 }] }
   const belowXAxisDash = { points: [{ x: 200, y: 270 }, { x: 270, y: 270 }] }
-  const tooLong = { points: [{ x: 100, y: 100 }, { x: 200, y: 100 }] }
+  const phoneDash = { points: [{ x: 360, y: 220 }, { x: 500, y: 220 }] }
+  const tooLong = { points: [{ x: 100, y: 100 }, { x: 210, y: 100 }] }
   const grown = {
     points: [{ x: 42, y: 22 }, { x: 194, y: 55 }, { x: 346, y: 254 }],
   }
@@ -461,6 +500,8 @@ check('draw-together classifies dash marks around a bowed-out PPF', () => {
   assert.equal(isPointRelativeToCurve(onCurveDash, bowedOut, box, 'outside'), false)
   assert.equal(isPointRelativeToCurve(leftOfAxisDash, bowedOut, box, 'outside'), false)
   assert.equal(isPointRelativeToCurve(belowXAxisDash, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(phoneDash, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(phoneDash, bowedOut, box, 'outside', 0.5), true)
   assert.equal(isPointRelativeToCurve(tooLong, bowedOut, box, 'inside'), false)
 })
 
@@ -488,6 +529,68 @@ check('draw-together caps label nudging when all nearby candidates collide', () 
   const placed = placeLabelAwayFromStrokes(preferred, 'A', strokes, 12)
   const cap = 3 * Math.max(10, 12 * 0.85)
   assert.ok(Math.hypot(placed.x - preferred.x, placed.y - preferred.y) <= cap)
+})
+
+check('draw-together flips labels into the visible viewport', () => {
+  const viewport = { minX: 0, minY: 0, maxX: 300, maxY: 200 }
+  const anchor = { x: 280, y: 50 }
+  const text = 'B: unattainable'
+  const preferred = pointLabelPosition(anchor, text, 16, viewport)
+  const placed = placeLabelAwayFromStrokes(preferred, text, [], 16, viewport)
+  const width = text.length * 16 * 0.65
+  assert.ok(placed.x < anchor.x)
+  assert.ok(placed.x >= viewport.minX)
+  assert.ok(placed.x + width <= viewport.maxX)
+  assert.ok(placed.y - 16 >= viewport.minY)
+})
+
+check('whole-curve graph mistakes trace red and keep green corrections', () => {
+  const wholeCurve = {
+    status: 'mistake',
+    name: 'supply and demand',
+    mistake: 'the demand curve slopes upward',
+    errorBox: { minX: 30, minY: 20, maxX: 130, maxY: 100 },
+    correction: { lines: [{ label: 'D', pts: [{ x: 0, y: 100 }, { x: 100, y: 0 }] }] },
+  }
+  const axes = {
+    id: 'axes',
+    points: [{ x: 0, y: 0 }, { x: 0, y: 120 }, { x: 140, y: 120 }],
+  }
+  const supply = {
+    id: 'supply',
+    points: [{ x: 20, y: 110 }, { x: 120, y: 40 }],
+  }
+  const wrongDemand = {
+    id: 'wrong-demand',
+    points: [{ x: 30, y: 100 }, { x: 130, y: 20 }],
+  }
+  assert.deepEqual(
+    graphWrongCurveStrokes(wholeCurve, ['axes', 'supply', 'wrong-demand'], [axes, supply, wrongDemand]).map(
+      (stroke) => stroke.id
+    ),
+    ['wrong-demand']
+  )
+  const ops = correctionOps(wholeCurve, [
+    { points: [{ x: 0, y: 100 }, { x: 50, y: 40 }, { x: 100, y: 0 }], width: 2 },
+  ])
+  const redIndex = ops.findIndex(
+    (op) => op.kind === 'stroke' && op.stroke.color === 'rgba(220,38,38,0.35)'
+  )
+  const greenIndex = ops.findIndex(
+    (op) => op.kind === 'stroke' && op.stroke.color === '#059669'
+  )
+  assert.equal(isWholeCurveMistake(wholeCurve), true)
+  assert.ok(redIndex >= 0)
+  assert.ok(ops[redIndex].stroke.width >= 12)
+  assert.ok(greenIndex > redIndex)
+  assert.equal(ops.some((op) => op.kind === 'stroke' && op.stroke.id === 'circle-stroke-0'), false)
+
+  const localError = {
+    ...wholeCurve,
+    mistake: 'P and Q are on the wrong axes',
+  }
+  assert.equal(isWholeCurveMistake(localError), false)
+  assert.ok(correctionOps(localError).some((op) => op.kind === 'stroke' && op.stroke.id === 'circle-stroke-0'))
 })
 
 console.log(`\n${n} checks passed`)

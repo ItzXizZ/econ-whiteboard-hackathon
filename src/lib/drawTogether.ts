@@ -36,6 +36,13 @@ export interface TogetherBox {
   h: number
 }
 
+export interface TogetherViewport {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+}
+
 export interface MarketCurveConfig {
   label: string
   slope: 'down' | 'up'
@@ -429,7 +436,8 @@ export function placeLabelAwayFromStrokes(
   preferred: TogetherPoint,
   text: string,
   strokes: readonly TogetherStroke[],
-  fontSize = 16
+  fontSize = 16,
+  viewport?: TogetherViewport
 ): TogetherPoint {
   const step = Math.max(10, fontSize * 0.85)
   const directions = [
@@ -446,6 +454,7 @@ export function placeLabelAwayFromStrokes(
   let best = preferred
   let bestOverlapCount = Number.POSITIVE_INFINITY
   let bestDistance = Number.POSITIVE_INFINITY
+  let bestFitsViewport = false
   for (let ring = 0; ring <= 3; ring++) {
     for (const direction of directions) {
       const candidate = {
@@ -455,16 +464,45 @@ export function placeLabelAwayFromStrokes(
       const overlapCount = strokes.filter((stroke) =>
         labelOverlapsStroke(candidate, text, stroke, fontSize)
       ).length
-      if (overlapCount === 0) return candidate
+      const fitsViewport =
+        !viewport ||
+        (candidate.x >= viewport.minX &&
+          candidate.x + text.length * fontSize * 0.65 <= viewport.maxX &&
+          candidate.y - fontSize >= viewport.minY &&
+          candidate.y + fontSize * 0.25 <= viewport.maxY)
+      if (overlapCount === 0 && fitsViewport) return candidate
       const distance = Math.hypot(candidate.x - preferred.x, candidate.y - preferred.y)
-      if (overlapCount < bestOverlapCount || (overlapCount === bestOverlapCount && distance < bestDistance)) {
+      if (
+        (fitsViewport && !bestFitsViewport) ||
+        (fitsViewport === bestFitsViewport &&
+          (overlapCount < bestOverlapCount ||
+            (overlapCount === bestOverlapCount && distance < bestDistance)))
+      ) {
         best = candidate
         bestOverlapCount = overlapCount
         bestDistance = distance
+        bestFitsViewport = fitsViewport
       }
     }
   }
   return best
+}
+
+export function pointLabelPosition(
+  anchor: TogetherPoint,
+  text: string,
+  fontSize: number,
+  viewport: TogetherViewport
+): TogetherPoint {
+  const width = text.length * fontSize * 0.65
+  let x = anchor.x + 8
+  if (x + width > viewport.maxX) x = anchor.x - width - 8
+  if (x < viewport.minX) x = viewport.minX + 4
+
+  let y = anchor.y + 4
+  if (y - fontSize < viewport.minY) y = anchor.y + fontSize + 4
+  y = Math.min(y, viewport.maxY - fontSize * 0.25 - 4)
+  return { x, y }
 }
 
 export function shiftedEquilibriumLabel(label: string): string {
@@ -578,6 +616,44 @@ export function nearestPolylineApproach(
     }
   }
   return best
+}
+
+export function curveEquilibrium(
+  first: TogetherPoint[] | null,
+  second: TogetherPoint[] | null,
+  box: TogetherBox
+): TogetherPoint {
+  const point =
+    first && second
+      ? polylineIntersection(first, second) ?? nearestPolylineApproach(first, second)
+      : null
+  return point ?? { x: box.x + box.w / 2, y: box.y + box.h / 2 }
+}
+
+export function equilibriumLabelPositions(
+  box: TogetherBox,
+  point: TogetherPoint,
+  priceLabel: string,
+  quantityLabel: string,
+  otherPoint?: TogetherPoint
+): { price: TogetherPoint; quantity: TogetherPoint } {
+  const left = box.x + 42
+  const bottom = box.y + box.h - 26
+  const priceWidth = priceLabel.length * 13 * 0.65
+  const quantityWidth = quantityLabel.length * 13 * 0.65
+  const priceCollides = otherPoint !== undefined && Math.abs(point.y - otherPoint.y) < 19
+  const quantityCollides =
+    otherPoint !== undefined && Math.abs(point.x - otherPoint.x) < quantityWidth + 10
+  return {
+    price: {
+      x: left - priceWidth - (priceCollides ? 28 : 10),
+      y: point.y + 4,
+    },
+    quantity: {
+      x: point.x - quantityWidth / 2,
+      y: bottom + 19 + (quantityCollides ? 20 : 0),
+    },
+  }
 }
 
 function axesFor(box: TogetherBox) {
@@ -694,14 +770,21 @@ export function isPointRelativeToCurve(
   pointStroke: TogetherStroke,
   curve: TogetherStroke,
   box: TogetherBox,
-  side: 'inside' | 'outside'
+  side: 'inside' | 'outside',
+  zoom = 1
 ): boolean {
   if (pointStroke.points.length === 0) return false
   const xs = pointStroke.points.map((point) => point.x)
   const ys = pointStroke.points.map((point) => point.y)
   const width = Math.max(...xs) - Math.min(...xs)
   const height = Math.max(...ys) - Math.min(...ys)
-  if (width > box.w * 0.24 || height > box.h * 0.24) return false
+  const screenMarkLimit = 100 / Math.max(zoom, 0.01)
+  if (
+    width > Math.max(box.w * 0.24, screenMarkLimit) ||
+    height > Math.max(box.h * 0.24, screenMarkLimit)
+  ) {
+    return false
+  }
   const point = strokeCenter(pointStroke)
   if (!point) return false
   const { left, bottom } = axesFor(box)
