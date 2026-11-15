@@ -10302,6 +10302,7 @@ kbd {
   .econ-welcome-action {
     animation: none;
     transition: none;
+    opacity: 1;
   }
 
   .econ-welcome-demo-axis,
