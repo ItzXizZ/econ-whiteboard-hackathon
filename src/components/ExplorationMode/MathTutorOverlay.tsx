@@ -464,7 +464,7 @@ function CoachCard({
       return
     }
     setOutgoingTogetherText(previous)
-    const timer = window.setTimeout(() => setOutgoingTogetherText(''), 240)
+    const timer = window.setTimeout(() => setOutgoingTogetherText(''), 300)
     return () => window.clearTimeout(timer)
   }, [session.text, session.togetherMode])
 
@@ -947,6 +947,7 @@ export function MathTutorScreenLayer({
   viewportY,
   strokes,
   tutorStrokes = [],
+  tutorLabels = [],
   images = [],
   occupied = [],
   chrome = [],
@@ -981,6 +982,7 @@ export function MathTutorScreenLayer({
   viewportY: number
   strokes: { id: string; points: { x: number; y: number }[] }[]
   tutorStrokes?: { id: string; points: { x: number; y: number }[] }[]
+  tutorLabels?: { x: number; y: number; text: string; size: number }[]
   images?: { x: number; y: number; w: number; h: number }[]
   occupied?: BoardBounds[]
   /** Fixed UI chrome (toolbar, mic button, zoom controls…) in screen space, relative to the pane. */
@@ -1077,12 +1079,25 @@ export function MathTutorScreenLayer({
       const b = boundsFromPoints(st.points)
       if (b) rects.push(toScreen(b))
     }
+    for (const label of tutorLabels) {
+      const topLeft = rf.flowToScreenPosition({ x: label.x, y: label.y - label.size })
+      const bottomRight = rf.flowToScreenPosition({
+        x: label.x + label.text.length * label.size * 0.65,
+        y: label.y + label.size * 0.25,
+      })
+      rects.push({
+        left: topLeft.x - pane.left,
+        top: topLeft.y - pane.top,
+        right: bottomRight.x - pane.left,
+        bottom: bottomRight.y - pane.top,
+      })
+    }
     for (const im of images) {
       rects.push(toScreen({ minX: im.x, minY: im.y, maxX: im.x + im.w, maxY: im.y + im.h }))
     }
     return rects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [strokes, tutorStrokes, images, rf, zoom, viewportX, viewportY, pane])
+  }, [strokes, tutorStrokes, tutorLabels, images, rf, zoom, viewportX, viewportY, pane])
 
   // Union bounding box of everything drawn/pasted on screen — used to dock
   // the coach BESIDE the student's actual work in open space, rather than a
@@ -1101,6 +1116,22 @@ export function MathTutorScreenLayer({
     }
     return { left, top, right, bottom }
   }, [inkAndImageRects])
+
+  const askBarObstacles = useMemo<ScreenRect[]>(() => {
+    if (!pane || typeof document === 'undefined') return []
+    return Array.from(document.querySelectorAll<HTMLElement>('.math-prompt-bar, .math-mic-bar'))
+      .filter((element) => getComputedStyle(element).display !== 'none')
+      .flatMap((element) => {
+        const rect = element.getBoundingClientRect()
+        if (rect.width === 0 || rect.height === 0) return []
+        return [{
+          left: rect.left - pane.left,
+          top: rect.top - pane.top,
+          right: rect.right - pane.left,
+          bottom: rect.bottom - pane.top,
+        }]
+      })
+  }, [pane, sessions, viewportX, viewportY, zoom])
 
   if (sessions.length === 0 || !pane) return null
 
@@ -1179,6 +1210,7 @@ export function MathTutorScreenLayer({
           cardWidth: cardW,
           cardHeight: cardH,
           obstacles: [...chrome, ...inkAndImageRects, ...placedRects],
+          protectedObstacles: askBarObstacles,
           margin,
           preferred,
         })

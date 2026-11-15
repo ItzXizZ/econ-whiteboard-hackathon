@@ -780,17 +780,39 @@ export function pointLabelPosition(
   anchor: TogetherPoint,
   text: string,
   fontSize: number,
-  viewport: TogetherViewport
+  viewport: TogetherViewport,
+  zoom = 1
 ): TogetherPoint {
   const width = text.length * fontSize * 0.65
-  let x = anchor.x + 8
-  if (x + width > viewport.maxX) x = anchor.x - width - 8
-  if (x < viewport.minX) x = viewport.minX + 4
+  const markerClearance = 18 / Math.max(zoom, 0.1)
+  const candidates = [
+    { x: anchor.x + markerClearance, y: anchor.y + fontSize * 0.25 },
+    { x: anchor.x - width - markerClearance, y: anchor.y + fontSize * 0.25 },
+    {
+      x: anchor.x - width / 2,
+      y: anchor.y - markerClearance - fontSize * 0.25,
+    },
+    {
+      x: anchor.x - width / 2,
+      y: anchor.y + markerClearance + fontSize,
+    },
+  ]
+  const fitsViewport = (position: TogetherPoint) =>
+    position.x >= viewport.minX &&
+    position.x + width <= viewport.maxX &&
+    position.y - fontSize >= viewport.minY &&
+    position.y + fontSize * 0.25 <= viewport.maxY
+  const visible = candidates.find(fitsViewport)
+  if (visible) return visible
 
-  let y = anchor.y + 4
-  if (y - fontSize < viewport.minY) y = anchor.y + fontSize + 4
-  y = Math.min(y, viewport.maxY - fontSize * 0.25 - 4)
-  return { x, y }
+  return candidates.reduce((best, candidate) => {
+    const overflow = (position: TogetherPoint) =>
+      Math.max(viewport.minX - position.x, 0) +
+      Math.max(position.x + width - viewport.maxX, 0) +
+      Math.max(viewport.minY - (position.y - fontSize), 0) +
+      Math.max(position.y + fontSize * 0.25 - viewport.maxY, 0)
+    return overflow(candidate) < overflow(best) ? candidate : best
+  })
 }
 
 export function shiftedEquilibriumLabel(label: string): string {

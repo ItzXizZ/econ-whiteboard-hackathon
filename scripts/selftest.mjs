@@ -55,6 +55,13 @@ const {
   SUPPLY_DEMAND_LESSON,
   TOGETHER_LESSONS,
 } = await import(`data:text/javascript;base64,${Buffer.from(drawTogetherJs).toString('base64')}`)
+const mathBoardManifestSource = await readFile(new URL('../src/lib/mathBoardManifest.ts', import.meta.url), 'utf8')
+const mathBoardManifestJs = ts.transpileModule(mathBoardManifestSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText
+const { computeHintPlacement } = await import(
+  `data:text/javascript;base64,${Buffer.from(mathBoardManifestJs).toString('base64')}`
+)
 const tutorPenSource = await readFile(new URL('../src/lib/tutorPen.ts', import.meta.url), 'utf8')
 const tutorPenJs = ts.transpileModule(tutorPenSource, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
@@ -711,6 +718,50 @@ check('draw-together flips labels into the visible viewport', () => {
   assert.ok(placed.x >= viewport.minX)
   assert.ok(placed.x + width <= viewport.maxX)
   assert.ok(placed.y - 16 >= viewport.minY)
+})
+
+check('draw-together keeps point labels clear of their marker at phone zoom', () => {
+  const viewport = { minX: 0, minY: 0, maxX: 300, maxY: 200 }
+  const anchor = { x: 150, y: 50 }
+  const text = 'B: unattainable for now'
+  const fontSize = 16
+  const zoom = 0.5
+  const position = pointLabelPosition(anchor, text, fontSize, viewport, zoom)
+  const width = text.length * fontSize * 0.65
+  const left = position.x
+  const right = position.x + width
+  const top = position.y - fontSize
+  const bottom = position.y + fontSize * 0.25
+  const dx = anchor.x < left ? left - anchor.x : anchor.x > right ? anchor.x - right : 0
+  const dy = anchor.y < top ? top - anchor.y : anchor.y > bottom ? anchor.y - bottom : 0
+
+  assert.ok(left >= viewport.minX)
+  assert.ok(right <= viewport.maxX)
+  assert.ok(top >= viewport.minY)
+  assert.ok(bottom <= viewport.maxY)
+  assert.ok(Math.hypot(dx, dy) >= 18 / zoom)
+})
+
+check('tutor-card placement avoids the protected Ask bar before other obstacles', () => {
+  const askBar = { left: 316, top: 650, right: 836, bottom: 700 }
+  const position = computeHintPlacement({
+    paneWidth: 1152,
+    paneHeight: 720,
+    cardWidth: 496,
+    cardHeight: 220,
+    obstacles: [askBar],
+    protectedObstacles: [askBar],
+    margin: 12,
+    preferred: { left: 500, top: 450 },
+  })
+  const card = {
+    left: position.left,
+    top: position.top,
+    right: position.left + 496,
+    bottom: position.top + 220,
+  }
+
+  assert.ok(card.right <= askBar.left || card.left >= askBar.right || card.bottom <= askBar.top || card.top >= askBar.bottom)
 })
 
 check('whole-curve graph mistakes trace red and keep green corrections', () => {

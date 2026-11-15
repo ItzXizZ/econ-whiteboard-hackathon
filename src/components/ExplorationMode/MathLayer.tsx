@@ -251,11 +251,12 @@ function tutorCurveLabel(
   text: string,
   obstacles: TogetherStroke[],
   anchor?: { x: number; y: number },
-  viewport?: TogetherViewport
+  viewport?: TogetherViewport,
+  zoom = 1
 ): PenOp {
   const point = anchor ?? stroke.points.reduce((right, current) => (current.x > right.x ? current : right))
   const preferred = viewport
-    ? pointLabelPosition(point, text, 16, viewport)
+    ? pointLabelPosition(point, text, 16, viewport, zoom)
     : { x: point.x + 8, y: point.y + 4 }
   return tutorLabelOp(preferred, text, obstacles, '#2563eb', 16, viewport)
 }
@@ -4439,7 +4440,8 @@ export default function MathLayer({
                 session.lesson.first.label,
                 getTogetherObstacles([acceptedStroke]),
                 undefined,
-                getViewportFlowBounds()
+                getViewportFlowBounds(),
+                zoom
               ),
             ]
           )
@@ -4459,7 +4461,8 @@ export default function MathLayer({
               session.lesson.second.label,
               getTogetherObstacles([acceptedStroke]),
               undefined,
-              getViewportFlowBounds()
+              getViewportFlowBounds(),
+              zoom
             ),
             ...tutorEquilibriumOps(
               session.box,
@@ -4488,7 +4491,8 @@ export default function MathLayer({
               session.lesson.shift.newLabel,
               getTogetherObstacles([acceptedStroke]),
               undefined,
-              getViewportFlowBounds()
+              getViewportFlowBounds(),
+              zoom
             ),
             ...(oldEquilibrium ? tutorArrowOps(oldEquilibrium, newEquilibrium) : []),
             ...tutorEquilibriumOps(
@@ -4514,7 +4518,7 @@ export default function MathLayer({
             tutorCurveLabel(acceptedStroke, 'PPF', getTogetherObstacles([acceptedStroke]), {
               x: start.x + 4,
               y: start.y - 28,
-            }, getViewportFlowBounds()),
+            }, getViewportFlowBounds(), zoom),
           ]
         )
       } else if (need === 'inside-point') {
@@ -4527,7 +4531,8 @@ export default function MathLayer({
               'A: inefficient',
               getTogetherObstacles([stroke]),
               undefined,
-              getViewportFlowBounds()
+              getViewportFlowBounds(),
+              zoom
             ),
           ]
         )
@@ -4541,7 +4546,8 @@ export default function MathLayer({
               'B: unattainable for now',
               getTogetherObstacles([stroke]),
               undefined,
-              getViewportFlowBounds()
+              getViewportFlowBounds(),
+              zoom
             ),
           ],
           'Now show economic growth: draw the new PPF.'
@@ -4556,7 +4562,8 @@ export default function MathLayer({
             'PPF₂',
             getTogetherObstacles([acceptedStroke]),
             undefined,
-            getViewportFlowBounds()
+            getViewportFlowBounds(),
+            zoom
           ),
           ...(oldBulge && newBulge ? tutorArrowOps(oldBulge, newBulge) : []),
         ])
@@ -6277,6 +6284,7 @@ export default function MathLayer({
         viewportY={y}
         strokes={strokes}
         tutorStrokes={pen.strokes}
+        tutorLabels={pen.labels}
         images={images}
         occupied={[]}
         chrome={chromeRects}

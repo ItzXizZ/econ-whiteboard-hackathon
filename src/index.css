@@ -11575,12 +11575,12 @@ kbd {
 }
 
 .math-coach-copy-layer.is-leaving {
-  animation: math-coach-copy-out var(--motion-base) var(--ease-out) both;
+  animation: math-coach-copy-out 120ms var(--ease-out) both;
   pointer-events: none;
 }
 
 .math-coach-copy-layer.is-entering {
-  animation: math-coach-copy-in var(--motion-base) var(--ease-out) both;
+  animation: math-coach-copy-in 180ms var(--ease-out) 120ms both;
 }
 
 .math-tutor-presence {
@@ -11887,6 +11887,10 @@ kbd {
 
   .math-coach-copy-layer.is-leaving {
     display: none;
+  }
+
+  .math-coach-copy-layer.is-entering {
+    animation-delay: 0ms !important;
   }
 
   .math-tutor-ink-glow {

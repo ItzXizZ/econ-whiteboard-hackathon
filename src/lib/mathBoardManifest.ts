@@ -330,6 +330,7 @@ export function computeHintPlacement(params: {
   cardWidth: number
   cardHeight: number
   obstacles: ScreenRect[]
+  protectedObstacles?: ScreenRect[]
   margin?: number
   /** Default/last-known spot — used as a tie-break so the card doesn't teleport unnecessarily. */
   preferred?: { left: number; top: number }
@@ -365,13 +366,20 @@ export function computeHintPlacement(params: {
   )
 
   let best = candidates[0]
+  let bestProtectedOverlap = Infinity
   let bestScore = Infinity
   for (const c of candidates) {
     const rect: ScreenRect = { left: c.left, top: c.top, right: c.left + cardWidth, bottom: c.top + cardHeight }
+    let protectedOverlap = 0
+    for (const ob of params.protectedObstacles ?? []) protectedOverlap += screenRectOverlapArea(rect, ob)
     let overlap = 0
     for (const ob of obstacles) overlap += screenRectOverlapArea(rect, ob)
     const score = overlap + c.bias
-    if (score < bestScore - 0.5) {
+    if (
+      protectedOverlap < bestProtectedOverlap - 0.5 ||
+      (Math.abs(protectedOverlap - bestProtectedOverlap) <= 0.5 && score < bestScore - 0.5)
+    ) {
+      bestProtectedOverlap = protectedOverlap
       bestScore = score
       best = c
     }
