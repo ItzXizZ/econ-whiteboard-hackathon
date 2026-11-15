@@ -12,7 +12,8 @@
     "hub:cert": "sh scripts/hub-cert.sh",
     "hub": "npm run build && node scripts/hub.mjs",
     "start": "node server.js",
-    "bonsai": "powershell -ExecutionPolicy Bypass -File scripts/start-bonsai.ps1"
+    "bonsai": "powershell -ExecutionPolicy Bypass -File scripts/start-bonsai.ps1",
+    "voice": "swift run -c release --package-path voice-server adam-voice --model tiny"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

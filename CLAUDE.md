@@ -24,17 +24,17 @@ cd ~/Bonsai-demo && BONSAI_MODEL=4B ./scripts/start_llama_server.sh
 cd ~/econ-whiteboard-hackathon && npm run dev
 
 # 3. Argmax speech-to-text (port 50060); only needed for the mic
-cd ~/argmax-oss-swift && .build/release/argmax-cli serve --model tiny
+cd ~/econ-whiteboard-hackathon && npm run voice
 ```
 
 `npm run bonsai` is a Windows PowerShell script; do not use it on the Mac. The API server does not
 hot-reload: restart window 2 after any change under `server/` or to `server.js`. Client changes hot-reload.
 
-Argmax build (first time only, needs the Swift toolchain; not confirmed to work on this Mac yet):
-
-```bash
-cd ~ && git clone https://github.com/argmaxinc/argmax-oss-swift.git && cd argmax-oss-swift && BUILD_ALL=1 swift build -c release --product argmax-cli
-```
+The voice server (`voice-server/`) is our own Swift server on Argmax's open-source SDK (WhisperKit),
+which is the organisers' allowed option: "Build a simple server with Swift/Kotlin, interface via Node".
+It does not use Argmax's Local Server API or `argmax-cli serve`. Run `npm run voice` once **with WiFi
+on** before the demo: the first run builds it and downloads the Whisper model, and it records the model's
+folder in `~/.adam-voice/` so later runs load from disk with WiFi off.
 
 Tests: `node scripts/selftest.mjs` (21 offline checks) and `npx tsc --noEmit`. Both passed after the last change.
 
@@ -64,7 +64,7 @@ A local test account named `claudetest` exists in `server/data/`.
 - The tutor's drawn graph is an SVG inside the reply card. It is not ink on the whiteboard.
 - Only speech-to-text uses Argmax. Spoken replies use the browser's on-device `speechSynthesis`.
 - The hackathon's Technical Details file says "the Local Server API will not be available". The voice
-  feature uses the server in Argmax's open-source CLI. Whether that is allowed is unconfirmed; ask the organisers.
+  feature therefore calls the Argmax SDK from our own Swift server (`voice-server/`), not Argmax's server.
 
 ## Chiara's list of what is still wrong (her words, 8:12pm)
 

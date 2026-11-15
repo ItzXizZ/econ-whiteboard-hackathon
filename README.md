@@ -27,12 +27,14 @@ The only language model wired in is Bonsai-2, and the launcher accepts only the 
 
 ### Argmax note
 
-Argmax provides on-device text-to-speech and speech-to-text, but only on Apple Silicon and recent Snapdragon Android devices, through Swift or Kotlin. This project was built on a Windows ARM64 laptop, where Argmax cannot run, so it uses local stand-ins:
+Speech-to-text runs on Argmax's open-source Swift SDK (WhisperKit) on Apple Silicon. `voice-server/` is our own small Swift server that loads WhisperKit directly and listens on `127.0.0.1:50060`; it does not use Argmax's Local Server API. The browser records the question, `server/voice.js` forwards the WAV to it, and the text comes back without leaving the computer.
 
-- **Speech out:** the browser's `speechSynthesis`, restricted to voices the operating system reports as on-device (`localService`). Network voices such as Chrome's "Google" voices are never used.
-- **Speech in:** off by default. The only speech recognizer a Windows browser offers is the Web Speech API, which Chrome and Edge implement by sending audio to a cloud service. Questions are typed instead. Setting `VITE_ALLOW_BROWSER_STT=1` before `npm run dev` turns the microphone on if you accept that trade-off.
+```bash
+npm run voice   # first run builds it and downloads the model (WiFi on); later runs work offline
+```
 
-Both live in one file, `src/lib/voiceTutor.ts`, so they can be replaced with Argmax on supported hardware without touching the rest of the app.
+- **Speech in:** Argmax, as above. When the voice server is not running the microphone is hidden and questions are typed. Setting `VITE_ALLOW_BROWSER_STT=1` falls back to the browser's Web Speech API, which sends audio to a cloud service, so it is off by default.
+- **Speech out:** the browser's `speechSynthesis`, restricted to voices the operating system reports as on-device (`localService`).
 
 ## Requirements
 

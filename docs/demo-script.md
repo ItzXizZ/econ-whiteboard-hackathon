@@ -1,6 +1,6 @@
 # Econ Coach: demo script (4 min live, under 2 min video)
 
-**Before you start:** turn WiFi off. Start Bonsai (port 8080), `npm run dev` (5173) and Argmax (50060). Open http://localhost:5173 and have the phone on the hub (https://<Mac IP>:3443).
+**Before you start:** turn WiFi off. Start Bonsai (port 8080), `npm run dev` (5173) and the Argmax voice server with `npm run voice` (50060). Open http://localhost:5173 and have the phone on the hub (https://<Mac IP>:3443).
 
 ## One-sentence description
 Econ Coach is an economics whiteboard tutor that runs entirely on a laptop. It recognizes the graphs and equations students draw, circles their mistakes, and draws the fix alongside them, using Bonsai-2, Argmax and our own graph-checking model with no internet.

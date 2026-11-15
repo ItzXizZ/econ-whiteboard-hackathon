@@ -1,11 +1,10 @@
 /**
  * Voice input through Argmax, on this machine.
  *
- * Argmax's open-source SDK ships a command line tool whose `serve` mode runs
- * WhisperKit (on-device speech-to-text for Apple Silicon) behind a small local
- * HTTP API:
+ * `voice-server/` is our own small Swift server built on Argmax's open-source
+ * SDK (WhisperKit, on-device speech-to-text for Apple Silicon):
  *
- *     argmax-cli serve --model tiny        ->  http://localhost:50060
+ *     npm run voice                        ->  http://127.0.0.1:50060
  *
  * The browser records the question, converts it to a 16 kHz WAV and posts it
  * here; this module forwards it to that local server and returns the text.
