@@ -9,6 +9,7 @@
     "server": "node server.js",
     "client": "vite",
     "build": "tsc && vite build",
+    "hub:cert": "sh scripts/hub-cert.sh",
     "hub": "npm run build && node scripts/hub.mjs",
     "start": "node server.js",
     "bonsai": "powershell -ExecutionPolicy Bypass -File scripts/start-bonsai.ps1"

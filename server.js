@@ -11,6 +11,9 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import fs from 'fs'
+import http from 'node:http'
+import https from 'node:https'
+import os from 'node:os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -24,6 +27,16 @@ import { ARGMAX_URL, argmaxHealth, registerVoiceRoutes } from './server/voice.js
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = Number(process.env.PORT || 3002)
 const HOST = process.env.HOST || '127.0.0.1'
+const HTTPS_CERT = process.env.HTTPS_CERT || ''
+const HTTPS_KEY = process.env.HTTPS_KEY || ''
+const HTTPS_PORT = Number(process.env.HTTPS_PORT || 3443)
+
+if (Boolean(HTTPS_CERT) !== Boolean(HTTPS_KEY)) {
+  throw new Error('HTTPS_CERT and HTTPS_KEY must be configured together.')
+}
+if (HTTPS_CERT && (!Number.isInteger(HTTPS_PORT) || HTTPS_PORT < 1 || HTTPS_PORT > 65535)) {
+  throw new Error(`Invalid HTTPS_PORT: ${process.env.HTTPS_PORT}`)
+}
 
 const app = express()
 app.disable('x-powered-by')
@@ -46,6 +59,14 @@ app.get('/api/health', async (_req, res) => {
     tts: 'browser-speechSynthesis',
     cloud: false,
   })
+})
+
+app.get('/hub-ca.crt', (_req, res) => {
+  const caPath =
+    process.env.HUB_CA_CERT || path.join(os.homedir(), '.econ-hub', 'ca.crt')
+  if (!fs.existsSync(caPath)) return res.sendStatus(404)
+  res.set('Content-Type', 'application/x-x509-ca-cert')
+  return res.send(fs.readFileSync(caPath))
 })
 
 registerAccountRoutes(app)
@@ -77,7 +98,10 @@ app.use((err, _req, res, _next) => {
   })
 })
 
-app.listen(PORT, HOST, async () => {
+const httpServer = http.createServer(app)
+let httpsServer
+
+httpServer.listen(PORT, HOST, async () => {
   console.log(`\n  Econ Coach API   http://${HOST}:${PORT}`)
   console.log('  Accounts/boards: local JSON files in server/data/')
   startGraphChecker()
@@ -106,6 +130,19 @@ app.listen(PORT, HOST, async () => {
   }
   console.log('')
 })
+
+if (HTTPS_CERT && HTTPS_KEY) {
+  httpsServer = https.createServer(
+    {
+      cert: fs.readFileSync(HTTPS_CERT),
+      key: fs.readFileSync(HTTPS_KEY),
+    },
+    app
+  )
+  httpsServer.listen(HTTPS_PORT, HOST, () => {
+    console.log(`  Econ Coach HTTPS https://${HOST}:${HTTPS_PORT}`)
+  })
+}
 
 // Take the graph checker process down with the server.
 for (const sig of ['SIGINT', 'SIGTERM']) {

@@ -1,13 +1,25 @@
 # Econ Coach phone hub
 
-The laptop hosts the app and its local API; a phone on the same Wi-Fi network or laptop hotspot opens the printed LAN URL. No internet connection is needed for the drawing lessons.
+The laptop serves the app and its local API to phones on the same Wi-Fi network or laptop hotspot. The drawing lessons run on the phone after the app shell has been cached; tutor answers, graph checking, and speech recognition need the laptop hub.
+
+## Start the hub
 
 1. Start the laptop's local Bonsai-2 4B service if tutor answers and graph checking are needed.
-2. From the repository, run `npm run hub`. This builds the app, binds the combined API and static site to `0.0.0.0`, and prints the local and LAN URLs. Set `PORT=3001` to use another port.
-3. Open the LAN URL on the phone and sign in. Use the browser's **Add to Home Screen** action to install Econ Coach.
+2. From the repository, run `npm run hub:cert`. This creates a private local CA and a server certificate in `~/.econ-hub/`; it does not contact the internet. Keep `ca.key` private and do not copy it to a phone.
+3. Run `npm run hub`. The command builds the app, binds HTTP on `0.0.0.0:3000` and HTTPS on `0.0.0.0:3443`, and prints the LAN URLs and CA download link. Set `PORT=3001` or `HTTPS_PORT=3444` to choose other ports.
+4. Install and trust the CA on each phone, then open the printed HTTPS URL. Plain HTTP remains available for troubleshooting, but the browser does not register the service worker or expose microphone access on an insecure LAN origin.
 
-On a secure origin, the service worker caches the app shell and its built assets after the first load. Draw-with-Adam lessons and the board remain available on the loaded page when the hub is unreachable; tutor responses, speech recognition, and graph checking need the laptop hub. Keep the phone connected to the laptop's local network to use those services without internet.
+## iPhone or iPad
 
-The printed LAN URL uses plain HTTP. Phones do not treat a laptop's LAN IP as a secure origin, so the service worker cannot cache the shell there; offline reloads and PWA installation require serving the hub over HTTPS with a certificate trusted by the phone. `localhost` is a secure-context exception only on the same device, not on the phone when it refers to itself.
+1. On the phone, open `http://<laptop-ip>:3000/hub-ca.crt` and allow the certificate profile to download.
+2. Open **Settings → Profile Downloaded → Install**.
+3. Then open **Settings → General → About → Certificate Trust Settings** and enable full trust for the Econ Coach local CA.
+4. Open `https://<laptop-ip>:3443` in Safari, sign in, then use **Share → Add to Home Screen**.
 
-Browsers also require HTTPS (or localhost) for microphone access. The microphone is hidden when the phone opens the hub over plain HTTP; typed questions and drawing lessons still work while the page is loaded.
+## Android
+
+1. On the phone, open `http://<laptop-ip>:3000/hub-ca.crt` and download the certificate.
+2. In Settings, open **Security & privacy → More security settings → Encryption & credentials → Install a certificate → CA certificate** (wording varies by device), and select the downloaded file.
+3. Open `https://<laptop-ip>:3443` in Chrome, sign in, then choose **Install app** or **Add to Home screen**.
+
+After the first HTTPS load, the service worker caches the built app shell and static assets. Draw-with-Adam lessons remain available when the hub is unreachable; Bonsai, speech recognition, and graph checking need the laptop. A phone on a plain `http://<laptop-ip>:3000` origin gets neither service-worker registration nor microphone access.

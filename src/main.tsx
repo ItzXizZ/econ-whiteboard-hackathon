@@ -4,7 +4,7 @@ import EconApp from './econ/EconApp'
 import 'katex/dist/katex.min.css'
 import './index.css'
 
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+if (import.meta.env.PROD && window.isSecureContext && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     void navigator.serviceWorker.register('/sw.js').catch(() => undefined)
   })
