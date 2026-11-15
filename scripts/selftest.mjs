@@ -39,6 +39,7 @@ const {
   polylineIntersection,
   pickTogetherLesson,
   ppfBulgePoint,
+  replaceCorrectionOpIds,
   shiftedEquilibriumLabel,
   SUPPLY_DEMAND_LESSON,
   TOGETHER_LESSONS,
@@ -425,10 +426,10 @@ check('draw-together distinguishes shifted equilibrium labels', () => {
   )
 })
 
-check('draw-together validates bowed-out PPFs and inside/outside points', () => {
+check('draw-together classifies dash marks around a bowed-out PPF', () => {
   const box = { x: 0, y: 0, w: 360, h: 280 }
   const bowedOut = {
-    points: [{ x: 42, y: 22 }, { x: 194, y: 95 }, { x: 346, y: 254 }],
+    points: [{ x: 42, y: 64 }, { x: 194, y: 95 }, { x: 346, y: 254 }],
   }
   const straight = {
     points: [{ x: 42, y: 22 }, { x: 194, y: 138 }, { x: 346, y: 254 }],
@@ -436,10 +437,13 @@ check('draw-together validates bowed-out PPFs and inside/outside points', () => 
   const bowedIn = {
     points: [{ x: 42, y: 22 }, { x: 194, y: 180 }, { x: 346, y: 254 }],
   }
-  const inside = { points: [{ x: 180, y: 160 }] }
-  const outside = { points: [{ x: 180, y: 60 }] }
-  const outsideAxes = { points: [{ x: 20, y: 60 }] }
-  const tooLong = { points: [{ x: 100, y: 100 }, { x: 140, y: 100 }] }
+  const nearOriginDash = { points: [{ x: 25, y: 240 }, { x: 95, y: 240 }] }
+  const aboveRightDash = { points: [{ x: 285, y: 50 }, { x: 355, y: 50 }] }
+  const beyondXAxisDash = { points: [{ x: 360, y: 250 }, { x: 430, y: 250 }] }
+  const onCurveDash = { points: [{ x: 159, y: 95 }, { x: 229, y: 95 }] }
+  const leftOfAxisDash = { points: [{ x: -10, y: 60 }, { x: 60, y: 60 }] }
+  const belowXAxisDash = { points: [{ x: 200, y: 270 }, { x: 270, y: 270 }] }
+  const tooLong = { points: [{ x: 100, y: 100 }, { x: 200, y: 100 }] }
   const grown = {
     points: [{ x: 42, y: 22 }, { x: 194, y: 55 }, { x: 346, y: 254 }],
   }
@@ -449,11 +453,22 @@ check('draw-together validates bowed-out PPFs and inside/outside points', () => 
   assert.equal(isPpfCurve(bowedOut, box), true)
   assert.equal(isPpfGrowth(bowedOut, grown, box), true)
   assert.ok(ppfBulgePoint(bowedOut))
-  assert.equal(isPointRelativeToCurve(inside, bowedOut, box, 'inside'), true)
-  assert.equal(isPointRelativeToCurve(inside, bowedOut, box, 'outside'), false)
-  assert.equal(isPointRelativeToCurve(outside, bowedOut, box, 'outside'), true)
-  assert.equal(isPointRelativeToCurve(outsideAxes, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(nearOriginDash, bowedOut, box, 'inside'), true)
+  assert.equal(isPointRelativeToCurve(nearOriginDash, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(aboveRightDash, bowedOut, box, 'outside'), true)
+  assert.equal(isPointRelativeToCurve(beyondXAxisDash, bowedOut, box, 'outside'), true)
+  assert.equal(isPointRelativeToCurve(onCurveDash, bowedOut, box, 'inside'), false)
+  assert.equal(isPointRelativeToCurve(onCurveDash, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(leftOfAxisDash, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(belowXAxisDash, bowedOut, box, 'outside'), false)
   assert.equal(isPointRelativeToCurve(tooLong, bowedOut, box, 'inside'), false)
+})
+
+check('draw-together replaces previous wrong-attempt correction circles', () => {
+  let active = replaceCorrectionOpIds([], ['circle-1']).active
+  const secondAttempt = replaceCorrectionOpIds(active, ['circle-2'])
+  assert.deepEqual(secondAttempt.remove, ['circle-1'])
+  assert.deepEqual(secondAttempt.active, ['circle-2'])
 })
 
 check('draw-together places labels clear of intersecting strokes', () => {

@@ -28,6 +28,7 @@ import {
   polylineIntersection,
   placeLabelAwayFromStrokes,
   ppfBulgePoint,
+  replaceCorrectionOpIds,
   shiftedEquilibriumLabel,
   strokeFitsBox,
   TOGETHER_LESSONS,
@@ -3663,10 +3664,11 @@ export default function MathLayer({
 
   const clearTogetherCorrectionInk = useCallback(
     (session: TogetherSession) => {
-      if (session.correctionOpIds.length) pen.remove(session.correctionOpIds)
+      const replacement = replaceCorrectionOpIds(session.correctionOpIds, [])
+      if (replacement.remove.length) pen.remove(replacement.remove)
       const removedBounds = new Set(session.correctionBounds)
       tutorPenBoundsRef.current = tutorPenBoundsRef.current.filter((bounds) => !removedBounds.has(bounds))
-      session.correctionOpIds = []
+      session.correctionOpIds = replacement.active
       session.correctionBounds = []
     },
     [pen.remove]
@@ -3782,6 +3784,7 @@ export default function MathLayer({
       }
 
       if (feedback) {
+        clearTogetherCorrectionInk(session)
         updateTogetherCard(session.id, step, feedback)
         const strokeBounds = tutorStrokeBounds(stroke)
         const correction = runTogetherOps(strokeBounds ? circleOps(strokeBounds) : [], () => {
@@ -3790,7 +3793,10 @@ export default function MathLayer({
           session.baselineIds = new Set(strokesRef.current.map((item) => item.id))
           session.awaiting = need
         })
-        session.correctionOpIds.push(...correction.ids)
+        session.correctionOpIds = replaceCorrectionOpIds(
+          session.correctionOpIds,
+          correction.ids
+        ).active
         if (correction.bounds) session.correctionBounds.push(correction.bounds)
         return
       }

@@ -659,6 +659,37 @@ function strokeCenter(stroke: TogetherStroke): TogetherPoint | null {
   }
 }
 
+function pointToPolylineDistance(point: TogetherPoint, line: TogetherPoint[]): number {
+  let minimum = Infinity
+  for (let i = 1; i < line.length; i++) {
+    const a = line[i - 1]
+    const b = line[i]
+    const dx = b.x - a.x
+    const dy = b.y - a.y
+    const lengthSquared = dx * dx + dy * dy
+    const t = lengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSquared))
+    minimum = Math.min(minimum, Math.hypot(point.x - a.x - t * dx, point.y - a.y - t * dy))
+  }
+  return minimum
+}
+
+function pointInPolygon(point: TogetherPoint, polygon: TogetherPoint[]): boolean {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[i]
+    const b = polygon[j]
+    if (
+      (a.y > point.y) !== (b.y > point.y) &&
+      point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x
+    ) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
 export function isPointRelativeToCurve(
   pointStroke: TogetherStroke,
   curve: TogetherStroke,
@@ -670,23 +701,34 @@ export function isPointRelativeToCurve(
   const ys = pointStroke.points.map((point) => point.y)
   const width = Math.max(...xs) - Math.min(...xs)
   const height = Math.max(...ys) - Math.min(...ys)
-  if (width >= box.w * 0.08 || height >= box.h * 0.08) return false
+  if (width > box.w * 0.24 || height > box.h * 0.24) return false
   const point = strokeCenter(pointStroke)
   if (!point) return false
-  const { left, top, right, bottom } = axesFor(box)
-  if (point.x < left || point.x > right || point.y < top || point.y > bottom) return false
+  const { left, bottom } = axesFor(box)
+  const axisMargin = Math.max(8, Math.hypot(box.w, box.h) * 0.02)
+  if (point.x < left - axisMargin || point.y > bottom + axisMargin) return false
+  if (curve.points.length < 2) return false
 
-  let best: { y: number; dx: number } | null = null
-  for (let i = 1; i < curve.points.length; i++) {
-    const a = curve.points[i - 1]
-    const b = curve.points[i]
-    const dx = b.x - a.x
-    const t = dx === 0 ? 0 : Math.max(0, Math.min(1, (point.x - a.x) / dx))
-    const projectedX = a.x + dx * t
-    const y = a.y + (b.y - a.y) * t
-    const distance = Math.abs(projectedX - point.x)
-    if (!best || distance < best.dx) best = { y, dx: distance }
-  }
-  if (!best || best.dx > box.w * 0.1) return false
-  return side === 'inside' ? point.y > best.y : point.y < best.y
+  const points =
+    Math.abs(curve.points[0].x - left) <= Math.abs(curve.points[curve.points.length - 1].x - left)
+      ? curve.points
+      : [...curve.points].reverse()
+  if (pointToPolylineDistance(point, points) < axisMargin) return false
+  const start = points[0]
+  const end = points[points.length - 1]
+  const polygon = [
+    { x: left, y: bottom },
+    { x: left, y: start.y },
+    ...points,
+    { x: end.x, y: bottom },
+  ]
+  const inside = pointInPolygon(point, polygon)
+  return side === 'inside' ? inside : !inside
+}
+
+export function replaceCorrectionOpIds(
+  previous: string[],
+  next: string[]
+): { remove: string[]; active: string[] } {
+  return { remove: [...previous], active: [...next] }
 }
