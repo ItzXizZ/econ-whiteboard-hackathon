@@ -1,0 +1,2150 @@
+{
+ "graph_types": [
+  "ad_as_long_run",
+  "ad_as_output_gap",
+  "budget_line_shift",
+  "business_cycle",
+  "comparative_advantage",
+  "consumer_optimum",
+  "consumer_producer_surplus",
+  "cost_curves",
+  "demand_shift",
+  "elasticity_comparison",
+  "fx_market",
+  "is_lm",
+  "isoquant_isocost",
+  "keynesian_cross",
+  "laffer_curve",
+  "loanable_funds",
+  "lorenz_curve",
+  "minimum_wage",
+  "money_market",
+  "monopolistic_competition_lr",
+  "monopoly",
+  "monopsony",
+  "negative_externality",
+  "pc_firm_loss",
+  "pc_firm_profit",
+  "pc_long_run",
+  "per_unit_subsidy",
+  "per_unit_tax",
+  "perfect_elasticity",
+  "phillips_curve",
+  "positive_externality",
+  "ppf",
+  "ppf_shift",
+  "price_ceiling",
+  "price_floor",
+  "short_run_production",
+  "solow_growth",
+  "supply_demand_equilibrium",
+  "supply_shift",
+  "supply_shock",
+  "tariff"
+ ],
+ "error_types": [
+  "none",
+  "ad_shift_wrong_direction",
+  "ad_upward",
+  "ae_slope_above_one",
+  "afc_rising",
+  "atc_avc_labels_swapped",
+  "axes_swapped_phillips",
+  "axis_labels_swapped",
+  "axis_real_rate",
+  "called_demand_pull",
+  "ceiling_above_equilibrium",
+  "comparative_advantage_reversed",
+  "cs_ps_swapped",
+  "cs_shaded_as_rectangle",
+  "curve_labels_swapped",
+  "curves_concave",
+  "curves_crossing",
+  "demand_slopes_up",
+  "dwl_wrong_side",
+  "elasticity_labels_swapped",
+  "equilibrium_off_45",
+  "equilibrium_off_intersection",
+  "equilibrium_off_lras",
+  "floor_below_equilibrium",
+  "fx_label_wrong",
+  "fx_wrong_direction",
+  "gap_mislabeled",
+  "gini_area_mislabeled",
+  "imports_from_origin",
+  "income_drawn_as_pivot",
+  "is_lm_labels_swapped",
+  "labeled_shortage",
+  "labeled_surplus",
+  "lf_wrong_curve",
+  "lf_wrong_direction",
+  "lorenz_above_equality",
+  "loss_labeled_profit",
+  "lr_price_above_atc_min",
+  "lr_profit_shown",
+  "lras_sloped",
+  "lrpc_not_at_natural_rate",
+  "mc_misses_atc_min",
+  "mfc_below_supply",
+  "min_wage_below_equilibrium",
+  "missing_axis_labels",
+  "missing_curve_labels",
+  "mp_ap_labels_swapped",
+  "mp_misses_ap_max",
+  "mr_parallel_to_demand",
+  "ms_shift_wrong_direction",
+  "ms_upward",
+  "new_equilibrium_misplaced",
+  "optimum_not_tangent",
+  "output_at_min_atc",
+  "output_investment_swapped",
+  "output_where_mc_falling",
+  "outside_point_attainable",
+  "peak_trough_swapped",
+  "perfect_labels_swapped",
+  "phase_labels_swapped",
+  "pivot_vs_parallel",
+  "point_labels_wrong",
+  "policy_wrong_curve",
+  "ppf_bowed_in",
+  "price_drawn_as_parallel",
+  "price_read_from_mr",
+  "producer_price_at_old_equilibrium",
+  "profit_height_uses_avc",
+  "q_labels_swapped",
+  "qs_qd_swapped",
+  "quantity_where_d_meets_mc",
+  "revenue_monotonic",
+  "revenue_positive_at_100",
+  "revenue_rectangle_wrong",
+  "revenue_uses_original_quantity",
+  "shift_inward",
+  "shift_wrong_direction",
+  "shutdown_claim_wrong",
+  "social_curve_wrong_side",
+  "sras_shift_wrong_direction",
+  "srpc_upward",
+  "steady_state_off_intersection",
+  "subsidy_shifts_supply_up",
+  "tangent_at_min_atc",
+  "tariff_lowers_price",
+  "tax_shifts_supply_down",
+  "unemployment_measured_wrong",
+  "wage_read_from_mfc",
+  "wrong_curve_shifted"
+ ],
+ "fix_templates": {
+  "ad_as_long_run/lras_sloped": {
+   "explanation": "In the long run output is set by resources and technology, not the price level, so LRAS is vertical at Yf.",
+   "fix": "Draw LRAS as a vertical line at Yf.",
+   "severity": "major",
+   "highlight_roles": [
+    "lras"
+   ]
+  },
+  "ad_as_long_run/ad_upward": {
+   "explanation": "Aggregate demand slopes downward: a higher price level lowers real wealth, raises interest rates and makes exports less competitive.",
+   "fix": "Redraw AD downward-sloping.",
+   "severity": "major",
+   "highlight_roles": [
+    "aggregate_demand"
+   ]
+  },
+  "ad_as_long_run/equilibrium_off_lras": {
+   "explanation": "AD and SRAS meet left of LRAS, so output is below Yf: that is a recessionary gap, not long-run equilibrium.",
+   "fix": "Either label it a recessionary gap or draw LRAS through the AD-SRAS intersection.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "equilibrium",
+    "lras"
+   ]
+  },
+  "ad_as_long_run/axis_labels_swapped": {
+   "explanation": "'PL' belongs on the vertical axis and 'Real GDP' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "ad_as_long_run/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "ad_as_long_run/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "aggregate_demand",
+    "lras",
+    "sras"
+   ]
+  },
+  "ad_as_long_run/curve_labels_swapped": {
+   "explanation": "The labels 'LRAS' and 'AD' are on the wrong curves: the curve drawn as lras is labeled 'AD', and the curve drawn as aggregate demand is labeled 'LRAS'.",
+   "fix": "Swap the labels back: 'LRAS' goes on the lras curve and 'AD' on the aggregate demand curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "aggregate_demand",
+    "lras"
+   ]
+  },
+  "ad_as_output_gap/gap_mislabeled": {
+   "explanation": "Output Y₂ is above full employment, which is a inflationary gap.",
+   "fix": "Relabel it 'Inflationary gap'.",
+   "severity": "major",
+   "highlight_roles": [
+    "equilibrium",
+    "output_gap"
+   ]
+  },
+  "ad_as_output_gap/ad_shift_wrong_direction": {
+   "explanation": "'An export boom' increases aggregate demand, so AD should shift right.",
+   "fix": "Draw AD₂ to the right of AD₁.",
+   "severity": "major",
+   "highlight_roles": [
+    "aggregate_demand"
+   ]
+  },
+  "ad_as_output_gap/axis_labels_swapped": {
+   "explanation": "'Price level (PL)' belongs on the vertical axis and 'Real GDP (Y)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "ad_as_output_gap/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "ad_as_output_gap/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "aggregate_demand",
+    "lras",
+    "sras"
+   ]
+  },
+  "ad_as_output_gap/curve_labels_swapped": {
+   "explanation": "The labels 'LRAS' and 'SRAS' are on the wrong curves: the curve drawn as lras is labeled 'SRAS', and the curve drawn as sras is labeled 'LRAS'.",
+   "fix": "Swap the labels back: 'LRAS' goes on the lras curve and 'SRAS' on the sras curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "lras",
+    "sras"
+   ]
+  },
+  "budget_line_shift/income_drawn_as_pivot": {
+   "explanation": "A pure income increase with unchanged prices keeps the slope (−Px/Py), so the line shifts out in parallel; both intercepts move.",
+   "fix": "Move both intercepts out proportionally.",
+   "severity": "major",
+   "highlight_roles": [
+    "budget"
+   ]
+  },
+  "budget_line_shift/price_drawn_as_parallel": {
+   "explanation": "Only the price of pizza changed, so the soda intercept (income/Py) stays fixed; the line pivots out along the pizza axis.",
+   "fix": "Keep the soda intercept and move only the pizza intercept.",
+   "severity": "major",
+   "highlight_roles": [
+    "budget"
+   ]
+  },
+  "budget_line_shift/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "budget_line_shift/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "budget"
+   ]
+  },
+  "business_cycle/peak_trough_swapped": {
+   "explanation": "The high point of the cycle is the peak and the low point is the trough; they are labeled backwards.",
+   "fix": "Swap the labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "peak",
+    "trough"
+   ]
+  },
+  "business_cycle/phase_labels_swapped": {
+   "explanation": "Between these turning points real GDP is falling, so this phase is a contraction.",
+   "fix": "Fix the phase label.",
+   "severity": "major",
+   "highlight_roles": [
+    "phase"
+   ]
+  },
+  "business_cycle/axis_labels_swapped": {
+   "explanation": "'Real GDP' belongs on the vertical axis and 'Time' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "business_cycle/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "comparative_advantage/comparative_advantage_reversed": {
+   "explanation": "Comparative advantage goes to the lower opportunity cost. Country B gives up less clothing per unit of food (flatter PPF).",
+   "fix": "Country B has the comparative advantage in food.",
+   "severity": "major",
+   "highlight_roles": [
+    "claim",
+    "ppf"
+   ]
+  },
+  "comparative_advantage/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "comparative_advantage/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "ppf"
+   ]
+  },
+  "consumer_optimum/optimum_not_tangent": {
+   "explanation": "At E the indifference curve crosses the budget line, so MRS ≠ Px/Py. The consumer can reach a higher indifference curve by reallocating spending.",
+   "fix": "Move the optimum to where the highest reachable curve is tangent to the line.",
+   "severity": "major",
+   "highlight_roles": [
+    "budget",
+    "indifference_curve",
+    "optimum"
+   ]
+  },
+  "consumer_optimum/curves_crossing": {
+   "explanation": "Indifference curves cannot cross: the crossing point would give two different utility levels, violating transitivity.",
+   "fix": "Draw the curves so that none of them intersect.",
+   "severity": "major",
+   "highlight_roles": [
+    "indifference_curve"
+   ]
+  },
+  "consumer_optimum/curves_concave": {
+   "explanation": "Indifference curves are drawn concave to the origin. Diminishing MRS makes them convex (bowed toward the origin); with concave curves, the tangency point is a utility minimum.",
+   "fix": "Redraw the curves bowed toward the origin.",
+   "severity": "major",
+   "highlight_roles": [
+    "indifference_curve"
+   ]
+  },
+  "consumer_optimum/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "consumer_optimum/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "budget",
+    "indifference_curve"
+   ]
+  },
+  "consumer_optimum/curve_labels_swapped": {
+   "explanation": "The labels 'Budget line' and 'IC₁' are on the wrong curves: the curve drawn as budget is labeled 'IC₁', and the curve drawn as indifference curve is labeled 'Budget line'.",
+   "fix": "Swap the labels back: 'Budget line' goes on the budget curve and 'IC₁' on the indifference curve curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "budget",
+    "indifference_curve"
+   ]
+  },
+  "consumer_producer_surplus/cs_ps_swapped": {
+   "explanation": "The labels are reversed. Consumer surplus is the triangle under demand and above price; producer surplus is above supply and below price.",
+   "fix": "Label the upper triangle CS and the lower triangle PS.",
+   "severity": "major",
+   "highlight_roles": [
+    "consumer_surplus",
+    "producer_surplus"
+   ]
+  },
+  "consumer_producer_surplus/cs_shaded_as_rectangle": {
+   "explanation": "The shaded rectangle P*×Q* is total consumer spending, not consumer surplus.",
+   "fix": "Shade the triangle between the demand curve and the price line P*, from 0 to Q*.",
+   "severity": "major",
+   "highlight_roles": [
+    "consumer_surplus"
+   ]
+  },
+  "consumer_producer_surplus/axis_labels_swapped": {
+   "explanation": "'Price (P)' belongs on the vertical axis and 'Quantity (Q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "consumer_producer_surplus/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "consumer_producer_surplus/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "consumer_producer_surplus/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "cost_curves/mc_misses_atc_min": {
+   "explanation": "MC must cross ATC and AVC at their minimum points: when marginal cost is below average, the average falls; when above, it rises.",
+   "fix": "Redraw MC so it passes through the lowest points of AVC and ATC.",
+   "severity": "major",
+   "highlight_roles": [
+    "marginal_cost",
+    "min_atc",
+    "min_avc"
+   ]
+  },
+  "cost_curves/atc_avc_labels_swapped": {
+   "explanation": "ATC = AVC + AFC, so ATC must lie above AVC. The labels are reversed.",
+   "fix": "Label the higher U-shaped curve ATC and the lower one AVC.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "average_variable_cost"
+   ]
+  },
+  "cost_curves/afc_rising": {
+   "explanation": "Average fixed cost = FC/Q always falls as output rises, since a fixed amount is spread over more units.",
+   "fix": "Draw AFC as a downward-sloping curve that approaches the axis.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_fixed_cost"
+   ]
+  },
+  "cost_curves/axis_labels_swapped": {
+   "explanation": "'Costs' belongs on the vertical axis and 'Quantity (Q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "cost_curves/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "cost_curves/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_fixed_cost",
+    "average_total_cost",
+    "average_variable_cost",
+    "marginal_cost"
+   ]
+  },
+  "demand_shift/shift_wrong_direction": {
+   "explanation": "'Price of a substitute for wheat rises' should shift demand to the right, but the new curve is drawn to the left.",
+   "fix": "Redraw D₂ to the right of D₁; equilibrium price rises and quantity rises.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "shift"
+   ]
+  },
+  "demand_shift/wrong_curve_shifted": {
+   "explanation": "'Price of a substitute for wheat rises' is a demand-side change, but the graph shifts the supply curve instead.",
+   "fix": "Keep supply fixed and shift the demand curve right.",
+   "severity": "major",
+   "highlight_roles": [
+    "shift",
+    "supply"
+   ]
+  },
+  "demand_shift/new_equilibrium_misplaced": {
+   "explanation": "E₂ is drawn at the old price on the new curve, not where the new curve meets the unchanged curve. The market would not clear there.",
+   "fix": "Place E₂ at the intersection of the shifted curve and the curve that did not move.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "equilibrium"
+   ]
+  },
+  "demand_shift/axis_labels_swapped": {
+   "explanation": "'Price ($)' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "demand_shift/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "demand_shift/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "demand_shift/curve_labels_swapped": {
+   "explanation": "The labels 'D₁' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D₁'.",
+   "fix": "Swap the labels back: 'D₁' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "elasticity_comparison/elasticity_labels_swapped": {
+   "explanation": "The labels are reversed. Through the same point, the steeper demand curve is relatively inelastic and the flatter one relatively elastic.",
+   "fix": "Label the steep curve inelastic and the flat curve elastic.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand_elastic",
+    "demand_inelastic"
+   ]
+  },
+  "elasticity_comparison/axis_labels_swapped": {
+   "explanation": "'Price (P)' belongs on the vertical axis and 'Quantity (Q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "elasticity_comparison/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "elasticity_comparison/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand_elastic",
+    "demand_inelastic"
+   ]
+  },
+  "fx_market/fx_wrong_direction": {
+   "explanation": "'Demand for ¥-area exports rises' increases demand for ¥, so the demand curve should shift right.",
+   "fix": "Shift D¥ right.",
+   "severity": "major",
+   "highlight_roles": [
+    "currency_demand"
+   ]
+  },
+  "fx_market/fx_label_wrong": {
+   "explanation": "The price of ¥ in $ rose, so the ¥ appreciated.",
+   "fix": "Fix the appreciation/depreciation label.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "claim"
+   ]
+  },
+  "fx_market/axis_labels_swapped": {
+   "explanation": "'$ per ¥' belongs on the vertical axis and 'Quantity of ¥' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "fx_market/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "fx_market/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "currency_demand",
+    "currency_supply"
+   ]
+  },
+  "fx_market/curve_labels_swapped": {
+   "explanation": "The labels 'D¥₁' and 'S¥' are on the wrong curves: the curve drawn as currency demand is labeled 'S¥', and the curve drawn as currency supply is labeled 'D¥₁'.",
+   "fix": "Swap the labels back: 'D¥₁' goes on the currency demand curve and 'S¥' on the currency supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "currency_demand",
+    "currency_supply"
+   ]
+  },
+  "is_lm/is_lm_labels_swapped": {
+   "explanation": "IS (goods market equilibrium) slopes downward and LM (money market equilibrium) slopes upward; the labels are reversed.",
+   "fix": "Swap IS and LM labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "is",
+    "lm"
+   ]
+  },
+  "is_lm/policy_wrong_curve": {
+   "explanation": "Government spending is a goods-market change: it shifts IS, not LM.",
+   "fix": "Shift IS instead.",
+   "severity": "major",
+   "highlight_roles": [
+    "lm"
+   ]
+  },
+  "is_lm/axis_labels_swapped": {
+   "explanation": "'i' belongs on the vertical axis and 'Real GDP (Y)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "is_lm/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "is_lm/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "is",
+    "lm"
+   ]
+  },
+  "isoquant_isocost/optimum_not_tangent": {
+   "explanation": "At E the isoquant crosses the isocost, so MRTS ≠ w/r. The same cost could produce more output.",
+   "fix": "Move the optimum to where the highest reachable curve is tangent to the line.",
+   "severity": "major",
+   "highlight_roles": [
+    "isocost",
+    "isoquant",
+    "optimum"
+   ]
+  },
+  "isoquant_isocost/curves_crossing": {
+   "explanation": "Isoquants cannot cross: one input bundle cannot produce two different output levels.",
+   "fix": "Draw the curves so that none of them intersect.",
+   "severity": "major",
+   "highlight_roles": [
+    "isoquant"
+   ]
+  },
+  "isoquant_isocost/curves_concave": {
+   "explanation": "Isoquants should be convex to the origin (diminishing MRTS).",
+   "fix": "Redraw the curves bowed toward the origin.",
+   "severity": "major",
+   "highlight_roles": [
+    "isoquant"
+   ]
+  },
+  "isoquant_isocost/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "isoquant_isocost/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "isocost",
+    "isoquant"
+   ]
+  },
+  "isoquant_isocost/curve_labels_swapped": {
+   "explanation": "The labels 'Isocost' and 'Q₁' are on the wrong curves: the curve drawn as isocost is labeled 'Q₁', and the curve drawn as isoquant is labeled 'Isocost'.",
+   "fix": "Swap the labels back: 'Isocost' goes on the isocost curve and 'Q₁' on the isoquant curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "isocost",
+    "isoquant"
+   ]
+  },
+  "keynesian_cross/ae_slope_above_one": {
+   "explanation": "AE has slope equal to the MPC, which is between 0 and 1, so AE must be flatter than the 45° line and cross it from above.",
+   "fix": "Draw AE with a positive intercept and slope < 1.",
+   "severity": "major",
+   "highlight_roles": [
+    "45_degree",
+    "aggregate_expenditure"
+   ]
+  },
+  "keynesian_cross/equilibrium_off_45": {
+   "explanation": "E is on the AE line but not on the 45° line, so planned spending exceeds output there and inventories fall; output will rise.",
+   "fix": "Move E to where AE crosses the 45° line.",
+   "severity": "major",
+   "highlight_roles": [
+    "45_degree",
+    "equilibrium"
+   ]
+  },
+  "keynesian_cross/axis_labels_swapped": {
+   "explanation": "'Aggregate expenditure (AE)' belongs on the vertical axis and 'Income, output (Y)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "keynesian_cross/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "keynesian_cross/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "45_degree",
+    "aggregate_expenditure"
+   ]
+  },
+  "keynesian_cross/curve_labels_swapped": {
+   "explanation": "The labels '45° line (AE = Y)' and 'AE = C + I + G + NX' are on the wrong curves: the curve drawn as 45 degree is labeled 'AE = C + I + G + NX', and the curve drawn as aggregate expenditure is labeled '45° line (AE = Y)'.",
+   "fix": "Swap the labels back: '45° line (AE = Y)' goes on the 45 degree curve and 'AE = C + I + G + NX' on the aggregate expenditure curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "45_degree",
+    "aggregate_expenditure"
+   ]
+  },
+  "laffer_curve/revenue_positive_at_100": {
+   "explanation": "At a 100% tax rate there is no incentive to earn taxable income, so revenue falls to zero.",
+   "fix": "Bring the curve back down to zero at 100%.",
+   "severity": "major",
+   "highlight_roles": [
+    "laffer_curve",
+    "tax_rate_100"
+   ]
+  },
+  "laffer_curve/revenue_monotonic": {
+   "explanation": "This curve keeps rising. The Laffer curve rises, peaks at some rate t*, then falls to zero at 100%.",
+   "fix": "Draw an inverted U from 0% to 100%.",
+   "severity": "major",
+   "highlight_roles": [
+    "laffer_curve",
+    "revenue_max"
+   ]
+  },
+  "laffer_curve/axis_labels_swapped": {
+   "explanation": "'Tax revenue' belongs on the vertical axis and 'Tax rate (%)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "laffer_curve/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "loanable_funds/lf_wrong_direction": {
+   "explanation": "More government borrowing increases demand for loanable funds, shifting D right.",
+   "fix": "Shift the curve to the right.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand_lf"
+   ]
+  },
+  "loanable_funds/lf_wrong_curve": {
+   "explanation": "A deficit means more government borrowing: the demand curve shifts, not supply.",
+   "fix": "Shift the other curve instead.",
+   "severity": "major",
+   "highlight_roles": [
+    "supply_lf"
+   ]
+  },
+  "loanable_funds/axis_labels_swapped": {
+   "explanation": "'Real interest rate (r)' belongs on the vertical axis and 'Quantity of loanable funds' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "loanable_funds/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "loanable_funds/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand_lf",
+    "supply_lf"
+   ]
+  },
+  "loanable_funds/curve_labels_swapped": {
+   "explanation": "The labels 'S_LF' and 'D_LF₁' are on the wrong curves: the curve drawn as supply lf is labeled 'D_LF₁', and the curve drawn as demand lf is labeled 'S_LF'.",
+   "fix": "Swap the labels back: 'S_LF' goes on the supply lf curve and 'D_LF₁' on the demand lf curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand_lf",
+    "supply_lf"
+   ]
+  },
+  "lorenz_curve/lorenz_above_equality": {
+   "explanation": "A Lorenz curve can never lie above the line of equality: the poorest x% cannot earn more than x% of income.",
+   "fix": "Draw the Lorenz curve bowed below the 45° line.",
+   "severity": "major",
+   "highlight_roles": [
+    "line_of_equality",
+    "lorenz_curve"
+   ]
+  },
+  "lorenz_curve/gini_area_mislabeled": {
+   "explanation": "The area under the Lorenz curve is B. The inequality area A is between the line of equality and the Lorenz curve.",
+   "fix": "Shade the gap between the two curves as A.",
+   "severity": "major",
+   "highlight_roles": [
+    "inequality_area",
+    "lorenz_curve"
+   ]
+  },
+  "lorenz_curve/axis_labels_swapped": {
+   "explanation": "'Cumulative % of income' belongs on the vertical axis and 'Cumulative % of population' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "lorenz_curve/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "lorenz_curve/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "line_of_equality",
+    "lorenz_curve"
+   ]
+  },
+  "lorenz_curve/curve_labels_swapped": {
+   "explanation": "The labels 'Line of equality' and 'Lorenz curve' are on the wrong curves: the curve drawn as line of equality is labeled 'Lorenz curve', and the curve drawn as lorenz curve is labeled 'Line of equality'.",
+   "fix": "Swap the labels back: 'Line of equality' goes on the line of equality curve and 'Lorenz curve' on the lorenz curve curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "line_of_equality",
+    "lorenz_curve"
+   ]
+  },
+  "minimum_wage/min_wage_below_equilibrium": {
+   "explanation": "A minimum wage below the equilibrium wage is non-binding; the market wage stays at W* and there is no unemployment from it.",
+   "fix": "Draw a binding minimum wage above W*.",
+   "severity": "major",
+   "highlight_roles": [
+    "minimum_wage",
+    "unemployment"
+   ]
+  },
+  "minimum_wage/unemployment_measured_wrong": {
+   "explanation": "Unemployment is the gap between labor supplied and labor demanded at the minimum wage (Ls − Ld), not Ls − L*.",
+   "fix": "Measure the gap from Ld to Ls.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "unemployment"
+   ]
+  },
+  "minimum_wage/axis_labels_swapped": {
+   "explanation": "'Wage (W)' belongs on the vertical axis and 'Labor (L)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "minimum_wage/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "minimum_wage/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "labor_demand",
+    "labor_supply",
+    "minimum_wage"
+   ]
+  },
+  "minimum_wage/curve_labels_swapped": {
+   "explanation": "The labels 'D_L = MRP' and 'S_L' are on the wrong curves: the curve drawn as labor demand is labeled 'S_L', and the curve drawn as labor supply is labeled 'D_L = MRP'.",
+   "fix": "Swap the labels back: 'D_L = MRP' goes on the labor demand curve and 'S_L' on the labor supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "labor_demand",
+    "labor_supply"
+   ]
+  },
+  "money_market/ms_upward": {
+   "explanation": "The money supply is set by the central bank and does not respond to the interest rate, so MS is vertical.",
+   "fix": "Draw MS as vertical lines.",
+   "severity": "major",
+   "highlight_roles": [
+    "money_supply"
+   ]
+  },
+  "money_market/ms_shift_wrong_direction": {
+   "explanation": "'The central bank lowers the reserve requirement' increases the money supply, so MS shifts right and i falls.",
+   "fix": "Move MS₂ to the right.",
+   "severity": "major",
+   "highlight_roles": [
+    "money_supply"
+   ]
+  },
+  "money_market/axis_real_rate": {
+   "explanation": "The money market graph uses the nominal interest rate (the opportunity cost of holding money); the real rate belongs on the loanable funds graph.",
+   "fix": "Label the vertical axis 'Nominal interest rate (i)'.",
+   "severity": "minor",
+   "highlight_roles": [
+    "y_axis"
+   ]
+  },
+  "money_market/axis_labels_swapped": {
+   "explanation": "'Nominal interest rate (i)' belongs on the vertical axis and 'Quantity of money (M)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "money_market/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "money_market/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "money_demand",
+    "money_supply"
+   ]
+  },
+  "money_market/curve_labels_swapped": {
+   "explanation": "The labels 'MD' and 'MS₁' are on the wrong curves: the curve drawn as money demand is labeled 'MS₁', and the curve drawn as money supply is labeled 'MD'.",
+   "fix": "Swap the labels back: 'MD' goes on the money demand curve and 'MS₁' on the money supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "money_demand",
+    "money_supply"
+   ]
+  },
+  "monopolistic_competition_lr/tangent_at_min_atc": {
+   "explanation": "A monopolistically competitive firm faces downward-sloping demand, so the tangency must be on the downward-sloping part of ATC, left of the minimum (excess capacity).",
+   "fix": "Draw D tangent to ATC to the left of min ATC.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "lr_equilibrium",
+    "min_atc"
+   ]
+  },
+  "monopolistic_competition_lr/lr_profit_shown": {
+   "explanation": "Demand lies above ATC, so firms earn economic profit. With free entry, that cannot persist in the long run.",
+   "fix": "Shift D (and MR) left until D is just tangent to ATC.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "demand",
+    "lr_equilibrium"
+   ]
+  },
+  "monopolistic_competition_lr/axis_labels_swapped": {
+   "explanation": "'Price, cost' belongs on the vertical axis and 'Q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "monopolistic_competition_lr/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "monopolistic_competition_lr/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_total_cost",
+    "demand",
+    "marginal_cost",
+    "marginal_revenue"
+   ]
+  },
+  "monopolistic_competition_lr/curve_labels_swapped": {
+   "explanation": "The labels 'ATC' and 'MC' are on the wrong curves: the curve drawn as average total cost is labeled 'MC', and the curve drawn as marginal cost is labeled 'ATC'.",
+   "fix": "Swap the labels back: 'ATC' goes on the average total cost curve and 'MC' on the marginal cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost"
+   ]
+  },
+  "monopoly/price_read_from_mr": {
+   "explanation": "The monopolist charges the highest price consumers will pay for Qm, which is on the demand curve, not at the MR = MC point.",
+   "fix": "Go up from Qm to D and read Pm there.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "demand",
+    "monopoly_price"
+   ]
+  },
+  "monopoly/mr_parallel_to_demand": {
+   "explanation": "With linear demand P = a − bQ, MR = a − 2bQ: same intercept, twice as steep. MR cannot be parallel to demand.",
+   "fix": "Draw MR starting at the demand intercept and hitting the quantity axis halfway to demand's intercept.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "marginal_revenue"
+   ]
+  },
+  "monopoly/quantity_where_d_meets_mc": {
+   "explanation": "Q where D = MC is the competitive outcome. A monopolist restricts output to where MR = MC.",
+   "fix": "Find Qm at MR = MC, then read Pm from demand; shade the DWL.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "marginal_revenue",
+    "monopoly_price"
+   ]
+  },
+  "monopoly/axis_labels_swapped": {
+   "explanation": "'Price' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "monopoly/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "monopoly/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "marginal_cost",
+    "marginal_revenue"
+   ]
+  },
+  "monopoly/curve_labels_swapped": {
+   "explanation": "The labels 'D = AR' and 'MR' are on the wrong curves: the curve drawn as demand is labeled 'MR', and the curve drawn as marginal revenue is labeled 'D = AR'.",
+   "fix": "Swap the labels back: 'D = AR' goes on the demand curve and 'MR' on the marginal revenue curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "marginal_revenue"
+   ]
+  },
+  "monopsony/wage_read_from_mfc": {
+   "explanation": "The monopsonist pays the lowest wage workers will accept for Lm, which is on the supply curve, not the MFC = MRP point.",
+   "fix": "Drop from the MRP = MFC point down to S and read Wm there.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "labor_supply",
+    "monopsony_wage"
+   ]
+  },
+  "monopsony/mfc_below_supply": {
+   "explanation": "Marginal factor cost exceeds the wage for a monopsonist (raising the wage applies to all workers), so MFC lies above S and is steeper.",
+   "fix": "Draw MFC above S with the same intercept and twice the slope.",
+   "severity": "major",
+   "highlight_roles": [
+    "labor_supply",
+    "marginal_factor_cost"
+   ]
+  },
+  "monopsony/axis_labels_swapped": {
+   "explanation": "'Wage (W)' belongs on the vertical axis and 'Labor (L)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "monopsony/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "monopsony/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "labor_demand",
+    "labor_supply",
+    "marginal_factor_cost"
+   ]
+  },
+  "monopsony/curve_labels_swapped": {
+   "explanation": "The labels 'S = AFC' and 'MFC' are on the wrong curves: the curve drawn as labor supply is labeled 'MFC', and the curve drawn as marginal factor cost is labeled 'S = AFC'.",
+   "fix": "Swap the labels back: 'S = AFC' goes on the labor supply curve and 'MFC' on the marginal factor cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "labor_supply",
+    "marginal_factor_cost"
+   ]
+  },
+  "negative_externality/social_curve_wrong_side": {
+   "explanation": "With a negative externality, social cost exceeds private cost, so MSC must lie above MPC, not below.",
+   "fix": "Draw MSC above S = MPC by the external cost per unit.",
+   "severity": "major",
+   "highlight_roles": [
+    "private_cost",
+    "social_cost"
+   ]
+  },
+  "negative_externality/q_labels_swapped": {
+   "explanation": "The market quantity is where D meets MPC and the social optimum is where D meets MSC; with a negative externality the market overproduces, so Qm > Qs.",
+   "fix": "Swap the Qm and Qs labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value"
+   ]
+  },
+  "negative_externality/axis_labels_swapped": {
+   "explanation": "'Price (P)' belongs on the vertical axis and 'Quantity (Q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "negative_externality/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "negative_externality/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "private_cost",
+    "social_cost"
+   ]
+  },
+  "negative_externality/curve_labels_swapped": {
+   "explanation": "The labels 'D = MPB = MSB' and 'S = MPC' are on the wrong curves: the curve drawn as demand is labeled 'S = MPC', and the curve drawn as private cost is labeled 'D = MPB = MSB'.",
+   "fix": "Swap the labels back: 'D = MPB = MSB' goes on the demand curve and 'S = MPC' on the private cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "private_cost"
+   ]
+  },
+  "pc_firm_loss/loss_labeled_profit": {
+   "explanation": "ATC at q* is above the price, so the firm earns an economic loss, not a profit.",
+   "fix": "Label the rectangle 'Loss'.",
+   "severity": "major",
+   "highlight_roles": [
+    "atc_at_q",
+    "economic_loss",
+    "marginal_revenue"
+   ]
+  },
+  "pc_firm_loss/shutdown_claim_wrong": {
+   "explanation": "The shutdown rule compares P with AVC, not ATC. Since P > min AVC, producing loses less than shutting down (which loses all fixed costs).",
+   "fix": "The firm should keep operating in the short run; shut down only if P < min AVC.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_variable_cost",
+    "claim",
+    "marginal_revenue"
+   ]
+  },
+  "pc_firm_loss/axis_labels_swapped": {
+   "explanation": "'Price, cost ($)' belongs on the vertical axis and 'Output (q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "pc_firm_loss/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "pc_firm_loss/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_total_cost",
+    "average_variable_cost",
+    "marginal_cost",
+    "marginal_revenue"
+   ]
+  },
+  "pc_firm_loss/curve_labels_swapped": {
+   "explanation": "The labels 'MC' and 'ATC' are on the wrong curves: the curve drawn as marginal cost is labeled 'ATC', and the curve drawn as average total cost is labeled 'MC'.",
+   "fix": "Swap the labels back: 'MC' goes on the marginal cost curve and 'ATC' on the average total cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost"
+   ]
+  },
+  "pc_firm_profit/output_at_min_atc": {
+   "explanation": "Output is set at the minimum of ATC. A profit-maximizing firm produces where MR = MC, which is to the right of min ATC when P is above it.",
+   "fix": "Move q* to where P = MC on the rising MC curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "economic_profit",
+    "profit_max"
+   ]
+  },
+  "pc_firm_profit/profit_height_uses_avc": {
+   "explanation": "The profit rectangle is measured down to AVC (which ignores fixed costs). Economic profit is (P − ATC) × q.",
+   "fix": "Draw the bottom of the profit rectangle at ATC(q*).",
+   "severity": "major",
+   "highlight_roles": [
+    "atc_at_q",
+    "axis_value",
+    "economic_profit"
+   ]
+  },
+  "pc_firm_profit/axis_labels_swapped": {
+   "explanation": "'$' belongs on the vertical axis and 'Output (q)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "pc_firm_profit/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "pc_firm_profit/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost",
+    "marginal_revenue"
+   ]
+  },
+  "pc_firm_profit/curve_labels_swapped": {
+   "explanation": "The labels 'MC' and 'ATC' are on the wrong curves: the curve drawn as marginal cost is labeled 'ATC', and the curve drawn as average total cost is labeled 'MC'.",
+   "fix": "Swap the labels back: 'MC' goes on the marginal cost curve and 'ATC' on the average total cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost"
+   ]
+  },
+  "pc_firm_profit/output_where_mc_falling": {
+   "explanation": "q* is at the crossing on the falling part of MC; there, producing more adds profit. The profit maximum is where MC crosses MR from below.",
+   "fix": "Use the MC = MR crossing on the upward-sloping part of MC.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "marginal_cost",
+    "profit_max"
+   ]
+  },
+  "pc_long_run/lr_price_above_atc_min": {
+   "explanation": "Price is above min ATC, so firms earn positive economic profit. That attracts entry, so it cannot be a long-run equilibrium.",
+   "fix": "In long-run equilibrium P = MR = MC = min ATC.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_revenue",
+    "profit_max"
+   ]
+  },
+  "pc_long_run/axis_labels_swapped": {
+   "explanation": "'P, C' belongs on the vertical axis and 'q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "pc_long_run/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "pc_long_run/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost",
+    "marginal_revenue"
+   ]
+  },
+  "pc_long_run/curve_labels_swapped": {
+   "explanation": "The labels 'MC' and 'ATC' are on the wrong curves: the curve drawn as marginal cost is labeled 'ATC', and the curve drawn as average total cost is labeled 'MC'.",
+   "fix": "Swap the labels back: 'MC' goes on the marginal cost curve and 'ATC' on the average total cost curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_total_cost",
+    "marginal_cost"
+   ]
+  },
+  "per_unit_subsidy/subsidy_shifts_supply_up": {
+   "explanation": "A subsidy lowers producers' effective cost, shifting supply down (right). Shifting it up shows a tax.",
+   "fix": "Draw S − subsidy below S; price to buyers falls and quantity rises.",
+   "severity": "major",
+   "highlight_roles": [
+    "supply_with_subsidy"
+   ]
+  },
+  "per_unit_subsidy/dwl_wrong_side": {
+   "explanation": "With a subsidy, output rises past Q*. The deadweight loss comes from overproduction between Q* and Qs, to the right of E.",
+   "fix": "Shade the triangle between E, (Qs,Pp) and (Qs,Pc).",
+   "severity": "major",
+   "highlight_roles": [
+    "deadweight_loss"
+   ]
+  },
+  "per_unit_subsidy/axis_labels_swapped": {
+   "explanation": "'Price' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "per_unit_subsidy/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "per_unit_subsidy/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply",
+    "supply_with_subsidy"
+   ]
+  },
+  "per_unit_subsidy/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "per_unit_tax/tax_shifts_supply_down": {
+   "explanation": "A tax on sellers raises their cost per unit, shifting supply up (left) by the tax. Shifting it down shows a subsidy.",
+   "fix": "Draw S + tax above S by the amount of the tax; Pc rises, Qt falls.",
+   "severity": "major",
+   "highlight_roles": [
+    "supply_with_tax"
+   ]
+  },
+  "per_unit_tax/dwl_wrong_side": {
+   "explanation": "The deadweight loss is drawn beyond Q*. A tax reduces trade, so the lost surplus is between Qt and Q*, to the left of the original equilibrium.",
+   "fix": "Shade the triangle with vertices (Qt,Pc), (Qt,Pp) and E.",
+   "severity": "major",
+   "highlight_roles": [
+    "deadweight_loss"
+   ]
+  },
+  "per_unit_tax/revenue_uses_original_quantity": {
+   "explanation": "Tax revenue is tax × quantity actually sold after the tax (Qt), not the pre-tax Q*.",
+   "fix": "Make the revenue rectangle width Qt.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "tax_revenue"
+   ]
+  },
+  "per_unit_tax/producer_price_at_old_equilibrium": {
+   "explanation": "Pp is drawn at the old equilibrium price. Sellers receive Pc minus the tax, which is the height of the original supply curve at Qt.",
+   "fix": "Read Pp off the original S at Qt.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "producer_price",
+    "tax_revenue"
+   ]
+  },
+  "per_unit_tax/axis_labels_swapped": {
+   "explanation": "'Price ($)' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "per_unit_tax/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "per_unit_tax/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply",
+    "supply_with_tax"
+   ]
+  },
+  "per_unit_tax/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "perfect_elasticity/perfect_labels_swapped": {
+   "explanation": "A horizontal demand curve is perfectly elastic and a vertical one is perfectly inelastic; the labels are reversed.",
+   "fix": "Swap the two labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand_perfectly_elastic",
+    "demand_perfectly_inelastic"
+   ]
+  },
+  "perfect_elasticity/axis_labels_swapped": {
+   "explanation": "'Price ($)' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "perfect_elasticity/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "perfect_elasticity/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand_perfectly_elastic",
+    "demand_perfectly_inelastic"
+   ]
+  },
+  "phillips_curve/srpc_upward": {
+   "explanation": "The short-run Phillips curve slopes downward: lower unemployment comes with higher inflation in the short run.",
+   "fix": "Redraw SRPC downward-sloping.",
+   "severity": "major",
+   "highlight_roles": [
+    "srpc"
+   ]
+  },
+  "phillips_curve/lrpc_not_at_natural_rate": {
+   "explanation": "The LRPC must be vertical at the natural rate uₙ; here it sits at a different unemployment rate, so the long-run point A is off the LRPC.",
+   "fix": "Move LRPC to uₙ.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "equilibrium",
+    "lrpc"
+   ]
+  },
+  "phillips_curve/axes_swapped_phillips": {
+   "explanation": "The Phillips curve puts the inflation rate on the vertical axis and the unemployment rate on the horizontal axis.",
+   "fix": "Swap the axis labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "phillips_curve/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "phillips_curve/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "lrpc",
+    "srpc"
+   ]
+  },
+  "phillips_curve/curve_labels_swapped": {
+   "explanation": "The labels 'SRPC' and 'LRPC' are on the wrong curves: the curve drawn as srpc is labeled 'LRPC', and the curve drawn as lrpc is labeled 'SRPC'.",
+   "fix": "Swap the labels back: 'SRPC' goes on the srpc curve and 'LRPC' on the lrpc curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "lrpc",
+    "srpc"
+   ]
+  },
+  "positive_externality/social_curve_wrong_side": {
+   "explanation": "With a positive externality, social benefit exceeds private benefit, so MSB must lie above MPB.",
+   "fix": "Draw MSB above D = MPB.",
+   "severity": "major",
+   "highlight_roles": [
+    "private_benefit",
+    "social_benefit"
+   ]
+  },
+  "positive_externality/q_labels_swapped": {
+   "explanation": "With a positive externality the market underproduces: Qm (D meets S) is less than Qs (MSB meets S). The labels are reversed.",
+   "fix": "Swap the Qm and Qs labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value"
+   ]
+  },
+  "positive_externality/axis_labels_swapped": {
+   "explanation": "'P' belongs on the vertical axis and 'Q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "positive_externality/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "positive_externality/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "private_benefit",
+    "social_benefit",
+    "supply"
+   ]
+  },
+  "positive_externality/curve_labels_swapped": {
+   "explanation": "The labels 'D = MPB' and 'MSB' are on the wrong curves: the curve drawn as private benefit is labeled 'MSB', and the curve drawn as social benefit is labeled 'D = MPB'.",
+   "fix": "Swap the labels back: 'D = MPB' goes on the private benefit curve and 'MSB' on the social benefit curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "private_benefit",
+    "social_benefit"
+   ]
+  },
+  "ppf/ppf_bowed_in": {
+   "explanation": "The PPF is bowed in (convex). Increasing opportunity cost requires a bowed-out (concave) frontier: each extra unit of X costs more Y.",
+   "fix": "Redraw the PPF bowed outward from the origin.",
+   "severity": "major",
+   "highlight_roles": [
+    "ppf"
+   ]
+  },
+  "ppf/point_labels_wrong": {
+   "explanation": "Points on the frontier are efficient and points inside are inefficient; A and B are labeled the wrong way around.",
+   "fix": "Label A efficient and B inefficient.",
+   "severity": "major",
+   "highlight_roles": [
+    "efficient",
+    "inefficient"
+   ]
+  },
+  "ppf/outside_point_attainable": {
+   "explanation": "C lies outside the PPF, so it cannot be produced with current resources and technology.",
+   "fix": "Label C unattainable.",
+   "severity": "major",
+   "highlight_roles": [
+    "ppf",
+    "unattainable"
+   ]
+  },
+  "ppf/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "ppf_shift/shift_inward": {
+   "explanation": "'Investment adds to the capital stock' expands production possibilities, so the PPF must shift outward, not inward.",
+   "fix": "Draw PPF₂ outside PPF₁.",
+   "severity": "major",
+   "highlight_roles": [
+    "ppf",
+    "shift"
+   ]
+  },
+  "ppf_shift/pivot_vs_parallel": {
+   "explanation": "The technology only affects pizza, so the maximum amount of robots does not change. The PPF should pivot out along the pizza axis.",
+   "fix": "Keep the robots intercept fixed and move only the pizza intercept out.",
+   "severity": "major",
+   "highlight_roles": [
+    "ppf"
+   ]
+  },
+  "ppf_shift/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "ppf_shift/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "ppf"
+   ]
+  },
+  "price_ceiling/ceiling_above_equilibrium": {
+   "explanation": "The ceiling is above the equilibrium price, so it is non-binding: the market still clears at P*, with no shortage.",
+   "fix": "A binding ceiling must be drawn below P*; otherwise remove the gap label.",
+   "severity": "major",
+   "highlight_roles": [
+    "price_control",
+    "shortage"
+   ]
+  },
+  "price_ceiling/labeled_surplus": {
+   "explanation": "At a binding price ceiling quantity demanded exceeds quantity supplied, so the gap is a shortage, not a surplus.",
+   "fix": "Relabel the gap as a shortage.",
+   "severity": "major",
+   "highlight_roles": [
+    "shortage"
+   ]
+  },
+  "price_ceiling/qs_qd_swapped": {
+   "explanation": "Qs and Qd are swapped: quantity supplied is read off the supply curve and quantity demanded off the demand curve.",
+   "fix": "Label the quantity where the control line meets S as Qs and where it meets D as Qd.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "demand",
+    "supply"
+   ]
+  },
+  "price_ceiling/axis_labels_swapped": {
+   "explanation": "'P' belongs on the vertical axis and 'Q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "price_ceiling/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "price_ceiling/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "price_control",
+    "supply"
+   ]
+  },
+  "price_ceiling/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "price_floor/floor_below_equilibrium": {
+   "explanation": "The floor is below the equilibrium price, so it is non-binding: the market still clears at P*, with no surplus.",
+   "fix": "A binding floor must be drawn above P*; otherwise remove the gap label.",
+   "severity": "major",
+   "highlight_roles": [
+    "price_control",
+    "surplus"
+   ]
+  },
+  "price_floor/labeled_shortage": {
+   "explanation": "At a binding price floor quantity supplied exceeds quantity demanded, so the gap is a surplus, not a shortage.",
+   "fix": "Relabel the gap as a surplus.",
+   "severity": "major",
+   "highlight_roles": [
+    "surplus"
+   ]
+  },
+  "price_floor/qs_qd_swapped": {
+   "explanation": "Qs and Qd are swapped: quantity supplied is read off the supply curve and quantity demanded off the demand curve.",
+   "fix": "Label the quantity where the control line meets S as Qs and where it meets D as Qd.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "demand",
+    "supply"
+   ]
+  },
+  "price_floor/axis_labels_swapped": {
+   "explanation": "'Price ($)' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "price_floor/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "price_floor/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "price_control",
+    "supply"
+   ]
+  },
+  "price_floor/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S' are on the wrong curves: the curve drawn as demand is labeled 'S', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "short_run_production/mp_misses_ap_max": {
+   "explanation": "When MP > AP, AP rises; when MP < AP, AP falls. So MP must cross AP exactly at AP's peak.",
+   "fix": "Redraw MP through the top of AP.",
+   "severity": "major",
+   "highlight_roles": [
+    "marginal_product",
+    "max_ap"
+   ]
+  },
+  "short_run_production/mp_ap_labels_swapped": {
+   "explanation": "The curve that peaks earlier and falls faster (eventually below zero) is MP; the flatter one it crosses at the peak is AP. Labels are reversed.",
+   "fix": "Swap the MP and AP labels.",
+   "severity": "major",
+   "highlight_roles": [
+    "average_product",
+    "marginal_product"
+   ]
+  },
+  "short_run_production/axis_labels_swapped": {
+   "explanation": "'MP, AP' belongs on the vertical axis and 'Labor (L)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "short_run_production/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "short_run_production/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "average_product",
+    "marginal_product"
+   ]
+  },
+  "solow_growth/steady_state_off_intersection": {
+   "explanation": "At the marked k, investment exceeds break-even investment, so capital per worker is still growing. Steady state is where sf(k) crosses (n + δ)k.",
+   "fix": "Move k* to the intersection.",
+   "severity": "major",
+   "highlight_roles": [
+    "break_even",
+    "investment",
+    "steady_state"
+   ]
+  },
+  "solow_growth/output_investment_swapped": {
+   "explanation": "Investment per worker sf(k) is a fraction (s < 1) of output, so it must lie below f(k); the labels are swapped.",
+   "fix": "Label the higher curve f(k) and the lower one sf(k).",
+   "severity": "major",
+   "highlight_roles": [
+    "investment",
+    "output"
+   ]
+  },
+  "solow_growth/axis_labels_swapped": {
+   "explanation": "'Output, investment per worker' belongs on the vertical axis and 'Capital per worker (k)' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "solow_growth/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "solow_growth/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "break_even",
+    "investment",
+    "output"
+   ]
+  },
+  "supply_demand_equilibrium/demand_slopes_up": {
+   "explanation": "The demand curve slopes upward. By the law of demand, quantity demanded falls as price rises, so demand must slope downward.",
+   "fix": "Redraw D from the upper left to the lower right through E.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand"
+   ]
+  },
+  "supply_demand_equilibrium/equilibrium_off_intersection": {
+   "explanation": "E is placed on the demand curve but not where demand and supply cross. At that price quantity demanded exceeds quantity supplied, so it is not an equilibrium.",
+   "fix": "Move E to the intersection of D and S and re-read P* and Q*.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "demand",
+    "equilibrium",
+    "supply"
+   ]
+  },
+  "supply_demand_equilibrium/curve_labels_swapped": {
+   "explanation": "The downward-sloping curve is labeled S and the upward-sloping curve D. Demand slopes down and supply slopes up.",
+   "fix": "Swap the labels: the downward-sloping curve is D, the upward-sloping curve is S.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "supply_demand_equilibrium/axis_labels_swapped": {
+   "explanation": "'P' belongs on the vertical axis and 'Q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "supply_demand_equilibrium/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "supply_demand_equilibrium/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "supply_shift/shift_wrong_direction": {
+   "explanation": "'New technology lowers the cost of producing smartphones' should shift supply to the right, but the new curve is drawn to the left.",
+   "fix": "Redraw S₂ to the right of S₁; equilibrium price falls and quantity rises.",
+   "severity": "major",
+   "highlight_roles": [
+    "shift",
+    "supply"
+   ]
+  },
+  "supply_shift/wrong_curve_shifted": {
+   "explanation": "'New technology lowers the cost of producing smartphones' is a supply-side change, but the graph shifts the demand curve instead.",
+   "fix": "Keep demand fixed and shift the supply curve right.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "shift"
+   ]
+  },
+  "supply_shift/new_equilibrium_misplaced": {
+   "explanation": "E₂ is drawn at the old price on the new curve, not where the new curve meets the unchanged curve. The market would not clear there.",
+   "fix": "Place E₂ at the intersection of the shifted curve and the curve that did not move.",
+   "severity": "major",
+   "highlight_roles": [
+    "axis_value",
+    "equilibrium"
+   ]
+  },
+  "supply_shift/axis_labels_swapped": {
+   "explanation": "'Price' belongs on the vertical axis and 'Quantity' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "supply_shift/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "supply_shift/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "supply_shift/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S₁' are on the wrong curves: the curve drawn as demand is labeled 'S₁', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S₁' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  },
+  "supply_shock/sras_shift_wrong_direction": {
+   "explanation": "'Oil prices spike' raises costs of production, so SRAS should shift left.",
+   "fix": "Draw SRAS₂ to the left.",
+   "severity": "major",
+   "highlight_roles": [
+    "sras"
+   ]
+  },
+  "supply_shock/called_demand_pull": {
+   "explanation": "Inflation caused by a leftward SRAS shift is cost-push inflation (with lower output: stagflation). Demand-pull inflation comes from AD shifting right.",
+   "fix": "Relabel it cost-push inflation / stagflation.",
+   "severity": "major",
+   "highlight_roles": [
+    "claim",
+    "sras"
+   ]
+  },
+  "supply_shock/axis_labels_swapped": {
+   "explanation": "'PL' belongs on the vertical axis and 'Real GDP' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "supply_shock/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "supply_shock/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "aggregate_demand",
+    "sras"
+   ]
+  },
+  "supply_shock/curve_labels_swapped": {
+   "explanation": "The labels 'AD' and 'SRAS₁' are on the wrong curves: the curve drawn as aggregate demand is labeled 'SRAS₁', and the curve drawn as sras is labeled 'AD'.",
+   "fix": "Swap the labels back: 'AD' goes on the aggregate demand curve and 'SRAS₁' on the sras curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "aggregate_demand",
+    "sras"
+   ]
+  },
+  "tariff/tariff_lowers_price": {
+   "explanation": "A tariff is a tax on imports; it raises the domestic price above the world price, not below it.",
+   "fix": "Draw Pw + tariff above Pw. Domestic quantity supplied rises and imports shrink.",
+   "severity": "major",
+   "highlight_roles": [
+    "price_with_tariff"
+   ]
+  },
+  "tariff/revenue_rectangle_wrong": {
+   "explanation": "Tariff revenue is collected only on imports after the tariff (Qs₂ to Qd₂), not on free-trade imports.",
+   "fix": "Shrink the revenue rectangle to span Qs₂–Qd₂ between Pw and Pw + tariff.",
+   "severity": "major",
+   "highlight_roles": [
+    "tariff_revenue"
+   ]
+  },
+  "tariff/imports_from_origin": {
+   "explanation": "Imports are the gap between domestic quantity demanded and domestic quantity supplied, not total quantity demanded.",
+   "fix": "Measure imports from Qs₂ to Qd₂.",
+   "severity": "major",
+   "highlight_roles": [
+    "imports"
+   ]
+  },
+  "tariff/axis_labels_swapped": {
+   "explanation": "'P' belongs on the vertical axis and 'Q' on the horizontal axis; the axis labels are swapped, which reverses the meaning of every slope.",
+   "fix": "Swap the axis labels back.",
+   "severity": "major",
+   "highlight_roles": [
+    "x_axis",
+    "y_axis"
+   ]
+  },
+  "tariff/missing_axis_labels": {
+   "explanation": "Neither axis is labeled, so the curves cannot be interpreted.",
+   "fix": "Label both axes.",
+   "severity": "minor",
+   "highlight_roles": []
+  },
+  "tariff/missing_curve_labels": {
+   "explanation": "None of the curves are labeled, so it is ambiguous which is which.",
+   "fix": "Label every curve.",
+   "severity": "minor",
+   "highlight_roles": [
+    "demand",
+    "price_with_tariff",
+    "supply",
+    "world_price"
+   ]
+  },
+  "tariff/curve_labels_swapped": {
+   "explanation": "The labels 'D' and 'S (domestic)' are on the wrong curves: the curve drawn as demand is labeled 'S (domestic)', and the curve drawn as supply is labeled 'D'.",
+   "fix": "Swap the labels back: 'D' goes on the demand curve and 'S (domestic)' on the supply curve.",
+   "severity": "major",
+   "highlight_roles": [
+    "demand",
+    "supply"
+   ]
+  }
+ },
+ "input": [
+  448,
+  336
+ ],
+ "stride": 16
+}

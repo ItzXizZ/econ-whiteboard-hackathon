@@ -1,0 +1,2361 @@
+[
+ {
+  "id": "ppf",
+  "field": "micro",
+  "topic": "scarcity & choice",
+  "name": "Production possibilities frontier (concave)",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "PPF curve",
+   "efficient point on curve",
+   "inefficient point inside",
+   "unattainable point outside"
+  ],
+  "correctness_rules": [
+   "Concave (bowed out) when opportunity costs increase",
+   "Points on curve efficient, inside inefficient, outside unattainable",
+   "Slope = opportunity cost of X in Y"
+  ],
+  "common_mistakes": [
+   "Bowed-in PPF labeled increasing cost",
+   "Inside point labeled efficient",
+   "Outside point labeled attainable",
+   "Straight PPF labeled increasing cost"
+  ],
+  "whiteboard_interactions": [
+   "Drag a point along the PPF to show the opportunity-cost tradeoff",
+   "Drag a point inside → highlight unemployed resources"
+  ],
+  "generator": "ppf",
+  "related": []
+ },
+ {
+  "id": "ppf_linear",
+  "field": "micro",
+  "topic": "scarcity & choice",
+  "name": "Linear PPF (constant opportunity cost)",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "straight PPF",
+   "intercepts"
+  ],
+  "correctness_rules": [
+   "Straight line ⇔ constant opportunity cost",
+   "Slope = −(Ymax/Xmax)"
+  ],
+  "common_mistakes": [
+   "Labeled increasing opportunity cost",
+   "Wrong slope for given intercepts"
+  ],
+  "whiteboard_interactions": [
+   "Drag an intercept to change opportunity cost"
+  ],
+  "generator": null,
+  "related": [
+   "comparative_advantage"
+  ]
+ },
+ {
+  "id": "ppf_shift",
+  "field": "micro",
+  "topic": "economic growth",
+  "name": "PPF outward shift / pivot",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "PPF1",
+   "PPF2",
+   "shift arrow"
+  ],
+  "correctness_rules": [
+   "Growth (more resources, general tech) → outward shift",
+   "Tech specific to one good → pivot along that axis only",
+   "Destruction of resources → inward shift"
+  ],
+  "common_mistakes": [
+   "Growth drawn inward",
+   "One-good technology drawn as parallel shift",
+   "Choosing more capital goods today does not shift tomorrow's PPF further out"
+  ],
+  "whiteboard_interactions": [
+   "Drag one intercept to pivot",
+   "Animate PPF1 → PPF2"
+  ],
+  "generator": "ppf_shift",
+  "related": []
+ },
+ {
+  "id": "comparative_advantage",
+  "field": "micro",
+  "topic": "trade",
+  "name": "Comparative advantage with two PPFs",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "PPF country A",
+   "PPF country B",
+   "terms-of-trade line",
+   "consumption points"
+  ],
+  "correctness_rules": [
+   "Lower opportunity cost (flatter PPF for X on x-axis) → comparative advantage in X",
+   "Terms of trade lie between the two opportunity costs",
+   "Post-trade consumption can lie outside own PPF"
+  ],
+  "common_mistakes": [
+   "Comparative advantage confused with absolute advantage",
+   "Comparative advantage assigned to the higher-cost producer",
+   "Terms of trade outside the range of opportunity costs"
+  ],
+  "whiteboard_interactions": [
+   "Rotate the terms-of-trade line between the two slopes",
+   "Highlight each slope as opportunity cost"
+  ],
+  "generator": "comparative_advantage",
+  "related": []
+ },
+ {
+  "id": "circular_flow",
+  "field": "micro",
+  "topic": "foundations",
+  "name": "Circular-flow diagram",
+  "axes": {
+   "x": null,
+   "y": null
+  },
+  "elements": [
+   "households",
+   "firms",
+   "product market",
+   "factor market",
+   "real and money flows"
+  ],
+  "correctness_rules": [
+   "Money flows opposite to goods/factor flows",
+   "Households sell factors, buy products"
+  ],
+  "common_mistakes": [
+   "Arrow directions reversed",
+   "Factor and product markets swapped"
+  ],
+  "whiteboard_interactions": [
+   "Trace one dollar around the loop"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "demand_curve",
+  "field": "micro",
+  "topic": "demand",
+  "name": "Demand curve, change in quantity demanded vs change in demand",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D curve",
+   "movement along",
+   "shift"
+  ],
+  "correctness_rules": [
+   "Downward sloping (law of demand)",
+   "Own-price change → movement along curve; other determinants → shift"
+  ],
+  "common_mistakes": [
+   "Upward-sloping demand",
+   "Price change drawn as a shift",
+   "Shift direction wrong for determinant"
+  ],
+  "whiteboard_interactions": [
+   "Drag a point along D vs drag D itself"
+  ],
+  "generator": "demand_shift",
+  "related": []
+ },
+ {
+  "id": "supply_curve",
+  "field": "micro",
+  "topic": "supply",
+  "name": "Supply curve, change in quantity supplied vs change in supply",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "S curve",
+   "movement along",
+   "shift"
+  ],
+  "correctness_rules": [
+   "Upward sloping",
+   "Own-price change → movement along; input cost/tech/expectations/number of sellers → shift"
+  ],
+  "common_mistakes": [
+   "'Increase in supply' drawn as upward (leftward) shift",
+   "Price change drawn as a shift"
+  ],
+  "whiteboard_interactions": [
+   "Drag S right/left"
+  ],
+  "generator": "supply_shift",
+  "related": []
+ },
+ {
+  "id": "supply_demand_equilibrium",
+  "field": "micro",
+  "topic": "markets",
+  "name": "Market equilibrium",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D",
+   "S",
+   "E",
+   "P*",
+   "Q*"
+  ],
+  "correctness_rules": [
+   "Equilibrium at intersection",
+   "P on vertical axis, Q on horizontal"
+  ],
+  "common_mistakes": [
+   "Equilibrium off intersection",
+   "Labels swapped",
+   "Axes swapped",
+   "Demand upward"
+  ],
+  "whiteboard_interactions": [
+   "Drag price above P* → highlight surplus; below → shortage"
+  ],
+  "generator": "supply_demand_equilibrium",
+  "related": []
+ },
+ {
+  "id": "demand_shift",
+  "field": "micro",
+  "topic": "markets",
+  "name": "Shift in demand",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D1",
+   "D2",
+   "S",
+   "E1",
+   "E2",
+   "arrow"
+  ],
+  "correctness_rules": [
+   "Normal good + income↑ → right",
+   "Substitute price↑ → right; complement price↑ → left",
+   "Both P and Q move same direction"
+  ],
+  "common_mistakes": [
+   "Wrong direction",
+   "Shifting supply for a demand event",
+   "E2 not at new intersection",
+   "Inferior good treated as normal"
+  ],
+  "whiteboard_interactions": [
+   "Drag D; E slides along S"
+  ],
+  "generator": "demand_shift",
+  "related": []
+ },
+ {
+  "id": "supply_shift",
+  "field": "micro",
+  "topic": "markets",
+  "name": "Shift in supply",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "S1",
+   "S2",
+   "D",
+   "E1",
+   "E2",
+   "arrow"
+  ],
+  "correctness_rules": [
+   "Input cost↓ / tech↑ / more sellers → right",
+   "P and Q move opposite directions"
+  ],
+  "common_mistakes": [
+   "Wrong direction",
+   "Shifting demand for a supply event",
+   "E2 misplaced"
+  ],
+  "whiteboard_interactions": [
+   "Drag S; E slides along D"
+  ],
+  "generator": "supply_shift",
+  "related": []
+ },
+ {
+  "id": "double_shift",
+  "field": "micro",
+  "topic": "markets",
+  "name": "Simultaneous shifts of demand and supply",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D1",
+   "D2",
+   "S1",
+   "S2",
+   "E1",
+   "E2"
+  ],
+  "correctness_rules": [
+   "One of P or Q is indeterminate unless magnitudes known"
+  ],
+  "common_mistakes": [
+   "Claiming both P and Q changes are determinate"
+  ],
+  "whiteboard_interactions": [
+   "Vary shift sizes to show ambiguity"
+  ],
+  "generator": null,
+  "related": [
+   "demand_shift",
+   "supply_shift"
+  ]
+ },
+ {
+  "id": "consumer_producer_surplus",
+  "field": "micro",
+  "topic": "welfare",
+  "name": "Consumer and producer surplus",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "CS triangle",
+   "PS triangle",
+   "E"
+  ],
+  "correctness_rules": [
+   "CS: below D, above P, 0..Q*",
+   "PS: above S, below P, 0..Q*"
+  ],
+  "common_mistakes": [
+   "Regions swapped",
+   "CS drawn as P×Q rectangle",
+   "Surplus extended past Q*"
+  ],
+  "whiteboard_interactions": [
+   "Hover CS/PS to show area formula"
+  ],
+  "generator": "consumer_producer_surplus",
+  "related": []
+ },
+ {
+  "id": "price_ceiling",
+  "field": "micro",
+  "topic": "government",
+  "name": "Price ceiling (binding)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "ceiling line",
+   "Qs",
+   "Qd",
+   "shortage",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Binding only below P*",
+   "Shortage = Qd − Qs",
+   "DWL triangle between Qs and Q*"
+  ],
+  "common_mistakes": [
+   "Ceiling above P* shown as binding",
+   "Shortage labeled surplus",
+   "Qs/Qd swapped"
+  ],
+  "whiteboard_interactions": [
+   "Drag ceiling up past P* → shortage disappears"
+  ],
+  "generator": "price_ceiling",
+  "related": []
+ },
+ {
+  "id": "price_floor",
+  "field": "micro",
+  "topic": "government",
+  "name": "Price floor (binding)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "floor line",
+   "Qs",
+   "Qd",
+   "surplus",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Binding only above P*",
+   "Surplus = Qs − Qd"
+  ],
+  "common_mistakes": [
+   "Floor below P* shown as binding",
+   "Surplus labeled shortage",
+   "Qs/Qd swapped"
+  ],
+  "whiteboard_interactions": [
+   "Drag floor down past P* → surplus disappears"
+  ],
+  "generator": "price_floor",
+  "related": []
+ },
+ {
+  "id": "per_unit_tax",
+  "field": "micro",
+  "topic": "government",
+  "name": "Per-unit (excise) tax: incidence, revenue, DWL",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "S",
+   "S+t",
+   "D",
+   "Pc",
+   "Pp",
+   "Qt",
+   "revenue rectangle",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Tax on sellers shifts S up by t",
+   "Pc − Pp = t",
+   "Revenue = t × Qt",
+   "DWL between Qt and Q*",
+   "Burden falls more on the less elastic side"
+  ],
+  "common_mistakes": [
+   "Shift down",
+   "DWL right of Q*",
+   "Revenue uses Q*",
+   "Pp at old P*",
+   "Incidence attributed by who writes the check"
+  ],
+  "whiteboard_interactions": [
+   "Drag t; watch revenue and DWL grow",
+   "Toggle elasticity to move incidence"
+  ],
+  "generator": "per_unit_tax",
+  "related": []
+ },
+ {
+  "id": "per_unit_subsidy",
+  "field": "micro",
+  "topic": "government",
+  "name": "Per-unit subsidy",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "S",
+   "S−s",
+   "D",
+   "Pc",
+   "Pp",
+   "cost rectangle",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Subsidy shifts S down",
+   "DWL from overproduction right of Q*",
+   "Government cost = s × Qs"
+  ],
+  "common_mistakes": [
+   "Shift up",
+   "DWL left of Q*"
+  ],
+  "whiteboard_interactions": [
+   "Drag subsidy size"
+  ],
+  "generator": "per_unit_subsidy",
+  "related": []
+ },
+ {
+  "id": "tax_incidence_elasticity",
+  "field": "micro",
+  "topic": "government",
+  "name": "Tax incidence and elasticity",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "elastic vs inelastic D or S",
+   "Pc",
+   "Pp"
+  ],
+  "correctness_rules": [
+   "More inelastic side bears more of the tax"
+  ],
+  "common_mistakes": [
+   "Burden on elastic side"
+  ],
+  "whiteboard_interactions": [
+   "Rotate D about E"
+  ],
+  "generator": null,
+  "related": [
+   "per_unit_tax"
+  ]
+ },
+ {
+  "id": "quota",
+  "field": "micro",
+  "topic": "government",
+  "name": "Production quota",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "vertical quota line",
+   "quota rent",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Quota below Q* raises price on D"
+  ],
+  "common_mistakes": [
+   "Price read off S at quota",
+   "Quota above Q* shown as binding"
+  ],
+  "whiteboard_interactions": [
+   "Drag quota line"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "elasticity_comparison",
+  "field": "micro",
+  "topic": "elasticity",
+  "name": "Elastic vs inelastic demand",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "steep D",
+   "flat D",
+   "common point"
+  ],
+  "correctness_rules": [
+   "Through a common point, steeper = more inelastic"
+  ],
+  "common_mistakes": [
+   "Labels swapped",
+   "Slope equated with elasticity along a linear curve"
+  ],
+  "whiteboard_interactions": [
+   "Rotate D through A"
+  ],
+  "generator": "elasticity_comparison",
+  "related": []
+ },
+ {
+  "id": "perfect_elasticity",
+  "field": "micro",
+  "topic": "elasticity",
+  "name": "Perfectly elastic / perfectly inelastic",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "horizontal D",
+   "vertical D"
+  ],
+  "correctness_rules": [
+   "Horizontal = perfectly elastic (∞)",
+   "Vertical = perfectly inelastic (0)"
+  ],
+  "common_mistakes": [
+   "Swapped"
+  ],
+  "whiteboard_interactions": [
+   "Toggle"
+  ],
+  "generator": "perfect_elasticity",
+  "related": []
+ },
+ {
+  "id": "elasticity_along_linear_demand",
+  "field": "micro",
+  "topic": "elasticity",
+  "name": "Elasticity along a linear demand curve and total revenue",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D",
+   "midpoint (unit elastic)",
+   "elastic/inelastic segments",
+   "TR curve"
+  ],
+  "correctness_rules": [
+   "Upper half elastic, lower half inelastic",
+   "TR max at unit-elastic midpoint"
+  ],
+  "common_mistakes": [
+   "Constant elasticity along a straight line",
+   "TR max at the intercept"
+  ],
+  "whiteboard_interactions": [
+   "Slide price; show TR rectangle change"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "cross_income_elasticity",
+  "field": "micro",
+  "topic": "elasticity",
+  "name": "Normal/inferior goods, substitutes/complements (shifts)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D1",
+   "D2"
+  ],
+  "correctness_rules": [
+   "Inferior good: income↑ → D left"
+  ],
+  "common_mistakes": [
+   "Inferior treated as normal"
+  ],
+  "whiteboard_interactions": [
+   "Scenario cards → drag D"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "total_marginal_utility",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Total and marginal utility",
+  "axes": {
+   "x": "Quantity consumed",
+   "y": "Utility"
+  },
+  "elements": [
+   "TU curve",
+   "MU curve"
+  ],
+  "correctness_rules": [
+   "MU declines (diminishing MU)",
+   "TU max where MU = 0"
+  ],
+  "common_mistakes": [
+   "MU rising",
+   "TU max not where MU = 0"
+  ],
+  "whiteboard_interactions": [
+   "Drag Q; show TU slope = MU"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "budget_line_shift",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Budget constraint and shifts",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "BL1",
+   "BL2",
+   "intercepts M/Px, M/Py"
+  ],
+  "correctness_rules": [
+   "Income change → parallel shift",
+   "One price change → pivot on the other intercept"
+  ],
+  "common_mistakes": [
+   "Income drawn as pivot",
+   "Price drawn as parallel shift",
+   "Pivot on wrong axis"
+  ],
+  "whiteboard_interactions": [
+   "Drag income slider vs price slider"
+  ],
+  "generator": "budget_line_shift",
+  "related": []
+ },
+ {
+  "id": "consumer_optimum",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Indifference curves and consumer optimum",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "budget line",
+   "IC1..IC3",
+   "tangency E"
+  ],
+  "correctness_rules": [
+   "ICs convex, downward, non-crossing",
+   "Optimum at tangency MRS = Px/Py"
+  ],
+  "common_mistakes": [
+   "Optimum where IC crosses BL",
+   "ICs cross",
+   "Concave ICs",
+   "Optimum on a non-tangent higher IC (unaffordable)"
+  ],
+  "whiteboard_interactions": [
+   "Drag the bundle along BL; highlight the IC it is on"
+  ],
+  "generator": "consumer_optimum",
+  "related": []
+ },
+ {
+  "id": "income_substitution_effect",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Income and substitution effects (Hicks/Slutsky)",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "BL1",
+   "BL2",
+   "compensated BL",
+   "A",
+   "B",
+   "C"
+  ],
+  "correctness_rules": [
+   "Compensated line parallel to new BL, tangent to old IC",
+   "Substitution effect always toward cheaper good"
+  ],
+  "common_mistakes": [
+   "Compensated line parallel to old BL",
+   "Effects mislabeled"
+  ],
+  "whiteboard_interactions": [
+   "Step through A→B (substitution) → C (income)"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "price_consumption_curve",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Price-consumption curve → individual demand",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "rotating budget lines",
+   "tangencies",
+   "PCC",
+   "derived demand curve"
+  ],
+  "correctness_rules": [
+   "Each tangency maps to one (P, Q) point on demand"
+  ],
+  "common_mistakes": [
+   "Demand derived upward-sloping for normal goods"
+  ],
+  "whiteboard_interactions": [
+   "Rotate BL; plot point on lower panel"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "income_consumption_engel",
+  "field": "micro",
+  "topic": "consumer",
+  "name": "Income-consumption curve and Engel curve",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y / Income"
+  },
+  "elements": [
+   "ICC",
+   "Engel curve"
+  ],
+  "correctness_rules": [
+   "Normal good: Engel slopes up; inferior: bends back"
+  ],
+  "common_mistakes": [
+   "Inferior good with upward Engel curve"
+  ],
+  "whiteboard_interactions": [
+   "Shift BL out; trace ICC"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "edgeworth_box",
+  "field": "micro",
+  "topic": "general equilibrium",
+  "name": "Edgeworth box and contract curve",
+  "axes": {
+   "x": "Good X",
+   "y": "Good Y"
+  },
+  "elements": [
+   "two origins",
+   "ICs of A and B",
+   "contract curve",
+   "lens of mutual gain"
+  ],
+  "correctness_rules": [
+   "Pareto efficient where ICs tangent",
+   "B's origin at top-right"
+  ],
+  "common_mistakes": [
+   "Both origins at bottom-left",
+   "Contract curve through IC crossings"
+  ],
+  "whiteboard_interactions": [
+   "Drag endowment point; shade lens"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "short_run_production",
+  "field": "micro",
+  "topic": "producer",
+  "name": "Total, marginal and average product",
+  "axes": {
+   "x": "Labor (L)",
+   "y": "Output"
+  },
+  "elements": [
+   "TP",
+   "MP",
+   "AP"
+  ],
+  "correctness_rules": [
+   "MP crosses AP at AP max",
+   "TP max where MP = 0",
+   "TP inflection where MP max"
+  ],
+  "common_mistakes": [
+   "MP misses AP max",
+   "Labels swapped",
+   "TP max where MP max"
+  ],
+  "whiteboard_interactions": [
+   "Drag L; show TP slope = MP"
+  ],
+  "generator": "short_run_production",
+  "related": []
+ },
+ {
+  "id": "cost_curves",
+  "field": "micro",
+  "topic": "costs",
+  "name": "Short-run cost curves (MC, ATC, AVC, AFC)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Cost"
+  },
+  "elements": [
+   "MC",
+   "ATC",
+   "AVC",
+   "AFC",
+   "min points"
+  ],
+  "correctness_rules": [
+   "MC cuts AVC and ATC at their minima",
+   "ATC − AVC = AFC shrinks with Q",
+   "AFC always falling"
+  ],
+  "common_mistakes": [
+   "MC misses minima",
+   "AVC above ATC",
+   "AFC rising or U-shaped",
+   "ATC and AVC converge to cross"
+  ],
+  "whiteboard_interactions": [
+   "Drag Q; show vertical gap ATC−AVC = AFC"
+  ],
+  "generator": "cost_curves",
+  "related": []
+ },
+ {
+  "id": "total_cost_curves",
+  "field": "micro",
+  "topic": "costs",
+  "name": "Total cost, variable cost, fixed cost",
+  "axes": {
+   "x": "Quantity",
+   "y": "Cost"
+  },
+  "elements": [
+   "TC",
+   "TVC",
+   "TFC"
+  ],
+  "correctness_rules": [
+   "TC = TVC + TFC: parallel vertical gap",
+   "TFC horizontal"
+  ],
+  "common_mistakes": [
+   "TFC sloped",
+   "TC and TVC diverge"
+  ],
+  "whiteboard_interactions": [
+   "Drag Q"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "long_run_atc",
+  "field": "micro",
+  "topic": "costs",
+  "name": "Long-run ATC envelope and economies of scale",
+  "axes": {
+   "x": "Quantity",
+   "y": "Cost"
+  },
+  "elements": [
+   "SRATC curves",
+   "LRATC envelope",
+   "MES"
+  ],
+  "correctness_rules": [
+   "LRATC envelope tangent to SRATCs",
+   "Economies → constant → diseconomies"
+  ],
+  "common_mistakes": [
+   "LRATC through SRATC minima everywhere",
+   "LRATC above SRATCs"
+  ],
+  "whiteboard_interactions": [
+   "Slide plant size"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "isoquant_isocost",
+  "field": "micro",
+  "topic": "producer",
+  "name": "Isoquant–isocost cost minimization",
+  "axes": {
+   "x": "Labor (L)",
+   "y": "Capital (K)"
+  },
+  "elements": [
+   "isocost",
+   "isoquants",
+   "tangency"
+  ],
+  "correctness_rules": [
+   "Tangency MRTS = w/r"
+  ],
+  "common_mistakes": [
+   "Crossing",
+   "Crossing isoquants",
+   "Concave"
+  ],
+  "whiteboard_interactions": [
+   "Rotate isocost when w changes"
+  ],
+  "generator": "isoquant_isocost",
+  "related": []
+ },
+ {
+  "id": "pc_firm_profit",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Perfect competition: firm with short-run profit",
+  "axes": {
+   "x": "Quantity (q)",
+   "y": "Price, cost"
+  },
+  "elements": [
+   "P=MR=AR=D",
+   "MC",
+   "ATC",
+   "q*",
+   "profit rectangle"
+  ],
+  "correctness_rules": [
+   "q* where MR = MC on rising MC",
+   "Profit = (P − ATC(q*))·q*"
+  ],
+  "common_mistakes": [
+   "q at min ATC",
+   "Falling-MC crossing",
+   "Profit to AVC",
+   "Firm demand drawn downward"
+  ],
+  "whiteboard_interactions": [
+   "Drag price line; rectangle updates"
+  ],
+  "generator": "pc_firm_profit",
+  "related": []
+ },
+ {
+  "id": "pc_firm_loss",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Perfect competition: loss and shutdown rule",
+  "axes": {
+   "x": "Quantity (q)",
+   "y": "Price, cost"
+  },
+  "elements": [
+   "P line",
+   "MC",
+   "ATC",
+   "AVC",
+   "loss rectangle",
+   "shutdown point"
+  ],
+  "correctness_rules": [
+   "Operate if P ≥ min AVC; shut down if P < min AVC"
+  ],
+  "common_mistakes": [
+   "Loss labeled profit",
+   "Shutdown rule uses ATC"
+  ],
+  "whiteboard_interactions": [
+   "Drag P below min AVC → shutdown highlight"
+  ],
+  "generator": "pc_firm_loss",
+  "related": []
+ },
+ {
+  "id": "pc_long_run",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Perfect competition: long-run equilibrium (firm and market side by side)",
+  "axes": {
+   "x": "Quantity",
+   "y": "Price, cost"
+  },
+  "elements": [
+   "P = min ATC",
+   "market S/D panel"
+  ],
+  "correctness_rules": [
+   "P = MR = MC = min ATC",
+   "Zero economic profit",
+   "Firm panel lowercase q, market uppercase Q"
+  ],
+  "common_mistakes": [
+   "Positive profit in long run",
+   "Market and firm panels at different prices"
+  ],
+  "whiteboard_interactions": [
+   "Shift market D; animate entry"
+  ],
+  "generator": "pc_long_run",
+  "related": []
+ },
+ {
+  "id": "pc_supply_curve",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Firm supply = MC above min AVC",
+  "axes": {
+   "x": "Quantity",
+   "y": "Price"
+  },
+  "elements": [
+   "MC",
+   "AVC",
+   "supply segment"
+  ],
+  "correctness_rules": [
+   "Supply curve is MC above shutdown point"
+  ],
+  "common_mistakes": [
+   "Supply drawn as ATC",
+   "Includes MC below AVC"
+  ],
+  "whiteboard_interactions": [
+   "Highlight segment"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "monopoly",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Monopoly profit maximization and DWL",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D=AR",
+   "MR",
+   "MC",
+   "ATC",
+   "Qm",
+   "Pm",
+   "profit",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "MR twice as steep as linear D",
+   "Qm at MR = MC",
+   "Pm read from D",
+   "DWL between Qm and Qc"
+  ],
+  "common_mistakes": [
+   "Price from MR",
+   "MR parallel to D",
+   "Q at D = MC",
+   "Profit rectangle using MC height"
+  ],
+  "whiteboard_interactions": [
+   "Drag MC; Qm, Pm follow"
+  ],
+  "generator": "monopoly",
+  "related": []
+ },
+ {
+  "id": "natural_monopoly",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Natural monopoly and regulation",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "falling ATC",
+   "MC below ATC",
+   "D",
+   "MR",
+   "P=MC (loss)",
+   "P=ATC (fair return)"
+  ],
+  "correctness_rules": [
+   "ATC falling across market demand",
+   "P = MC regulation → loss"
+  ],
+  "common_mistakes": [
+   "ATC U-shaped with min inside market",
+   "P = MC shown profitable"
+  ],
+  "whiteboard_interactions": [
+   "Toggle regulation price"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "price_discrimination",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Perfect price discrimination",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D = MR",
+   "MC",
+   "Q = competitive Q"
+  ],
+  "correctness_rules": [
+   "No DWL; all CS captured"
+  ],
+  "common_mistakes": [
+   "DWL shaded"
+  ],
+  "whiteboard_interactions": [
+   "Step from single price to discrimination"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "monopolistic_competition_lr",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Monopolistic competition (short and long run)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "D",
+   "MR",
+   "MC",
+   "ATC",
+   "tangency",
+   "excess capacity"
+  ],
+  "correctness_rules": [
+   "LR: D tangent to ATC left of min ATC",
+   "Zero economic profit",
+   "Excess capacity"
+  ],
+  "common_mistakes": [
+   "Tangent at min ATC",
+   "Profit in long run",
+   "Horizontal demand"
+  ],
+  "whiteboard_interactions": [
+   "Animate entry shifting D left"
+  ],
+  "generator": "monopolistic_competition_lr",
+  "related": []
+ },
+ {
+  "id": "kinked_demand",
+  "field": "micro",
+  "topic": "market structure",
+  "name": "Kinked demand oligopoly",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "kinked D",
+   "discontinuous MR",
+   "MC range"
+  ],
+  "correctness_rules": [
+   "Elastic above kink, inelastic below",
+   "MC can move within MR gap without price change"
+  ],
+  "common_mistakes": [
+   "Kink reversed",
+   "MR continuous"
+  ],
+  "whiteboard_interactions": [
+   "Drag MC within the gap"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "payoff_matrix",
+  "field": "micro",
+  "topic": "game theory",
+  "name": "Payoff matrix / Nash equilibrium (prisoner's dilemma)",
+  "axes": {
+   "x": null,
+   "y": null
+  },
+  "elements": [
+   "2×2 matrix",
+   "dominant strategies",
+   "Nash cell"
+  ],
+  "correctness_rules": [
+   "Nash: no player gains by deviating unilaterally"
+  ],
+  "common_mistakes": [
+   "Nash marked at jointly best cell",
+   "Payoff order (row, col) reversed"
+  ],
+  "whiteboard_interactions": [
+   "Click cells to check best responses"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "cournot_reaction",
+  "field": "micro",
+  "topic": "game theory",
+  "name": "Cournot reaction functions",
+  "axes": {
+   "x": "q1",
+   "y": "q2"
+  },
+  "elements": [
+   "R1",
+   "R2",
+   "Nash"
+  ],
+  "correctness_rules": [
+   "Equilibrium at intersection"
+  ],
+  "common_mistakes": [
+   "Reaction curves upward-sloping"
+  ],
+  "whiteboard_interactions": [
+   "Drag q1; best response highlights"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "labor_market",
+  "field": "micro",
+  "topic": "factor markets",
+  "name": "Competitive labor market and firm wage-taker",
+  "axes": {
+   "x": "Labor (L)",
+   "y": "Wage (W)"
+  },
+  "elements": [
+   "D_L = MRP",
+   "S_L",
+   "W*",
+   "firm's horizontal S"
+  ],
+  "correctness_rules": [
+   "Firm hires where MRP = W"
+  ],
+  "common_mistakes": [
+   "MRP upward"
+  ],
+  "whiteboard_interactions": [
+   "Shift MRP with output price"
+  ],
+  "generator": "minimum_wage",
+  "related": []
+ },
+ {
+  "id": "minimum_wage",
+  "field": "micro",
+  "topic": "factor markets",
+  "name": "Minimum wage",
+  "axes": {
+   "x": "Labor (L)",
+   "y": "Wage (W)"
+  },
+  "elements": [
+   "min wage line",
+   "Ld",
+   "Ls",
+   "unemployment"
+  ],
+  "correctness_rules": [
+   "Binding above W*",
+   "Unemployment = Ls − Ld"
+  ],
+  "common_mistakes": [
+   "Below W* binding",
+   "Unemployment from L*"
+  ],
+  "whiteboard_interactions": [
+   "Drag minimum wage"
+  ],
+  "generator": "minimum_wage",
+  "related": []
+ },
+ {
+  "id": "monopsony",
+  "field": "micro",
+  "topic": "factor markets",
+  "name": "Monopsony",
+  "axes": {
+   "x": "Labor (L)",
+   "y": "Wage (W)"
+  },
+  "elements": [
+   "S=AFC",
+   "MFC",
+   "MRP",
+   "Lm",
+   "Wm"
+  ],
+  "correctness_rules": [
+   "Lm at MRP = MFC",
+   "Wm from S",
+   "MFC above S"
+  ],
+  "common_mistakes": [
+   "Wage from MFC",
+   "MFC below S"
+  ],
+  "whiteboard_interactions": [
+   "Drag minimum wage into monopsony"
+  ],
+  "generator": "monopsony",
+  "related": []
+ },
+ {
+  "id": "negative_externality",
+  "field": "micro",
+  "topic": "market failure",
+  "name": "Negative production externality",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "MPC",
+   "MSC",
+   "D = MSB",
+   "Qm",
+   "Qs",
+   "DWL",
+   "Pigouvian tax"
+  ],
+  "correctness_rules": [
+   "MSC above MPC",
+   "Market overproduces",
+   "DWL between Qs and Qm"
+  ],
+  "common_mistakes": [
+   "MSC below MPC",
+   "Q labels swapped",
+   "DWL shaded left of Qs"
+  ],
+  "whiteboard_interactions": [
+   "Drag Pigouvian tax to close gap"
+  ],
+  "generator": "negative_externality",
+  "related": []
+ },
+ {
+  "id": "positive_externality",
+  "field": "micro",
+  "topic": "market failure",
+  "name": "Positive consumption externality",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "MPB",
+   "MSB",
+   "S",
+   "Qm",
+   "Qs",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "MSB above MPB",
+   "Market underproduces"
+  ],
+  "common_mistakes": [
+   "MSB below MPB",
+   "Q labels swapped"
+  ],
+  "whiteboard_interactions": [
+   "Drag subsidy"
+  ],
+  "generator": "positive_externality",
+  "related": []
+ },
+ {
+  "id": "public_goods",
+  "field": "micro",
+  "topic": "market failure",
+  "name": "Public good: vertical summation of demand",
+  "axes": {
+   "x": "Quantity",
+   "y": "Price/benefit"
+  },
+  "elements": [
+   "individual D",
+   "vertically summed D",
+   "MC"
+  ],
+  "correctness_rules": [
+   "Public good demands sum vertically"
+  ],
+  "common_mistakes": [
+   "Summed horizontally"
+  ],
+  "whiteboard_interactions": [
+   "Add consumers"
+  ],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "common_resource",
+  "field": "micro",
+  "topic": "market failure",
+  "name": "Tragedy of the commons",
+  "axes": {
+   "x": "Quantity harvested",
+   "y": "Cost/benefit"
+  },
+  "elements": [
+   "MPC",
+   "MSC",
+   "D"
+  ],
+  "correctness_rules": [
+   "Overuse relative to social optimum"
+  ],
+  "common_mistakes": [
+   "Underuse"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "lorenz_curve",
+  "field": "micro",
+  "topic": "distribution",
+  "name": "Lorenz curve and Gini coefficient",
+  "axes": {
+   "x": "Cumulative % population",
+   "y": "Cumulative % income"
+  },
+  "elements": [
+   "equality line",
+   "Lorenz",
+   "area A",
+   "area B"
+  ],
+  "correctness_rules": [
+   "Lorenz below equality",
+   "Gini = A/(A+B)"
+  ],
+  "common_mistakes": [
+   "Above equality",
+   "A mislabeled"
+  ],
+  "whiteboard_interactions": [
+   "Bend the Lorenz curve; Gini updates"
+  ],
+  "generator": "lorenz_curve",
+  "related": []
+ },
+ {
+  "id": "tariff",
+  "field": "micro",
+  "topic": "trade",
+  "name": "Tariff in a small open economy",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "Pw",
+   "Pw+t",
+   "Qs1, Qd1, Qs2, Qd2",
+   "imports",
+   "revenue",
+   "DWL"
+  ],
+  "correctness_rules": [
+   "Tariff raises domestic price",
+   "Imports Qd − Qs",
+   "Revenue t × imports",
+   "Two DWL triangles"
+  ],
+  "common_mistakes": [
+   "Tariff below Pw",
+   "Revenue on free-trade imports",
+   "Imports from origin"
+  ],
+  "whiteboard_interactions": [
+   "Drag tariff to prohibitive level"
+  ],
+  "generator": "tariff",
+  "related": []
+ },
+ {
+  "id": "import_quota_trade",
+  "field": "micro",
+  "topic": "trade",
+  "name": "Import quota / export market (world price above domestic)",
+  "axes": {
+   "x": "Quantity (Q)",
+   "y": "Price (P)"
+  },
+  "elements": [
+   "Pw",
+   "exports"
+  ],
+  "correctness_rules": [
+   "Pw above P* → exports Qs − Qd"
+  ],
+  "common_mistakes": [
+   "Exports measured as Qd − Qs"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "laffer_curve",
+  "field": "micro",
+  "topic": "public finance",
+  "name": "Laffer curve",
+  "axes": {
+   "x": "Tax rate (%)",
+   "y": "Tax revenue"
+  },
+  "elements": [
+   "inverted U",
+   "t*"
+  ],
+  "correctness_rules": [
+   "Zero revenue at 0% and 100%"
+  ],
+  "common_mistakes": [
+   "Positive at 100%",
+   "Monotonic"
+  ],
+  "whiteboard_interactions": [
+   "Slide tax rate"
+  ],
+  "generator": "laffer_curve",
+  "related": []
+ },
+ {
+  "id": "business_cycle",
+  "field": "macro",
+  "topic": "cycles",
+  "name": "Business cycle",
+  "axes": {
+   "x": "Time",
+   "y": "Real GDP"
+  },
+  "elements": [
+   "trend",
+   "peak",
+   "trough",
+   "expansion",
+   "contraction"
+  ],
+  "correctness_rules": [
+   "Peak = top, trough = bottom"
+  ],
+  "common_mistakes": [
+   "Peak/trough swapped",
+   "Phases swapped"
+  ],
+  "whiteboard_interactions": [
+   "Hover phases"
+  ],
+  "generator": "business_cycle",
+  "related": []
+ },
+ {
+  "id": "ad_as_long_run",
+  "field": "macro",
+  "topic": "AD-AS",
+  "name": "AD-AS long-run equilibrium",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "AD",
+   "SRAS",
+   "LRAS",
+   "Yf"
+  ],
+  "correctness_rules": [
+   "LRAS vertical at Yf",
+   "AD down, SRAS up",
+   "All three meet in LR eq"
+  ],
+  "common_mistakes": [
+   "LRAS sloped",
+   "AD upward",
+   "LR eq off LRAS",
+   "Axes labeled P/Q (micro)"
+  ],
+  "whiteboard_interactions": [
+   "Drag AD/SRAS"
+  ],
+  "generator": "ad_as_long_run",
+  "related": []
+ },
+ {
+  "id": "ad_as_output_gap",
+  "field": "macro",
+  "topic": "AD-AS",
+  "name": "Recessionary / inflationary gap from AD shift",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "AD1",
+   "AD2",
+   "SRAS",
+   "LRAS",
+   "gap"
+  ],
+  "correctness_rules": [
+   "Y < Yf recessionary, Y > Yf inflationary"
+  ],
+  "common_mistakes": [
+   "Gap mislabeled",
+   "Wrong shift direction"
+  ],
+  "whiteboard_interactions": [
+   "Scenario → drag AD"
+  ],
+  "generator": "ad_as_output_gap",
+  "related": []
+ },
+ {
+  "id": "supply_shock",
+  "field": "macro",
+  "topic": "AD-AS",
+  "name": "Negative/positive supply shock (stagflation)",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "SRAS1",
+   "SRAS2",
+   "AD"
+  ],
+  "correctness_rules": [
+   "Cost increase → SRAS left: PL↑, Y↓"
+  ],
+  "common_mistakes": [
+   "Wrong direction",
+   "Called demand-pull"
+  ],
+  "whiteboard_interactions": [
+   "Drag SRAS"
+  ],
+  "generator": "supply_shock",
+  "related": []
+ },
+ {
+  "id": "self_correction",
+  "field": "macro",
+  "topic": "AD-AS",
+  "name": "Long-run self-adjustment (wages adjust, SRAS shifts back to LRAS)",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "AD2",
+   "SRAS1",
+   "SRAS2",
+   "LRAS"
+  ],
+  "correctness_rules": [
+   "In recession wages fall → SRAS right back to Yf"
+  ],
+  "common_mistakes": [
+   "SRAS shifts wrong way",
+   "AD shifts back on its own"
+  ],
+  "whiteboard_interactions": [
+   "Animate adjustment"
+  ],
+  "generator": null,
+  "related": [
+   "ad_as_output_gap"
+  ]
+ },
+ {
+  "id": "fiscal_monetary_policy_adas",
+  "field": "macro",
+  "topic": "policy",
+  "name": "Stabilization policy closing a gap",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "AD1",
+   "AD2",
+   "LRAS"
+  ],
+  "correctness_rules": [
+   "Expansionary policy shifts AD right to Yf"
+  ],
+  "common_mistakes": [
+   "Contractionary policy for recession"
+  ],
+  "whiteboard_interactions": [
+   "Drag AD"
+  ],
+  "generator": null,
+  "related": [
+   "ad_as_output_gap"
+  ]
+ },
+ {
+  "id": "keynesian_ad_as",
+  "field": "macro",
+  "topic": "AD-AS",
+  "name": "Keynesian/intermediate/classical AS ranges",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "horizontal, upward, vertical AS segments"
+  ],
+  "correctness_rules": [
+   "Horizontal at low Y, vertical at Yf"
+  ],
+  "common_mistakes": [
+   "Ranges reversed"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "keynesian_cross",
+  "field": "macro",
+  "topic": "aggregate expenditure",
+  "name": "Keynesian cross (45° line)",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Aggregate expenditure"
+  },
+  "elements": [
+   "45° line",
+   "AE",
+   "E",
+   "recessionary gap vertical distance"
+  ],
+  "correctness_rules": [
+   "AE slope = MPC < 1",
+   "E on 45° line",
+   "Multiplier = 1/(1−MPC)"
+  ],
+  "common_mistakes": [
+   "AE steeper than 45°",
+   "E off 45° line"
+  ],
+  "whiteboard_interactions": [
+   "Raise G; AE shifts up, E moves by multiplier"
+  ],
+  "generator": "keynesian_cross",
+  "related": []
+ },
+ {
+  "id": "consumption_function",
+  "field": "macro",
+  "topic": "aggregate expenditure",
+  "name": "Consumption and saving functions",
+  "axes": {
+   "x": "Disposable income",
+   "y": "C, S"
+  },
+  "elements": [
+   "C",
+   "S",
+   "45°",
+   "break-even income"
+  ],
+  "correctness_rules": [
+   "MPC + MPS = 1",
+   "S = 0 where C crosses 45°"
+  ],
+  "common_mistakes": [
+   "MPC > 1",
+   "Saving positive at break-even"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "phillips_curve",
+  "field": "macro",
+  "topic": "inflation/unemployment",
+  "name": "Short-run and long-run Phillips curves",
+  "axes": {
+   "x": "Unemployment rate",
+   "y": "Inflation rate"
+  },
+  "elements": [
+   "SRPC",
+   "LRPC",
+   "u_n"
+  ],
+  "correctness_rules": [
+   "SRPC down",
+   "LRPC vertical at u_n"
+  ],
+  "common_mistakes": [
+   "SRPC upward",
+   "LRPC off u_n",
+   "Axes swapped"
+  ],
+  "whiteboard_interactions": [
+   "Shift SRPC with expected inflation"
+  ],
+  "generator": "phillips_curve",
+  "related": []
+ },
+ {
+  "id": "phillips_shift",
+  "field": "macro",
+  "topic": "inflation/unemployment",
+  "name": "SRPC shift from expectations / supply shock",
+  "axes": {
+   "x": "Unemployment rate",
+   "y": "Inflation rate"
+  },
+  "elements": [
+   "SRPC1",
+   "SRPC2",
+   "LRPC"
+  ],
+  "correctness_rules": [
+   "Higher expected inflation → SRPC up"
+  ],
+  "common_mistakes": [
+   "Shift direction wrong",
+   "LRPC moves with expectations"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": [
+   "phillips_curve"
+  ]
+ },
+ {
+  "id": "money_market",
+  "field": "macro",
+  "topic": "money",
+  "name": "Money market (MS vertical, MD down)",
+  "axes": {
+   "x": "Quantity of money",
+   "y": "Nominal interest rate"
+  },
+  "elements": [
+   "MS",
+   "MD",
+   "i*"
+  ],
+  "correctness_rules": [
+   "MS vertical",
+   "OMO purchase → MS right → i↓"
+  ],
+  "common_mistakes": [
+   "MS upward",
+   "Wrong shift",
+   "Real rate on axis"
+  ],
+  "whiteboard_interactions": [
+   "Drag MS"
+  ],
+  "generator": "money_market",
+  "related": []
+ },
+ {
+  "id": "reserves_market",
+  "field": "macro",
+  "topic": "money",
+  "name": "Ample-reserves market (IORB, floor system)",
+  "axes": {
+   "x": "Quantity of reserves",
+   "y": "Policy rate"
+  },
+  "elements": [
+   "reserve demand (flat in ample region)",
+   "vertical supply",
+   "IORB"
+  ],
+  "correctness_rules": [
+   "Supply in flat region; rate set by administered rates"
+  ],
+  "common_mistakes": [
+   "Rate changed by shifting supply in ample region"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "loanable_funds",
+  "field": "macro",
+  "topic": "money",
+  "name": "Loanable funds market",
+  "axes": {
+   "x": "Quantity of loanable funds",
+   "y": "Real interest rate"
+  },
+  "elements": [
+   "S_LF",
+   "D_LF",
+   "r*"
+  ],
+  "correctness_rules": [
+   "Deficit → D_LF right (or S_LF left): r↑, crowding out"
+  ],
+  "common_mistakes": [
+   "Wrong curve or direction",
+   "Nominal rate on axis"
+  ],
+  "whiteboard_interactions": [
+   "Scenario → drag"
+  ],
+  "generator": "loanable_funds",
+  "related": []
+ },
+ {
+  "id": "fx_market",
+  "field": "macro",
+  "topic": "open economy",
+  "name": "Foreign exchange market",
+  "axes": {
+   "x": "Quantity of currency",
+   "y": "Exchange rate (price of currency)"
+  },
+  "elements": [
+   "D",
+   "S",
+   "e*"
+  ],
+  "correctness_rules": [
+   "Appreciation = currency's price rises"
+  ],
+  "common_mistakes": [
+   "Direction wrong",
+   "Appreciation/depreciation mislabeled",
+   "Axis price expressed in wrong currency"
+  ],
+  "whiteboard_interactions": [
+   "Drag D/S"
+  ],
+  "generator": "fx_market",
+  "related": []
+ },
+ {
+  "id": "is_lm",
+  "field": "macro",
+  "topic": "IS-LM",
+  "name": "IS-LM model",
+  "axes": {
+   "x": "Output (Y)",
+   "y": "Interest rate (i)"
+  },
+  "elements": [
+   "IS",
+   "LM",
+   "E"
+  ],
+  "correctness_rules": [
+   "IS down, LM up",
+   "Fiscal shifts IS, money shifts LM"
+  ],
+  "common_mistakes": [
+   "Labels swapped",
+   "Wrong curve shifts"
+  ],
+  "whiteboard_interactions": [
+   "Drag IS/LM"
+  ],
+  "generator": "is_lm",
+  "related": []
+ },
+ {
+  "id": "is_mp",
+  "field": "macro",
+  "topic": "IS-MP",
+  "name": "IS-MP model (horizontal MP)",
+  "axes": {
+   "x": "Output (Y)",
+   "y": "Real interest rate (r)"
+  },
+  "elements": [
+   "IS",
+   "MP"
+  ],
+  "correctness_rules": [
+   "MP horizontal at policy rate"
+  ],
+  "common_mistakes": [
+   "MP upward"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": [
+   "is_lm"
+  ]
+ },
+ {
+  "id": "mundell_fleming",
+  "field": "macro",
+  "topic": "open economy",
+  "name": "Mundell-Fleming (IS*-LM*)",
+  "axes": {
+   "x": "Output (Y)",
+   "y": "Exchange rate (e)"
+  },
+  "elements": [
+   "IS*",
+   "LM* vertical"
+  ],
+  "correctness_rules": [
+   "LM* vertical under floating rates"
+  ],
+  "common_mistakes": [
+   "LM* upward"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "solow_growth",
+  "field": "macro",
+  "topic": "growth",
+  "name": "Solow model steady state",
+  "axes": {
+   "x": "Capital per worker (k)",
+   "y": "Output, investment per worker"
+  },
+  "elements": [
+   "f(k)",
+   "sf(k)",
+   "(n+δ)k",
+   "k*"
+  ],
+  "correctness_rules": [
+   "sf(k) below f(k)",
+   "k* where sf(k) = (n+δ)k"
+  ],
+  "common_mistakes": [
+   "SS off intersection",
+   "Curves swapped"
+  ],
+  "whiteboard_interactions": [
+   "Raise s; k* moves right"
+  ],
+  "generator": "solow_growth",
+  "related": []
+ },
+ {
+  "id": "aggregate_production_function",
+  "field": "macro",
+  "topic": "growth",
+  "name": "Per-worker production function and technology shift",
+  "axes": {
+   "x": "Capital per worker",
+   "y": "Output per worker"
+  },
+  "elements": [
+   "f(k)",
+   "shifted f(k)"
+  ],
+  "correctness_rules": [
+   "Concave",
+   "Technology shifts up"
+  ],
+  "common_mistakes": [
+   "Convex"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "quantity_theory",
+  "field": "macro",
+  "topic": "money",
+  "name": "Quantity theory / long-run money neutrality (vertical LRAS + AD shift)",
+  "axes": {
+   "x": "Real GDP (Y)",
+   "y": "Price level (PL)"
+  },
+  "elements": [
+   "LRAS",
+   "AD shift"
+  ],
+  "correctness_rules": [
+   "Money ↑ → only PL↑ in long run"
+  ],
+  "common_mistakes": [
+   "Real GDP rises permanently"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "beveridge_curve",
+  "field": "macro",
+  "topic": "labor",
+  "name": "Beveridge curve",
+  "axes": {
+   "x": "Unemployment rate",
+   "y": "Job vacancy rate"
+  },
+  "elements": [
+   "downward curve"
+  ],
+  "correctness_rules": [
+   "Inverse relation"
+  ],
+  "common_mistakes": [
+   "Upward"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "j_curve",
+  "field": "macro",
+  "topic": "open economy",
+  "name": "J-curve of trade balance after depreciation",
+  "axes": {
+   "x": "Time",
+   "y": "Trade balance"
+  },
+  "elements": [
+   "J shape"
+  ],
+  "correctness_rules": [
+   "Worsens then improves"
+  ],
+  "common_mistakes": [
+   "Inverted J"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "yield_curve",
+  "field": "macro",
+  "topic": "finance",
+  "name": "Yield curve (normal / inverted)",
+  "axes": {
+   "x": "Maturity",
+   "y": "Yield"
+  },
+  "elements": [
+   "curve"
+  ],
+  "correctness_rules": [
+   "Normal upward; inverted downward"
+  ],
+  "common_mistakes": [
+   "Labels swapped"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "bond_price_interest",
+  "field": "macro",
+  "topic": "finance",
+  "name": "Bond market (bond price vs interest rate inverse)",
+  "axes": {
+   "x": "Quantity of bonds",
+   "y": "Price of bonds"
+  },
+  "elements": [
+   "D_bonds",
+   "S_bonds"
+  ],
+  "correctness_rules": [
+   "Bond price↑ ⇔ interest rate↓"
+  ],
+  "common_mistakes": [
+   "Same-direction relation"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ },
+ {
+  "id": "crowding_out",
+  "field": "macro",
+  "topic": "policy",
+  "name": "Crowding out (loanable funds + investment demand)",
+  "axes": {
+   "x": "Quantity",
+   "y": "Real interest rate"
+  },
+  "elements": [
+   "D_LF shift",
+   "investment demand curve"
+  ],
+  "correctness_rules": [
+   "r↑ reduces private investment"
+  ],
+  "common_mistakes": [
+   "Investment rises"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": [
+   "loanable_funds"
+  ]
+ },
+ {
+  "id": "investment_demand",
+  "field": "macro",
+  "topic": "aggregate expenditure",
+  "name": "Investment demand curve",
+  "axes": {
+   "x": "Quantity of investment",
+   "y": "Real interest rate"
+  },
+  "elements": [
+   "ID curve"
+  ],
+  "correctness_rules": [
+   "Downward sloping"
+  ],
+  "common_mistakes": [
+   "Upward"
+  ],
+  "whiteboard_interactions": [],
+  "generator": null,
+  "related": []
+ }
+]

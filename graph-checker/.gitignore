@@ -1,0 +1,14 @@
+__pycache__/
+cache/
+dataset/synthetic/images/
+dataset/synthetic_v1_old/
+dataset/real/images/
+dataset/openstax/images/
+dataset/synthetic/annotations/
+export/release/
+train/model.pt
+images/
+images_dl/
+*.log
+train/*.pt
+*.checked.png

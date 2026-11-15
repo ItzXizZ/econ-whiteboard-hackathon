@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "econ-graphs/record/1.0",
+  "title": "Economics graph record",
+  "type": "object",
+  "required": ["schema_version", "id", "source", "image", "graph_type", "verdict", "license"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string"},
+    "source": {"enum": ["synthetic", "wikimedia", "openstax"]},
+    "image": {"type": "string", "description": "Path relative to the images root (synthetic/images/..., real/images/..., openstax/images/...)"},
+    "width": {"type": ["integer", "null"]},
+    "height": {"type": ["integer", "null"]},
+    "graph_type": {"type": ["string", "null"], "description": "Taxonomy id, see taxonomy.json"},
+    "graph_name": {"type": ["string", "null"]},
+    "topic": {"type": ["string", "null"]},
+    "title": {"type": ["string", "null"]},
+    "verdict": {"enum": ["correct", "incorrect", "ambiguous", "off_topic", "unreviewed"]},
+    "error": {
+      "type": ["object", "null"],
+      "properties": {
+        "type": {"type": ["string", "null"]},
+        "severity": {"type": ["string", "null"]},
+        "explanation": {"type": ["string", "null"], "description": "Why it is wrong"},
+        "fix": {"type": ["string", "null"], "description": "Human-readable fix"},
+        "highlight": {"type": "array", "items": {"type": "string"}, "description": "Element ids to highlight"},
+        "highlight_bboxes": {"type": "array", "items": {"$ref": "#/$defs/bbox"}}
+      }
+    },
+    "correction": {
+      "type": ["object", "null"],
+      "description": "How to make the graph correct: element-level actions with target pixel geometry (synthetic only)",
+      "properties": {
+        "corrected_id": {"type": "string", "description": "id of the correct version of this graph"},
+        "fix": {"type": "string"},
+        "actions": {"type": "array", "items": {"$ref": "#/$defs/action"}}
+      }
+    },
+    "pair_id": {"type": ["string", "null"]},
+    "axes": {"type": ["object", "null"], "properties": {"x": {"type": ["string", "null"]}, "y": {"type": ["string", "null"]}}},
+    "elements": {"type": "array", "items": {"$ref": "#/$defs/element"}},
+    "explanation_steps": {
+      "type": "array",
+      "items": {"type": "object", "properties": {
+        "text": {"type": "string"},
+        "highlight": {"type": "array", "items": {"type": "string"}},
+        "highlight_bboxes": {"type": "array", "items": {"$ref": "#/$defs/bbox"}}}}
+    },
+    "render_style": {"type": ["object", "null"]},
+    "license": {"type": ["string", "null"]},
+    "license_url": {"type": ["string", "null"]},
+    "author": {"type": ["string", "null"]},
+    "source_page": {"type": ["string", "null"]},
+    "original_url": {"type": ["string", "null"]},
+    "caption": {"type": ["string", "null"]},
+    "alt_text": {"type": ["string", "null"]},
+    "review": {"type": ["object", "null"]}
+  },
+  "$defs": {
+    "bbox": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4, "description": "[x0, y0, x1, y1] in image pixels"},
+    "points": {"type": "array", "items": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}},
+    "element": {
+      "type": "object",
+      "required": ["id", "kind", "role"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {"enum": ["axis", "curve", "point", "region", "arrow", "guide", "tick", "text"]},
+        "role": {"type": "string", "description": "e.g. demand, supply, lras, deadweight_loss"},
+        "label": {"type": ["string", "null"]},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "label_bbox": {"$ref": "#/$defs/bbox"},
+        "polyline": {"$ref": "#/$defs/points"},
+        "polygon": {"$ref": "#/$defs/points"},
+        "center": {"type": "array", "items": {"type": "number"}},
+        "from": {"type": "array", "items": {"type": "number"}},
+        "to": {"type": "array", "items": {"type": "number"}},
+        "data_xy": {"type": "array"},
+        "data_polyline": {"type": "array"}
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": ["action", "element"],
+      "properties": {
+        "action": {"enum": ["move", "relabel", "add", "remove"]},
+        "element": {"type": "string"},
+        "role": {"type": "string"},
+        "from_bbox": {"$ref": "#/$defs/bbox"},
+        "to_bbox": {"$ref": "#/$defs/bbox"},
+        "to_polyline": {"$ref": "#/$defs/points"},
+        "to_polygon": {"$ref": "#/$defs/points"},
+        "from_label": {"type": ["string", "null"]},
+        "to_label": {"type": ["string", "null"]},
+        "follows": {"type": "string", "description": "Moves with this parent element (e.g. a label following its curve)"}
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+ "schema_version": "1.0",
+ "records_file": "records.jsonl.gz",
+ "records_sha256": "1d0c2be40594e16fecf9ec9abfec47d758b8939a17f63c2c490d46ea1b7c0095",
+ "counts": {
+  "synthetic": {
+   "correct": 4100,
+   "incorrect": 14174
+  },
+  "wikimedia": {
+   "correct": 1216,
+   "ambiguous": 121,
+   "off_topic": 507,
+   "incorrect": 18
+  },
+  "openstax": {
+   "unreviewed": 317
+  }
+ },
+ "total": 20453,
+ "image_assets": {
+  "images-synthetic-1.tar": 1154037760,
+  "images-synthetic-2.tar": 1154048000,
+  "images-real.tar": 126443520,
+  "images-openstax.tar": 45690880
+ }
+}

@@ -1,0 +1,6465 @@
+{
+ "supply_demand:0": {
+  "verdict": "off_topic",
+  "note": "Not a coordinate economics graph (flowchart/cycle diagram/load chart)."
+ },
+ "supply_demand:1": {
+  "verdict": "correct"
+ },
+ "supply_demand:2": {
+  "verdict": "correct"
+ },
+ "supply_demand:3": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:4": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:5": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:6": {
+  "verdict": "correct"
+ },
+ "supply_demand:7": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:8": {
+  "verdict": "correct"
+ },
+ "supply_demand:9": {
+  "verdict": "correct"
+ },
+ "supply_demand:10": {
+  "verdict": "off_topic",
+  "note": "Not a coordinate economics graph (flowchart/cycle diagram/load chart)."
+ },
+ "supply_demand:11": {
+  "verdict": "correct"
+ },
+ "supply_demand:12": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:13": {
+  "verdict": "correct"
+ },
+ "supply_demand:14": {
+  "verdict": "off_topic",
+  "note": "Not a coordinate economics graph (flowchart/cycle diagram/load chart)."
+ },
+ "supply_demand:15": {
+  "verdict": "correct"
+ },
+ "supply_demand:16": {
+  "verdict": "correct"
+ },
+ "supply_demand:17": {
+  "verdict": "correct"
+ },
+ "supply_demand:18": {
+  "verdict": "correct"
+ },
+ "supply_demand:19": {
+  "verdict": "correct"
+ },
+ "supply_demand:20": {
+  "verdict": "correct"
+ },
+ "supply_demand:21": {
+  "verdict": "correct"
+ },
+ "supply_demand:22": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:23": {
+  "verdict": "correct"
+ },
+ "supply_demand:24": {
+  "verdict": "correct"
+ },
+ "supply_demand:25": {
+  "verdict": "correct"
+ },
+ "supply_demand:26": {
+  "verdict": "correct"
+ },
+ "supply_demand:27": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:28": {
+  "verdict": "correct"
+ },
+ "supply_demand:29": {
+  "verdict": "correct"
+ },
+ "supply_demand:30": {
+  "verdict": "off_topic",
+  "note": "Not a coordinate economics graph (flowchart/cycle diagram/load chart)."
+ },
+ "supply_demand:31": {
+  "verdict": "correct",
+  "note": "Giffen good: upward-sloping demand is intentional."
+ },
+ "supply_demand:32": {
+  "verdict": "correct"
+ },
+ "supply_demand:33": {
+  "verdict": "correct"
+ },
+ "supply_demand:34": {
+  "verdict": "correct"
+ },
+ "supply_demand:35": {
+  "verdict": "correct"
+ },
+ "supply_demand:36": {
+  "verdict": "correct"
+ },
+ "supply_demand:37": {
+  "verdict": "correct"
+ },
+ "supply_demand:38": {
+  "verdict": "off_topic",
+  "note": "Not a coordinate economics graph (flowchart/cycle diagram/load chart)."
+ },
+ "supply_demand:39": {
+  "verdict": "correct"
+ },
+ "supply_demand:40": {
+  "verdict": "correct"
+ },
+ "supply_demand:41": {
+  "verdict": "correct"
+ },
+ "supply_demand:42": {
+  "verdict": "correct"
+ },
+ "supply_demand:43": {
+  "verdict": "correct"
+ },
+ "supply_demand:44": {
+  "verdict": "incorrect",
+  "error_type": "y_axis_inverted",
+  "severity": "major",
+  "highlight": [
+   "y_axis"
+  ],
+  "explanation": "Price-axis tick values increase downward (10 at the top, 20 at the bottom), so the visual slopes of supply and demand are reversed relative to the standard convention.",
+  "fix": "Put the lowest price at the origin and increase price upward."
+ },
+ "supply_demand:45": {
+  "verdict": "correct"
+ },
+ "supply_demand:46": {
+  "verdict": "correct"
+ },
+ "supply_demand:47": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled or specialized diagram; correctness cannot be judged without source text."
+ },
+ "supply_demand:48": {
+  "verdict": "correct"
+ },
+ "supply_demand:49": {
+  "verdict": "correct"
+ },
+ "ad_as:0": {
+  "verdict": "correct"
+ },
+ "ad_as:1": {
+  "verdict": "correct"
+ },
+ "ad_as:2": {
+  "verdict": "correct"
+ },
+ "ad_as:3": {
+  "verdict": "correct"
+ },
+ "ad_as:4": {
+  "verdict": "ambiguous",
+  "note": "Income-expenditure style or unlabeled shifts; graph type ambiguous."
+ },
+ "ad_as:5": {
+  "verdict": "correct"
+ },
+ "ad_as:6": {
+  "verdict": "correct"
+ },
+ "ad_as:7": {
+  "verdict": "correct"
+ },
+ "ad_as:8": {
+  "verdict": "correct"
+ },
+ "ad_as:9": {
+  "verdict": "correct"
+ },
+ "ad_as:10": {
+  "verdict": "correct"
+ },
+ "ad_as:11": {
+  "verdict": "correct"
+ },
+ "ad_as:12": {
+  "verdict": "correct"
+ },
+ "ad_as:13": {
+  "verdict": "correct"
+ },
+ "ad_as:14": {
+  "verdict": "ambiguous",
+  "note": "Income-expenditure style or unlabeled shifts; graph type ambiguous."
+ },
+ "ad_as:15": {
+  "verdict": "correct",
+  "note": "Right-to-left (Arabic) layout; axes mirrored intentionally."
+ },
+ "ad_as:16": {
+  "verdict": "correct"
+ },
+ "ad_as:17": {
+  "verdict": "correct"
+ },
+ "ad_as:18": {
+  "verdict": "correct"
+ },
+ "ad_as:19": {
+  "verdict": "correct"
+ },
+ "ad_as:20": {
+  "verdict": "correct",
+  "note": "Actually an IS-LM diagram (family mislabeled)."
+ },
+ "ad_as:21": {
+  "verdict": "correct"
+ },
+ "ad_as:22": {
+  "verdict": "correct"
+ },
+ "ad_as:23": {
+  "verdict": "correct"
+ },
+ "ad_as:24": {
+  "verdict": "correct"
+ },
+ "ad_as:25": {
+  "verdict": "correct",
+  "note": "Actually a tax-wedge supply/demand diagram (family mislabeled)."
+ },
+ "ad_as:26": {
+  "verdict": "correct"
+ },
+ "ad_as:27": {
+  "verdict": "correct"
+ },
+ "ad_as:28": {
+  "verdict": "correct"
+ },
+ "ad_as:29": {
+  "verdict": "correct"
+ },
+ "ad_as:30": {
+  "verdict": "correct"
+ },
+ "ad_as:31": {
+  "verdict": "correct"
+ },
+ "ad_as:32": {
+  "verdict": "correct"
+ },
+ "ad_as:33": {
+  "verdict": "correct"
+ },
+ "ad_as:34": {
+  "verdict": "correct"
+ },
+ "ad_as:35": {
+  "verdict": "correct"
+ },
+ "ad_as:36": {
+  "verdict": "correct"
+ },
+ "ad_as:37": {
+  "verdict": "correct"
+ },
+ "ad_as:38": {
+  "verdict": "correct"
+ },
+ "ad_as:39": {
+  "verdict": "correct"
+ },
+ "ad_as:40": {
+  "verdict": "correct"
+ },
+ "ad_as:41": {
+  "verdict": "correct"
+ },
+ "ad_as:42": {
+  "verdict": "correct"
+ },
+ "ad_as:43": {
+  "verdict": "correct"
+ },
+ "ad_as:44": {
+  "verdict": "correct"
+ },
+ "ad_as:45": {
+  "verdict": "correct"
+ },
+ "ad_as:46": {
+  "verdict": "correct"
+ },
+ "ad_as:47": {
+  "verdict": "correct"
+ },
+ "ad_as:48": {
+  "verdict": "correct"
+ },
+ "ad_as:49": {
+  "verdict": "correct"
+ },
+ "ppf:0": {
+  "verdict": "correct"
+ },
+ "ppf:1": {
+  "verdict": "ambiguous",
+  "note": "Deliberately non-concave frontier (formula given); not a textbook PPF."
+ },
+ "ppf:2": {
+  "verdict": "correct"
+ },
+ "ppf:3": {
+  "verdict": "correct"
+ },
+ "ppf:4": {
+  "verdict": "correct"
+ },
+ "ppf:5": {
+  "verdict": "correct"
+ },
+ "ppf:6": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (The file title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin."
+ },
+ "ppf:7": {
+  "verdict": "correct"
+ },
+ "ppf:8": {
+  "verdict": "ambiguous",
+  "note": "Contract-curve/Edgeworth-style diagram, not a PPF."
+ },
+ "ppf:9": {
+  "verdict": "correct"
+ },
+ "ppf:10": {
+  "verdict": "off_topic",
+  "note": "Finance (CAPM efficient frontier), not a PPF."
+ },
+ "ppf:11": {
+  "verdict": "correct"
+ },
+ "ppf:12": {
+  "verdict": "correct"
+ },
+ "ppf:13": {
+  "verdict": "correct"
+ },
+ "ppf:14": {
+  "verdict": "correct"
+ },
+ "ppf:15": {
+  "verdict": "correct"
+ },
+ "ppf:16": {
+  "verdict": "correct"
+ },
+ "ppf:17": {
+  "verdict": "correct"
+ },
+ "ppf:18": {
+  "verdict": "correct"
+ },
+ "ppf:19": {
+  "verdict": "correct"
+ },
+ "ppf:20": {
+  "verdict": "correct"
+ },
+ "ppf:21": {
+  "verdict": "correct"
+ },
+ "ppf:22": {
+  "verdict": "correct"
+ },
+ "ppf:23": {
+  "verdict": "correct"
+ },
+ "ppf:24": {
+  "verdict": "correct"
+ },
+ "phillips_curve:0": {
+  "verdict": "correct"
+ },
+ "phillips_curve:1": {
+  "verdict": "correct"
+ },
+ "phillips_curve:2": {
+  "verdict": "correct"
+ },
+ "phillips_curve:3": {
+  "verdict": "correct"
+ },
+ "phillips_curve:4": {
+  "verdict": "correct"
+ },
+ "phillips_curve:5": {
+  "verdict": "correct"
+ },
+ "phillips_curve:6": {
+  "verdict": "correct"
+ },
+ "phillips_curve:7": {
+  "verdict": "correct"
+ },
+ "phillips_curve:8": {
+  "verdict": "correct"
+ },
+ "phillips_curve:9": {
+  "verdict": "correct"
+ },
+ "phillips_curve:10": {
+  "verdict": "correct"
+ },
+ "phillips_curve:11": {
+  "verdict": "correct"
+ },
+ "phillips_curve:12": {
+  "verdict": "correct"
+ },
+ "phillips_curve:13": {
+  "verdict": "correct"
+ },
+ "phillips_curve:14": {
+  "verdict": "correct"
+ },
+ "phillips_curve:15": {
+  "verdict": "correct"
+ },
+ "phillips_curve:16": {
+  "verdict": "correct"
+ },
+ "phillips_curve:17": {
+  "verdict": "correct"
+ },
+ "phillips_curve:18": {
+  "verdict": "correct"
+ },
+ "phillips_curve:19": {
+  "verdict": "correct"
+ },
+ "phillips_curve:20": {
+  "verdict": "correct"
+ },
+ "phillips_curve:21": {
+  "verdict": "correct"
+ },
+ "phillips_curve:22": {
+  "verdict": "correct"
+ },
+ "phillips_curve:23": {
+  "verdict": "correct"
+ },
+ "phillips_curve:24": {
+  "verdict": "correct"
+ },
+ "cost_revenue:0": {
+  "verdict": "correct"
+ },
+ "cost_revenue:1": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:2": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:3": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:4": {
+  "verdict": "correct"
+ },
+ "cost_revenue:5": {
+  "verdict": "correct"
+ },
+ "cost_revenue:6": {
+  "verdict": "correct"
+ },
+ "cost_revenue:7": {
+  "verdict": "correct"
+ },
+ "cost_revenue:8": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:9": {
+  "verdict": "correct"
+ },
+ "cost_revenue:10": {
+  "verdict": "correct"
+ },
+ "cost_revenue:11": {
+  "verdict": "correct"
+ },
+ "cost_revenue:12": {
+  "verdict": "correct"
+ },
+ "cost_revenue:13": {
+  "verdict": "correct"
+ },
+ "cost_revenue:14": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:15": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:16": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:17": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:18": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:19": {
+  "verdict": "off_topic",
+  "note": "Engineering/finance/operations chart, not a standard micro cost diagram."
+ },
+ "cost_revenue:20": {
+  "verdict": "correct"
+ },
+ "cost_revenue:21": {
+  "verdict": "correct"
+ },
+ "cost_revenue:22": {
+  "verdict": "correct"
+ },
+ "cost_revenue:23": {
+  "verdict": "correct"
+ },
+ "cost_revenue:24": {
+  "verdict": "correct"
+ },
+ "monopoly:0": {
+  "verdict": "correct"
+ },
+ "monopoly:1": {
+  "verdict": "correct"
+ },
+ "monopoly:2": {
+  "verdict": "correct"
+ },
+ "monopoly:3": {
+  "verdict": "correct"
+ },
+ "monopoly:4": {
+  "verdict": "correct"
+ },
+ "monopoly:5": {
+  "verdict": "correct"
+ },
+ "monopoly:6": {
+  "verdict": "ambiguous",
+  "note": "Numbered curves without labels."
+ },
+ "monopoly:7": {
+  "verdict": "correct"
+ },
+ "monopoly:8": {
+  "verdict": "correct"
+ },
+ "monopoly:9": {
+  "verdict": "correct"
+ },
+ "monopoly:10": {
+  "verdict": "correct"
+ },
+ "monopoly:11": {
+  "verdict": "correct"
+ },
+ "monopoly:12": {
+  "verdict": "correct"
+ },
+ "monopoly:13": {
+  "verdict": "correct"
+ },
+ "monopoly:14": {
+  "verdict": "correct"
+ },
+ "monopoly:15": {
+  "verdict": "correct"
+ },
+ "monopoly:16": {
+  "verdict": "correct"
+ },
+ "monopoly:17": {
+  "verdict": "correct"
+ },
+ "monopoly:18": {
+  "verdict": "correct"
+ },
+ "monopoly:19": {
+  "verdict": "correct"
+ },
+ "monopoly:20": {
+  "verdict": "correct"
+ },
+ "monopoly:21": {
+  "verdict": "correct"
+ },
+ "monopoly:22": {
+  "verdict": "ambiguous",
+  "note": "'Profit' rectangle drawn without an ATC curve; its lower edge cannot be verified."
+ },
+ "monopoly:23": {
+  "verdict": "correct"
+ },
+ "monopoly:24": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:0": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:1": {
+  "verdict": "ambiguous",
+  "note": "Economic diagram but not a Keynesian cross."
+ },
+ "keynesian_cross:2": {
+  "verdict": "ambiguous",
+  "note": "Economic diagram but not a Keynesian cross."
+ },
+ "keynesian_cross:3": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:4": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:5": {
+  "verdict": "ambiguous",
+  "note": "Economic diagram but not a Keynesian cross."
+ },
+ "keynesian_cross:6": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:7": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:8": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:9": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:10": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:11": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:12": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:13": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:14": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:15": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:16": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:17": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:18": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:19": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:20": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:21": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:22": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:23": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "keynesian_cross:24": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "is_lm:0": {
+  "verdict": "correct",
+  "note": "Right-to-left layout; axes mirrored intentionally."
+ },
+ "is_lm:1": {
+  "verdict": "correct"
+ },
+ "is_lm:2": {
+  "verdict": "correct"
+ },
+ "is_lm:3": {
+  "verdict": "correct"
+ },
+ "is_lm:4": {
+  "verdict": "correct"
+ },
+ "is_lm:5": {
+  "verdict": "correct"
+ },
+ "is_lm:6": {
+  "verdict": "correct"
+ },
+ "is_lm:7": {
+  "verdict": "correct"
+ },
+ "is_lm:8": {
+  "verdict": "correct"
+ },
+ "is_lm:9": {
+  "verdict": "correct"
+ },
+ "is_lm:10": {
+  "verdict": "correct"
+ },
+ "is_lm:11": {
+  "verdict": "correct"
+ },
+ "is_lm:12": {
+  "verdict": "correct"
+ },
+ "is_lm:13": {
+  "verdict": "correct"
+ },
+ "is_lm:14": {
+  "verdict": "correct"
+ },
+ "is_lm:15": {
+  "verdict": "correct"
+ },
+ "is_lm:16": {
+  "verdict": "correct"
+ },
+ "is_lm:17": {
+  "verdict": "correct"
+ },
+ "is_lm:18": {
+  "verdict": "correct"
+ },
+ "is_lm:19": {
+  "verdict": "correct"
+ },
+ "is_lm:20": {
+  "verdict": "correct"
+ },
+ "is_lm:21": {
+  "verdict": "correct"
+ },
+ "is_lm:22": {
+  "verdict": "correct"
+ },
+ "is_lm:23": {
+  "verdict": "correct"
+ },
+ "is_lm:24": {
+  "verdict": "correct"
+ },
+ "labor_market:0": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:1": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:2": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:3": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:4": {
+  "verdict": "correct"
+ },
+ "labor_market:5": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:6": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:7": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:8": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:9": {
+  "verdict": "correct",
+  "note": "Y-axis says Wages but ticks are labeled P1/P2 (minor labeling inconsistency)."
+ },
+ "labor_market:10": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:11": {
+  "verdict": "correct"
+ },
+ "labor_market:12": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:13": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:14": {
+  "verdict": "ambiguous",
+  "note": "Specialized or text-heavy labor diagram; needs source context."
+ },
+ "labor_market:15": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:16": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:17": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:18": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:19": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:20": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:21": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:22": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:23": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "labor_market:24": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:0": {
+  "verdict": "correct"
+ },
+ "price_control:1": {
+  "verdict": "correct"
+ },
+ "price_control:2": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:3": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:4": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:5": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:6": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:7": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:8": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:9": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:10": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:11": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:12": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:13": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:14": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:15": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:16": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:17": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:18": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:19": {
+  "verdict": "correct"
+ },
+ "price_control:20": {
+  "verdict": "correct"
+ },
+ "price_control:21": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:22": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:23": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "price_control:24": {
+  "verdict": "off_topic",
+  "note": "Not an economics graph (photo, poster, map, technical drawing, data chart, or flowchart)."
+ },
+ "per_unit_tax:0": {
+  "verdict": "ambiguous",
+  "note": "Specialized or under-labeled tax diagram."
+ },
+ "per_unit_tax:1": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:2": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:3": {
+  "verdict": "ambiguous",
+  "note": "Specialized or under-labeled tax diagram."
+ },
+ "per_unit_tax:4": {
+  "verdict": "ambiguous",
+  "note": "Specialized or under-labeled tax diagram."
+ },
+ "per_unit_tax:5": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:6": {
+  "verdict": "off_topic",
+  "note": "Data chart or map, not a tax-incidence diagram."
+ },
+ "per_unit_tax:7": {
+  "verdict": "off_topic",
+  "note": "Data chart or map, not a tax-incidence diagram."
+ },
+ "per_unit_tax:8": {
+  "verdict": "off_topic",
+  "note": "Data chart or map, not a tax-incidence diagram."
+ },
+ "per_unit_tax:9": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:10": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:11": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:12": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:13": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:14": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:15": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:16": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:17": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:18": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:19": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:20": {
+  "verdict": "ambiguous",
+  "note": "Specialized or under-labeled tax diagram."
+ },
+ "per_unit_tax:21": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:22": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:23": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:24": {
+  "verdict": "correct"
+ },
+ "elasticity:0": {
+  "verdict": "ambiguous",
+  "note": "Economic chart but not a demand-elasticity diagram."
+ },
+ "elasticity:1": {
+  "verdict": "ambiguous",
+  "note": "Economic chart but not a demand-elasticity diagram."
+ },
+ "elasticity:2": {
+  "verdict": "ambiguous",
+  "note": "Economic chart but not a demand-elasticity diagram."
+ },
+ "elasticity:3": {
+  "verdict": "correct"
+ },
+ "elasticity:4": {
+  "verdict": "correct"
+ },
+ "elasticity:5": {
+  "verdict": "ambiguous",
+  "note": "Economic chart but not a demand-elasticity diagram."
+ },
+ "elasticity:6": {
+  "verdict": "correct"
+ },
+ "elasticity:7": {
+  "verdict": "correct"
+ },
+ "elasticity:8": {
+  "verdict": "correct"
+ },
+ "elasticity:9": {
+  "verdict": "correct"
+ },
+ "elasticity:10": {
+  "verdict": "correct"
+ },
+ "elasticity:11": {
+  "verdict": "correct"
+ },
+ "elasticity:12": {
+  "verdict": "incorrect",
+  "error_type": "linear_curve_labeled_unit_elastic",
+  "severity": "major",
+  "highlight": [
+   "D3"
+  ],
+  "explanation": "D3 is a straight downward-sloping line labeled unit elastic. Elasticity varies along a linear demand curve (elastic above the midpoint, inelastic below), so a line cannot be unit elastic everywhere.",
+  "fix": "Draw unit-elastic demand as a rectangular hyperbola (P x Q = constant), as in the companion file DemandElasticity-he-2."
+ },
+ "elasticity:13": {
+  "verdict": "correct"
+ },
+ "elasticity:14": {
+  "verdict": "correct"
+ },
+ "elasticity:15": {
+  "verdict": "correct"
+ },
+ "elasticity:16": {
+  "verdict": "correct"
+ },
+ "elasticity:17": {
+  "verdict": "correct"
+ },
+ "elasticity:18": {
+  "verdict": "correct"
+ },
+ "elasticity:19": {
+  "verdict": "correct"
+ },
+ "elasticity:20": {
+  "verdict": "correct"
+ },
+ "elasticity:21": {
+  "verdict": "correct"
+ },
+ "elasticity:22": {
+  "verdict": "correct"
+ },
+ "elasticity:23": {
+  "verdict": "correct"
+ },
+ "elasticity:24": {
+  "verdict": "ambiguous",
+  "note": "Economic chart but not a demand-elasticity diagram."
+ },
+ "supply_demand:50": {
+  "verdict": "correct"
+ },
+ "supply_demand:51": {
+  "verdict": "correct"
+ },
+ "supply_demand:52": {
+  "verdict": "correct"
+ },
+ "supply_demand:53": {
+  "verdict": "correct"
+ },
+ "supply_demand:54": {
+  "verdict": "correct"
+ },
+ "supply_demand:55": {
+  "verdict": "correct"
+ },
+ "supply_demand:56": {
+  "verdict": "correct"
+ },
+ "supply_demand:57": {
+  "verdict": "correct"
+ },
+ "supply_demand:58": {
+  "verdict": "correct"
+ },
+ "supply_demand:59": {
+  "verdict": "correct"
+ },
+ "supply_demand:60": {
+  "verdict": "ambiguous",
+  "note": "Gift-economy market diagram; non-standard, cannot verify."
+ },
+ "supply_demand:61": {
+  "verdict": "correct"
+ },
+ "supply_demand:62": {
+  "verdict": "incorrect",
+  "error_type": "curve_labels_swapped",
+  "severity": "major",
+  "highlight": [
+   "demand_curve",
+   "supply_curve"
+  ],
+  "explanation": "The upward-sloping line is labeled Nachfrage (demand) and the downward-sloping line Angebot (supply). Demand slopes down and supply slopes up, so the labels are reversed.",
+  "fix": "Label the downward-sloping red line Nachfrage and the upward-sloping black line Angebot."
+ },
+ "supply_demand:63": {
+  "verdict": "correct"
+ },
+ "supply_demand:64": {
+  "verdict": "correct"
+ },
+ "supply_demand:65": {
+  "verdict": "correct"
+ },
+ "supply_demand:66": {
+  "verdict": "ambiguous",
+  "note": "Dense composite firm/market cost diagram; too cluttered to verify."
+ },
+ "supply_demand:67": {
+  "verdict": "correct"
+ },
+ "supply_demand:68": {
+  "verdict": "correct"
+ },
+ "supply_demand:69": {
+  "verdict": "correct"
+ },
+ "supply_demand:70": {
+  "verdict": "correct"
+ },
+ "supply_demand:71": {
+  "verdict": "correct",
+  "note": "Engel curve (inferior good), misfiled",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:72": {
+  "verdict": "correct",
+  "note": "Engel curve, misfiled",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:73": {
+  "verdict": "correct",
+  "note": "Engel curve with income elasticities, misfiled",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:74": {
+  "verdict": "correct",
+  "note": "Engel curve with income elasticities, misfiled",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:75": {
+  "verdict": "correct"
+ },
+ "supply_demand:76": {
+  "verdict": "correct"
+ },
+ "supply_demand:77": {
+  "verdict": "correct"
+ },
+ "supply_demand:78": {
+  "verdict": "correct",
+  "true_family": "oligopoly",
+  "note": "kinked demand"
+ },
+ "supply_demand:79": {
+  "verdict": "correct",
+  "true_family": "labor_market"
+ },
+ "supply_demand:80": {
+  "verdict": "correct",
+  "true_family": "labor_market"
+ },
+ "supply_demand:81": {
+  "verdict": "correct"
+ },
+ "supply_demand:82": {
+  "verdict": "correct"
+ },
+ "supply_demand:83": {
+  "verdict": "correct"
+ },
+ "supply_demand:84": {
+  "verdict": "correct"
+ },
+ "supply_demand:85": {
+  "verdict": "correct"
+ },
+ "supply_demand:86": {
+  "verdict": "correct"
+ },
+ "supply_demand:87": {
+  "verdict": "correct"
+ },
+ "supply_demand:88": {
+  "verdict": "correct"
+ },
+ "supply_demand:89": {
+  "verdict": "correct",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:90": {
+  "verdict": "correct",
+  "true_family": "elasticity"
+ },
+ "supply_demand:91": {
+  "verdict": "correct",
+  "true_family": "monopoly"
+ },
+ "supply_demand:92": {
+  "verdict": "correct",
+  "true_family": "negative_externality"
+ },
+ "supply_demand:93": {
+  "verdict": "correct",
+  "true_family": "engel_curve"
+ },
+ "supply_demand:94": {
+  "verdict": "correct"
+ },
+ "supply_demand:95": {
+  "verdict": "correct",
+  "true_family": "trade"
+ },
+ "supply_demand:96": {
+  "verdict": "correct"
+ },
+ "supply_demand:97": {
+  "verdict": "correct",
+  "true_family": "ad_as"
+ },
+ "supply_demand:98": {
+  "verdict": "correct"
+ },
+ "supply_demand:99": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled shifted lines; intent unclear."
+ },
+ "supply_demand:100": {
+  "verdict": "ambiguous",
+  "note": "Shaded welfare triangle with shifted lines; labels unclear."
+ },
+ "supply_demand:101": {
+  "verdict": "correct"
+ },
+ "supply_demand:102": {
+  "verdict": "correct",
+  "true_family": "externality"
+ },
+ "supply_demand:103": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "supply_demand:104": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "supply_demand:105": {
+  "verdict": "correct"
+ },
+ "supply_demand:106": {
+  "verdict": "correct"
+ },
+ "supply_demand:107": {
+  "verdict": "correct"
+ },
+ "supply_demand:108": {
+  "verdict": "correct"
+ },
+ "supply_demand:109": {
+  "verdict": "correct",
+  "true_family": "cost_revenue"
+ },
+ "supply_demand:110": {
+  "verdict": "correct"
+ },
+ "supply_demand:111": {
+  "verdict": "correct",
+  "true_family": "trade"
+ },
+ "supply_demand:112": {
+  "verdict": "correct",
+  "true_family": "trade"
+ },
+ "supply_demand:113": {
+  "verdict": "ambiguous",
+  "note": "Curve labeled S is U-shaped (falls then rises); a supply curve should not slope down. Possibly intended as MC."
+ },
+ "supply_demand:114": {
+  "verdict": "ambiguous",
+  "note": "U-shaped curve labeled S; surplus/shortage placement otherwise right."
+ },
+ "supply_demand:115": {
+  "verdict": "ambiguous",
+  "note": "U-shaped curves labeled S1/S2."
+ },
+ "supply_demand:116": {
+  "verdict": "correct"
+ },
+ "supply_demand:117": {
+  "verdict": "correct"
+ },
+ "supply_demand:118": {
+  "verdict": "correct"
+ },
+ "supply_demand:119": {
+  "verdict": "correct"
+ },
+ "supply_demand:120": {
+  "verdict": "correct"
+ },
+ "supply_demand:121": {
+  "verdict": "ambiguous",
+  "note": "Kinked-demand style chart with MC drawn as rainbow arcs; decorative, nonstandard."
+ },
+ "supply_demand:122": {
+  "verdict": "correct"
+ },
+ "supply_demand:123": {
+  "verdict": "correct"
+ },
+ "supply_demand:124": {
+  "verdict": "correct"
+ },
+ "supply_demand:125": {
+  "verdict": "correct"
+ },
+ "supply_demand:126": {
+  "verdict": "correct"
+ },
+ "supply_demand:127": {
+  "verdict": "correct"
+ },
+ "supply_demand:128": {
+  "verdict": "ambiguous",
+  "note": "Price on horizontal and quantity on vertical axis (non-standard), slopes consistent with that choice."
+ },
+ "supply_demand:129": {
+  "verdict": "correct"
+ },
+ "supply_demand:130": {
+  "verdict": "ambiguous",
+  "note": "ggplot with price on x-axis and quantity on y-axis (non-standard), slopes consistent."
+ },
+ "supply_demand:131": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "supply_demand:132": {
+  "verdict": "correct"
+ },
+ "supply_demand:133": {
+  "verdict": "correct"
+ },
+ "supply_demand:134": {
+  "verdict": "correct"
+ },
+ "supply_demand:135": {
+  "verdict": "correct"
+ },
+ "supply_demand:136": {
+  "verdict": "correct"
+ },
+ "supply_demand:137": {
+  "verdict": "correct"
+ },
+ "supply_demand:138": {
+  "verdict": "correct"
+ },
+ "supply_demand:139": {
+  "verdict": "correct"
+ },
+ "supply_demand:140": {
+  "verdict": "correct"
+ },
+ "supply_demand:141": {
+  "verdict": "correct"
+ },
+ "supply_demand:142": {
+  "verdict": "correct"
+ },
+ "supply_demand:143": {
+  "verdict": "correct"
+ },
+ "supply_demand:144": {
+  "verdict": "correct"
+ },
+ "supply_demand:145": {
+  "verdict": "correct"
+ },
+ "supply_demand:146": {
+  "verdict": "correct"
+ },
+ "supply_demand:147": {
+  "verdict": "correct"
+ },
+ "supply_demand:148": {
+  "verdict": "correct"
+ },
+ "supply_demand:149": {
+  "verdict": "correct"
+ },
+ "supply_demand:150": {
+  "verdict": "correct"
+ },
+ "supply_demand:151": {
+  "verdict": "correct"
+ },
+ "supply_demand:152": {
+  "verdict": "correct"
+ },
+ "supply_demand:153": {
+  "verdict": "correct"
+ },
+ "supply_demand:154": {
+  "verdict": "correct"
+ },
+ "supply_demand:155": {
+  "verdict": "correct"
+ },
+ "supply_demand:156": {
+  "verdict": "correct"
+ },
+ "supply_demand:157": {
+  "verdict": "correct"
+ },
+ "supply_demand:158": {
+  "verdict": "correct"
+ },
+ "supply_demand:159": {
+  "verdict": "correct"
+ },
+ "supply_demand:160": {
+  "verdict": "correct"
+ },
+ "supply_demand:161": {
+  "verdict": "correct"
+ },
+ "supply_demand:162": {
+  "verdict": "correct"
+ },
+ "supply_demand:163": {
+  "verdict": "correct"
+ },
+ "supply_demand:164": {
+  "verdict": "correct"
+ },
+ "supply_demand:165": {
+  "verdict": "correct"
+ },
+ "supply_demand:166": {
+  "verdict": "correct"
+ },
+ "supply_demand:167": {
+  "verdict": "ambiguous",
+  "note": "Quantity on vertical and price on horizontal axis (non-standard), slopes consistent."
+ },
+ "supply_demand:168": {
+  "verdict": "correct",
+  "true_family": "labor_market"
+ },
+ "supply_demand:169": {
+  "verdict": "correct"
+ },
+ "supply_demand:170": {
+  "verdict": "correct"
+ },
+ "supply_demand:171": {
+  "verdict": "correct"
+ },
+ "supply_demand:172": {
+  "verdict": "correct"
+ },
+ "supply_demand:173": {
+  "verdict": "correct"
+ },
+ "supply_demand:174": {
+  "verdict": "ambiguous",
+  "note": "Too faint to read."
+ },
+ "cost_revenue:25": {
+  "verdict": "off_topic",
+  "note": "Empirical time-series data chart, not a theory diagram."
+ },
+ "cost_revenue:26": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:27": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:28": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:29": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:30": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:31": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:32": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:33": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:34": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:35": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:36": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:37": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:38": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:39": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:40": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:41": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:42": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:43": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:44": {
+  "verdict": "off_topic"
+ },
+ "cost_revenue:45": {
+  "verdict": "correct"
+ },
+ "cost_revenue:46": {
+  "verdict": "correct"
+ },
+ "cost_revenue:47": {
+  "verdict": "correct"
+ },
+ "cost_revenue:48": {
+  "verdict": "correct"
+ },
+ "cost_revenue:49": {
+  "verdict": "correct"
+ },
+ "cost_revenue:50": {
+  "verdict": "correct"
+ },
+ "cost_revenue:51": {
+  "verdict": "correct"
+ },
+ "cost_revenue:52": {
+  "verdict": "correct"
+ },
+ "cost_revenue:53": {
+  "verdict": "correct"
+ },
+ "cost_revenue:54": {
+  "verdict": "correct"
+ },
+ "cost_revenue:55": {
+  "verdict": "correct"
+ },
+ "cost_revenue:56": {
+  "verdict": "correct"
+ },
+ "cost_revenue:57": {
+  "verdict": "correct"
+ },
+ "cost_revenue:58": {
+  "verdict": "ambiguous",
+  "note": "Three unlabeled grid panels with straight lines."
+ },
+ "cost_revenue:59": {
+  "verdict": "correct"
+ },
+ "cost_revenue:60": {
+  "verdict": "correct"
+ },
+ "cost_revenue:61": {
+  "verdict": "correct"
+ },
+ "cost_revenue:62": {
+  "verdict": "correct"
+ },
+ "cost_revenue:63": {
+  "verdict": "correct"
+ },
+ "cost_revenue:64": {
+  "verdict": "correct"
+ },
+ "cost_revenue:65": {
+  "verdict": "correct"
+ },
+ "cost_revenue:66": {
+  "verdict": "correct"
+ },
+ "cost_revenue:67": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:68": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:69": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:70": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:71": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:72": {
+  "verdict": "correct",
+  "note": "cost-volume-profit / break-even chart"
+ },
+ "cost_revenue:73": {
+  "verdict": "correct"
+ },
+ "cost_revenue:74": {
+  "verdict": "correct"
+ },
+ "supply_demand:175": {
+  "verdict": "correct"
+ },
+ "supply_demand:176": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:177": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:178": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:179": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:180": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:181": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:182": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:183": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:184": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:185": {
+  "verdict": "ambiguous",
+  "note": "Two-sided platform expectation/demand diagram; advanced, not verifiable against standard rules."
+ },
+ "supply_demand:186": {
+  "verdict": "correct"
+ },
+ "supply_demand:187": {
+  "verdict": "correct"
+ },
+ "supply_demand:188": {
+  "verdict": "correct"
+ },
+ "supply_demand:189": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:190": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:191": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:192": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:193": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:194": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:195": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:196": {
+  "verdict": "correct",
+  "true_family": "price_consumption_curve",
+  "note": "deriving demand from indifference curves"
+ },
+ "supply_demand:197": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:198": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "supply_demand:199": {
+  "verdict": "off_topic",
+  "note": "flowchart / table / data chart / infographic"
+ },
+ "cost_revenue:75": {
+  "verdict": "correct"
+ },
+ "cost_revenue:76": {
+  "verdict": "correct"
+ },
+ "cost_revenue:77": {
+  "verdict": "correct"
+ },
+ "cost_revenue:78": {
+  "verdict": "correct"
+ },
+ "cost_revenue:79": {
+  "verdict": "correct"
+ },
+ "cost_revenue:80": {
+  "verdict": "correct"
+ },
+ "cost_revenue:81": {
+  "verdict": "correct"
+ },
+ "cost_revenue:82": {
+  "verdict": "correct"
+ },
+ "cost_revenue:83": {
+  "verdict": "correct"
+ },
+ "cost_revenue:84": {
+  "verdict": "correct"
+ },
+ "cost_revenue:85": {
+  "verdict": "correct"
+ },
+ "cost_revenue:86": {
+  "verdict": "correct"
+ },
+ "cost_revenue:87": {
+  "verdict": "correct"
+ },
+ "cost_revenue:88": {
+  "verdict": "correct"
+ },
+ "cost_revenue:89": {
+  "verdict": "correct"
+ },
+ "cost_revenue:90": {
+  "verdict": "correct"
+ },
+ "cost_revenue:91": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:92": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:93": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:94": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:95": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:96": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:97": {
+  "verdict": "correct",
+  "note": "hand-drawn"
+ },
+ "cost_revenue:98": {
+  "verdict": "correct"
+ },
+ "cost_revenue:99": {
+  "verdict": "correct"
+ },
+ "cost_revenue:100": {
+  "verdict": "correct"
+ },
+ "cost_revenue:101": {
+  "verdict": "correct"
+ },
+ "cost_revenue:102": {
+  "verdict": "correct"
+ },
+ "cost_revenue:103": {
+  "verdict": "correct"
+ },
+ "cost_revenue:104": {
+  "verdict": "correct"
+ },
+ "cost_revenue:105": {
+  "verdict": "correct"
+ },
+ "cost_revenue:106": {
+  "verdict": "correct"
+ },
+ "cost_revenue:107": {
+  "verdict": "correct"
+ },
+ "cost_revenue:108": {
+  "verdict": "correct"
+ },
+ "cost_revenue:109": {
+  "verdict": "correct"
+ },
+ "cost_revenue:110": {
+  "verdict": "correct"
+ },
+ "cost_revenue:111": {
+  "verdict": "correct"
+ },
+ "cost_revenue:112": {
+  "verdict": "correct"
+ },
+ "cost_revenue:113": {
+  "verdict": "off_topic",
+  "note": "project-management cost chart"
+ },
+ "cost_revenue:114": {
+  "verdict": "correct"
+ },
+ "cost_revenue:115": {
+  "verdict": "correct"
+ },
+ "cost_revenue:116": {
+  "verdict": "correct"
+ },
+ "cost_revenue:117": {
+  "verdict": "correct"
+ },
+ "cost_revenue:118": {
+  "verdict": "correct"
+ },
+ "cost_revenue:119": {
+  "verdict": "correct"
+ },
+ "cost_revenue:120": {
+  "verdict": "off_topic",
+  "note": "project-management cost chart"
+ },
+ "cost_revenue:121": {
+  "verdict": "correct"
+ },
+ "cost_revenue:122": {
+  "verdict": "correct"
+ },
+ "cost_revenue:123": {
+  "verdict": "correct"
+ },
+ "cost_revenue:124": {
+  "verdict": "correct"
+ },
+ "cost_revenue:125": {
+  "verdict": "ambiguous",
+  "note": "Accounting plan-cost chart."
+ },
+ "cost_revenue:126": {
+  "verdict": "correct"
+ },
+ "cost_revenue:127": {
+  "verdict": "correct"
+ },
+ "cost_revenue:128": {
+  "verdict": "correct"
+ },
+ "cost_revenue:129": {
+  "verdict": "correct"
+ },
+ "cost_revenue:130": {
+  "verdict": "correct"
+ },
+ "cost_revenue:131": {
+  "verdict": "correct"
+ },
+ "cost_revenue:132": {
+  "verdict": "correct"
+ },
+ "cost_revenue:133": {
+  "verdict": "incorrect",
+  "error_type": "lrac_through_srac_minima",
+  "severity": "minor",
+  "highlight": [
+   "LRAC",
+   "SRAC_1",
+   "SRAC_3"
+  ],
+  "explanation": "The LAC envelope is drawn through the minimum point of every short-run AC curve (Viner's error). Only at the minimum of LAC does the tangency occur at an SRAC minimum; on the falling part of LAC the tangency is left of the SRAC minimum, on the rising part to the right.",
+  "fix": "Make LAC tangent to AC1 on AC1's downward-sloping part and to AC3 on its upward-sloping part; only AC2 touches at its minimum.",
+  "note": "verify at full resolution"
+ },
+ "cost_revenue:134": {
+  "verdict": "correct"
+ },
+ "cost_revenue:135": {
+  "verdict": "correct"
+ },
+ "cost_revenue:136": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:137": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:138": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:139": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:140": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:141": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:142": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:143": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:144": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:145": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:146": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:147": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:148": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "cost_revenue:149": {
+  "verdict": "off_topic",
+  "note": "infographic / map / photo / pie or bar chart"
+ },
+ "payoff_diagram:0": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:1": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:2": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:3": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:4": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:5": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:6": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:7": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:8": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:9": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:10": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:11": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:12": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:13": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:14": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:15": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:16": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:17": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:18": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:19": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:20": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:21": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:22": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:23": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:24": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope)"
+ },
+ "payoff_diagram:25": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:26": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:27": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:28": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:29": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:30": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:31": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:32": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:33": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:34": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:35": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:36": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:37": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:38": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:39": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:40": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:41": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:42": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:43": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:44": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:45": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:46": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:47": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:48": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:49": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:50": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:51": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:52": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:53": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:54": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:55": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:56": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:57": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:58": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:59": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:60": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:61": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:62": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:63": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:64": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:65": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:66": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:67": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:68": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:69": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:70": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:71": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:72": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:73": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:74": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:75": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:76": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:77": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:78": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:79": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:80": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:81": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:82": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:83": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:84": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:85": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:86": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:87": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:88": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:89": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:90": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:91": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:92": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:93": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:94": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:95": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:96": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:97": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:98": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:99": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:100": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:101": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:102": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:103": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:104": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:105": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:106": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:107": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:108": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:109": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:110": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:111": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:112": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:113": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:114": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:115": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "payoff_diagram:116": {
+  "verdict": "off_topic",
+  "note": "Finance option-strategy payoff diagram (out of econ scope); bulk-labeled by category, not individually viewed"
+ },
+ "lorenz_curve:0": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:1": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:2": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:3": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:4": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:5": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:6": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:7": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:8": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:9": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:10": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:11": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:12": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:13": {
+  "verdict": "ambiguous"
+ },
+ "lorenz_curve:14": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:15": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:16": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:17": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:18": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:20": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:21": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:22": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:23": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:24": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:25": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:26": {
+  "verdict": "off_topic"
+ },
+ "lorenz_curve:27": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:28": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:29": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:30": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:31": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:32": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:33": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:34": {
+  "verdict": "ambiguous"
+ },
+ "lorenz_curve:35": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:36": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:37": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:38": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:39": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:40": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:41": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:42": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:43": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:44": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:45": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:46": {
+  "verdict": "ambiguous"
+ },
+ "lorenz_curve:47": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:48": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:49": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:19": {
+  "verdict": "incorrect",
+  "error_type": "lorenz_exceeds_bounds",
+  "severity": "major",
+  "highlight": [
+   "lorenz_curve"
+  ],
+  "explanation": "The Lorenz curve bends past 100% of the population and curls back up. A Lorenz curve is a non-decreasing, convex curve inside the unit square from (0,0) to (100,100).",
+  "fix": "End the curve exactly at (100%,100%) without crossing the right edge; keep it below the line of equality and convex."
+ },
+ "ppf:25": {
+  "verdict": "correct"
+ },
+ "ppf:26": {
+  "verdict": "correct"
+ },
+ "ppf:27": {
+  "verdict": "correct"
+ },
+ "ppf:28": {
+  "verdict": "correct"
+ },
+ "ppf:29": {
+  "verdict": "correct"
+ },
+ "ppf:30": {
+  "verdict": "correct"
+ },
+ "ppf:31": {
+  "verdict": "correct"
+ },
+ "ppf:32": {
+  "verdict": "correct"
+ },
+ "ppf:33": {
+  "verdict": "correct"
+ },
+ "ppf:34": {
+  "verdict": "correct"
+ },
+ "ppf:35": {
+  "verdict": "correct"
+ },
+ "ppf:36": {
+  "verdict": "correct"
+ },
+ "ppf:37": {
+  "verdict": "correct"
+ },
+ "ppf:38": {
+  "verdict": "correct"
+ },
+ "ppf:39": {
+  "verdict": "correct"
+ },
+ "ppf:40": {
+  "verdict": "correct"
+ },
+ "ppf:41": {
+  "verdict": "correct"
+ },
+ "ppf:42": {
+  "verdict": "correct"
+ },
+ "ppf:43": {
+  "verdict": "correct"
+ },
+ "ppf:44": {
+  "verdict": "correct"
+ },
+ "ppf:45": {
+  "verdict": "correct"
+ },
+ "ppf:46": {
+  "verdict": "correct"
+ },
+ "ppf:47": {
+  "verdict": "correct"
+ },
+ "ppf:48": {
+  "verdict": "correct"
+ },
+ "ppf:49": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:25": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:26": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:27": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:28": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:29": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:30": {
+  "verdict": "off_topic",
+  "note": "tailoring/weaving pattern"
+ },
+ "keynesian_cross:31": {
+  "verdict": "correct",
+  "note": "Kuznets/Keynes consumption function"
+ },
+ "keynesian_cross:32": {
+  "verdict": "correct",
+  "note": "Kuznets/Keynes consumption function"
+ },
+ "keynesian_cross:33": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:34": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:35": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:36": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:37": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:38": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:39": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:40": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:41": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:42": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:43": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:44": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:45": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:46": {
+  "verdict": "correct"
+ },
+ "keynesian_cross:47": {
+  "verdict": "correct",
+  "true_family": "loanable_funds"
+ },
+ "keynesian_cross:48": {
+  "verdict": "correct",
+  "true_family": "loanable_funds"
+ },
+ "keynesian_cross:49": {
+  "verdict": "correct",
+  "note": "investment function I(r)"
+ },
+ "price_consumption_curve:0": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:1": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:2": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:3": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:4": {
+  "verdict": "ambiguous",
+  "note": "Quantity on vertical, price on horizontal axis."
+ },
+ "price_consumption_curve:5": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:6": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:7": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:8": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:9": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:10": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:11": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:12": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:13": {
+  "verdict": "ambiguous"
+ },
+ "price_consumption_curve:14": {
+  "verdict": "correct",
+  "note": "Cournot convention: demand D as function of price p"
+ },
+ "price_consumption_curve:15": {
+  "verdict": "correct",
+  "note": "Cournot convention: demand D as function of price p"
+ },
+ "price_consumption_curve:16": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:17": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:18": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:19": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:20": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:21": {
+  "verdict": "off_topic"
+ },
+ "price_consumption_curve:22": {
+  "verdict": "off_topic"
+ },
+ "price_consumption_curve:23": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:24": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:0": {
+  "verdict": "correct"
+ },
+ "macro_other:1": {
+  "verdict": "correct"
+ },
+ "macro_other:2": {
+  "verdict": "correct"
+ },
+ "macro_other:3": {
+  "verdict": "correct"
+ },
+ "macro_other:4": {
+  "verdict": "correct"
+ },
+ "macro_other:5": {
+  "verdict": "correct"
+ },
+ "macro_other:6": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:7": {
+  "verdict": "off_topic"
+ },
+ "macro_other:8": {
+  "verdict": "off_topic"
+ },
+ "macro_other:9": {
+  "verdict": "correct"
+ },
+ "macro_other:10": {
+  "verdict": "correct"
+ },
+ "macro_other:11": {
+  "verdict": "correct"
+ },
+ "macro_other:12": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:13": {
+  "verdict": "off_topic"
+ },
+ "macro_other:14": {
+  "verdict": "off_topic"
+ },
+ "macro_other:15": {
+  "verdict": "off_topic"
+ },
+ "macro_other:16": {
+  "verdict": "correct"
+ },
+ "macro_other:17": {
+  "verdict": "off_topic"
+ },
+ "macro_other:18": {
+  "verdict": "correct"
+ },
+ "macro_other:19": {
+  "verdict": "off_topic"
+ },
+ "macro_other:20": {
+  "verdict": "off_topic"
+ },
+ "macro_other:21": {
+  "verdict": "correct"
+ },
+ "macro_other:22": {
+  "verdict": "off_topic"
+ },
+ "macro_other:23": {
+  "verdict": "correct"
+ },
+ "macro_other:24": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:25": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:26": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:27": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:28": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:29": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:30": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:31": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:32": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:33": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:34": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:35": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:36": {
+  "verdict": "off_topic",
+  "note": "formula text only"
+ },
+ "price_consumption_curve:37": {
+  "verdict": "off_topic"
+ },
+ "price_consumption_curve:38": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:39": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:40": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:41": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:42": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:43": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:44": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:45": {
+  "verdict": "ambiguous",
+  "note": "ratchet effect diagram"
+ },
+ "price_consumption_curve:46": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:47": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:48": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:49": {
+  "verdict": "correct"
+ },
+ "macro_other:25": {
+  "verdict": "correct"
+ },
+ "macro_other:26": {
+  "verdict": "off_topic"
+ },
+ "macro_other:27": {
+  "verdict": "off_topic"
+ },
+ "macro_other:28": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:29": {
+  "verdict": "off_topic"
+ },
+ "macro_other:30": {
+  "verdict": "off_topic"
+ },
+ "macro_other:31": {
+  "verdict": "correct"
+ },
+ "macro_other:32": {
+  "verdict": "correct"
+ },
+ "macro_other:33": {
+  "verdict": "correct"
+ },
+ "macro_other:34": {
+  "verdict": "correct"
+ },
+ "macro_other:35": {
+  "verdict": "correct"
+ },
+ "macro_other:36": {
+  "verdict": "correct"
+ },
+ "macro_other:37": {
+  "verdict": "correct"
+ },
+ "macro_other:38": {
+  "verdict": "off_topic"
+ },
+ "macro_other:39": {
+  "verdict": "correct"
+ },
+ "macro_other:40": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:41": {
+  "verdict": "correct"
+ },
+ "macro_other:42": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:43": {
+  "verdict": "off_topic"
+ },
+ "macro_other:44": {
+  "verdict": "correct"
+ },
+ "macro_other:45": {
+  "verdict": "off_topic"
+ },
+ "macro_other:46": {
+  "verdict": "off_topic"
+ },
+ "macro_other:47": {
+  "verdict": "off_topic"
+ },
+ "macro_other:48": {
+  "verdict": "off_topic"
+ },
+ "macro_other:49": {
+  "verdict": "off_topic"
+ },
+ "price_consumption_curve:50": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:51": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:52": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:53": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:54": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:55": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:56": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:57": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:58": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:59": {
+  "verdict": "ambiguous"
+ },
+ "price_consumption_curve:60": {
+  "verdict": "ambiguous"
+ },
+ "price_consumption_curve:61": {
+  "verdict": "ambiguous"
+ },
+ "price_consumption_curve:62": {
+  "verdict": "ambiguous",
+  "note": "Deliberately oscillating supply/demand with multiple equilibria."
+ },
+ "price_consumption_curve:63": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:64": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:65": {
+  "verdict": "correct"
+ },
+ "price_consumption_curve:66": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:50": {
+  "verdict": "off_topic"
+ },
+ "macro_other:51": {
+  "verdict": "off_topic"
+ },
+ "macro_other:52": {
+  "verdict": "off_topic"
+ },
+ "macro_other:53": {
+  "verdict": "off_topic"
+ },
+ "macro_other:54": {
+  "verdict": "correct"
+ },
+ "macro_other:55": {
+  "verdict": "correct"
+ },
+ "macro_other:56": {
+  "verdict": "correct"
+ },
+ "macro_other:57": {
+  "verdict": "correct"
+ },
+ "macro_other:58": {
+  "verdict": "correct"
+ },
+ "macro_other:59": {
+  "verdict": "correct"
+ },
+ "macro_other:60": {
+  "verdict": "off_topic"
+ },
+ "macro_other:61": {
+  "verdict": "ambiguous"
+ },
+ "macro_other:62": {
+  "verdict": "off_topic"
+ },
+ "macro_other:63": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:0": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:1": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:2": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:3": {
+  "verdict": "off_topic"
+ },
+ "consumer_optimum:4": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:5": {
+  "verdict": "off_topic"
+ },
+ "consumer_optimum:6": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:7": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:8": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:9": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:10": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:11": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:12": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:13": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:14": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:15": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:16": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:17": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:18": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:19": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:20": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:21": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:22": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:23": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:24": {
+  "verdict": "correct"
+ },
+ "circular_flow:0": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:1": {
+  "verdict": "off_topic"
+ },
+ "circular_flow:2": {
+  "verdict": "ambiguous"
+ },
+ "circular_flow:3": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:4": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:5": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:6": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:7": {
+  "verdict": "off_topic"
+ },
+ "circular_flow:8": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:9": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:10": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:11": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:12": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:13": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:14": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:15": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:16": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:17": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:18": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:19": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:20": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:21": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:22": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:23": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:24": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "consumer_optimum:25": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:26": {
+  "verdict": "ambiguous",
+  "note": "3D utility surface"
+ },
+ "consumer_optimum:27": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:28": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:29": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:30": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:31": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:32": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:33": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:34": {
+  "verdict": "incorrect",
+  "error_type": "indifference_curves_cross",
+  "severity": "major",
+  "highlight": [
+   "I1",
+   "I2",
+   "B"
+  ],
+  "explanation": "I1 and I2 intersect at B. Crossing indifference curves contradict transitivity and monotonic preferences (this figure is a didactic counterexample).",
+  "fix": "Draw I2 entirely above/right of I1 so the curves never touch.",
+  "note": "intentional teaching counterexample"
+ },
+ "consumer_optimum:35": {
+  "verdict": "correct",
+  "note": "preference zones relative to bundle A"
+ },
+ "consumer_optimum:36": {
+  "verdict": "correct",
+  "note": "preference zones relative to bundle A"
+ },
+ "consumer_optimum:37": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:38": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:39": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:40": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:41": {
+  "verdict": "incorrect",
+  "error_type": "indifference_curves_cross",
+  "severity": "major",
+  "highlight": [
+   "IC_1",
+   "IC_2"
+  ],
+  "explanation": "The two indifference curves cross, which violates transitivity.",
+  "fix": "Draw non-intersecting indifference curves.",
+  "note": "likely intentional counterexample"
+ },
+ "consumer_optimum:42": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:43": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:44": {
+  "verdict": "ambiguous"
+ },
+ "consumer_optimum:45": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:46": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:47": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:48": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:49": {
+  "verdict": "correct"
+ },
+ "circular_flow:25": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:26": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:27": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:28": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:29": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:30": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:31": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:32": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:33": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:34": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:35": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:36": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:37": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:38": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:39": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:40": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:41": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:42": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:43": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:44": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:45": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:46": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:47": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:48": {
+  "verdict": "correct",
+  "note": "concept flow diagram"
+ },
+ "circular_flow:49": {
+  "verdict": "ambiguous",
+  "note": "innovation flowchart"
+ },
+ "elasticity:25": {
+  "verdict": "correct"
+ },
+ "elasticity:26": {
+  "verdict": "ambiguous",
+  "note": "Faint, unreadable labels."
+ },
+ "elasticity:27": {
+  "verdict": "correct"
+ },
+ "elasticity:28": {
+  "verdict": "correct"
+ },
+ "elasticity:29": {
+  "verdict": "off_topic",
+  "note": "Historical data chart."
+ },
+ "elasticity:30": {
+  "verdict": "correct"
+ },
+ "elasticity:31": {
+  "verdict": "correct"
+ },
+ "elasticity:32": {
+  "verdict": "correct"
+ },
+ "elasticity:33": {
+  "verdict": "correct"
+ },
+ "elasticity:34": {
+  "verdict": "correct"
+ },
+ "elasticity:35": {
+  "verdict": "correct"
+ },
+ "elasticity:36": {
+  "verdict": "correct"
+ },
+ "elasticity:37": {
+  "verdict": "correct"
+ },
+ "elasticity:38": {
+  "verdict": "correct"
+ },
+ "elasticity:39": {
+  "verdict": "correct",
+  "note": "Anomalous (upward-sloping) demand, deliberate."
+ },
+ "elasticity:40": {
+  "verdict": "correct"
+ },
+ "elasticity:41": {
+  "verdict": "correct"
+ },
+ "elasticity:42": {
+  "verdict": "correct"
+ },
+ "elasticity:43": {
+  "verdict": "correct"
+ },
+ "elasticity:44": {
+  "verdict": "correct"
+ },
+ "elasticity:45": {
+  "verdict": "correct"
+ },
+ "elasticity:46": {
+  "verdict": "correct"
+ },
+ "elasticity:47": {
+  "verdict": "correct"
+ },
+ "elasticity:48": {
+  "verdict": "correct"
+ },
+ "elasticity:49": {
+  "verdict": "correct"
+ },
+ "ppf:50": {
+  "verdict": "correct"
+ },
+ "ppf:51": {
+  "verdict": "correct"
+ },
+ "ppf:52": {
+  "verdict": "correct"
+ },
+ "ppf:53": {
+  "verdict": "correct"
+ },
+ "ppf:54": {
+  "verdict": "correct"
+ },
+ "ppf:55": {
+  "verdict": "correct"
+ },
+ "ppf:56": {
+  "verdict": "correct"
+ },
+ "ppf:57": {
+  "verdict": "correct"
+ },
+ "ppf:58": {
+  "verdict": "correct"
+ },
+ "ppf:59": {
+  "verdict": "correct"
+ },
+ "ppf:60": {
+  "verdict": "correct"
+ },
+ "ppf:61": {
+  "verdict": "correct"
+ },
+ "ppf:62": {
+  "verdict": "correct"
+ },
+ "ppf:63": {
+  "verdict": "correct"
+ },
+ "ppf:64": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:65": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:66": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:67": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:68": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:69": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:70": {
+  "verdict": "incorrect",
+  "error_type": "ppf_bowed_in",
+  "severity": "minor",
+  "highlight": [
+   "ppf"
+  ],
+  "explanation": "The frontier is convex to the origin, which implies decreasing opportunity cost. The standard PPF is concave (bowed out) because resources are not equally suited to both goods. (File title says it is intentionally 'inverted'.)",
+  "fix": "Draw the PPF bowed outward from the origin.",
+  "note": "intentional counterexample, language variant"
+ },
+ "ppf:71": {
+  "verdict": "correct"
+ },
+ "ppf:72": {
+  "verdict": "correct"
+ },
+ "ppf:73": {
+  "verdict": "correct"
+ },
+ "ppf:74": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:25": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:26": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:27": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:28": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:29": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:30": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:31": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:32": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:33": {
+  "verdict": "incorrect",
+  "error_type": "per_unit_tax_labeled_lump_sum",
+  "severity": "minor",
+  "highlight": [
+   "S_with_tax",
+   "tax_arrow"
+  ],
+  "explanation": "The supply curve is shifted up by a fixed amount per unit, which is a per-unit (specific) tax, but the gap is labeled 'Magnitude of Lump Sum Tax'. A lump-sum tax does not change marginal cost, so it would not shift supply.",
+  "fix": "Relabel the vertical gap as 'Per-unit tax' (or remove the supply shift if a lump-sum tax is intended)."
+ },
+ "per_unit_tax:34": {
+  "verdict": "incorrect",
+  "error_type": "per_unit_tax_labeled_lump_sum",
+  "severity": "minor",
+  "highlight": [
+   "S_with_tax",
+   "tax_arrow"
+  ],
+  "explanation": "The supply curve is shifted up by a fixed amount per unit, which is a per-unit (specific) tax, but the gap is labeled 'Magnitude of Lump Sum Tax'. A lump-sum tax does not change marginal cost, so it would not shift supply.",
+  "fix": "Relabel the vertical gap as 'Per-unit tax' (or remove the supply shift if a lump-sum tax is intended)."
+ },
+ "per_unit_tax:35": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:36": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:37": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:38": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:39": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:40": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:41": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:42": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:43": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:44": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:45": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:46": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:47": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:48": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "per_unit_tax:49": {
+  "verdict": "off_topic",
+  "note": "photo / map / icon / data chart"
+ },
+ "edgeworth_box:0": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:1": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:2": {
+  "verdict": "ambiguous",
+  "note": "Edgeworth's original 1881 figure"
+ },
+ "edgeworth_box:3": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:4": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:5": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:6": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:7": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:8": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:9": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:10": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:11": {
+  "verdict": "ambiguous",
+  "note": "Deliberate pathological preferences example"
+ },
+ "edgeworth_box:12": {
+  "verdict": "ambiguous",
+  "note": "Deliberate pathological preferences example"
+ },
+ "edgeworth_box:13": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:14": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:15": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:16": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:17": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:18": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:19": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:20": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:21": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:22": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:23": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:24": {
+  "verdict": "correct"
+ },
+ "per_unit_tax:50": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:51": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:52": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:53": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:54": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:55": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:56": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:57": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:58": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:59": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:60": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:61": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:62": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:63": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:64": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:65": {
+  "verdict": "off_topic",
+  "note": "photo / map / data chart / logo"
+ },
+ "per_unit_tax:66": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "edgeworth_box:25": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:26": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:27": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:28": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:29": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:30": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:31": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:32": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:33": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:34": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:35": {
+  "verdict": "ambiguous",
+  "note": "Indifference map only"
+ },
+ "edgeworth_box:36": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:37": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:38": {
+  "verdict": "correct"
+ },
+ "edgeworth_box:39": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:50": {
+  "verdict": "ambiguous",
+  "note": "Bar-based Lorenz chart"
+ },
+ "lorenz_curve:51": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:52": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:53": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:54": {
+  "verdict": "correct",
+  "note": "crossing Lorenz curves (legitimate)"
+ },
+ "lorenz_curve:55": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:56": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:57": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:58": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:59": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:60": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:61": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:62": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:63": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:64": {
+  "verdict": "off_topic",
+  "note": "network graph"
+ },
+ "lorenz_curve:65": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:66": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:67": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:68": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:69": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:70": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:71": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:72": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:73": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:74": {
+  "verdict": "correct"
+ },
+ "is_lm:25": {
+  "verdict": "correct"
+ },
+ "is_lm:26": {
+  "verdict": "correct"
+ },
+ "is_lm:27": {
+  "verdict": "correct"
+ },
+ "is_lm:28": {
+  "verdict": "ambiguous",
+  "note": "Multi-panel derivation, unclear labels"
+ },
+ "is_lm:29": {
+  "verdict": "correct"
+ },
+ "is_lm:30": {
+  "verdict": "correct"
+ },
+ "is_lm:31": {
+  "verdict": "correct"
+ },
+ "is_lm:32": {
+  "verdict": "correct"
+ },
+ "is_lm:33": {
+  "verdict": "correct"
+ },
+ "is_lm:34": {
+  "verdict": "correct"
+ },
+ "is_lm:35": {
+  "verdict": "correct"
+ },
+ "is_lm:36": {
+  "verdict": "correct"
+ },
+ "is_lm:37": {
+  "verdict": "correct"
+ },
+ "is_lm:38": {
+  "verdict": "correct"
+ },
+ "is_lm:39": {
+  "verdict": "correct"
+ },
+ "is_lm:40": {
+  "verdict": "correct"
+ },
+ "is_lm:41": {
+  "verdict": "correct"
+ },
+ "is_lm:42": {
+  "verdict": "correct"
+ },
+ "is_lm:43": {
+  "verdict": "correct"
+ },
+ "is_lm:44": {
+  "verdict": "correct"
+ },
+ "is_lm:45": {
+  "verdict": "correct"
+ },
+ "is_lm:46": {
+  "verdict": "ambiguous",
+  "note": "Too faint"
+ },
+ "is_lm:47": {
+  "verdict": "correct"
+ },
+ "is_lm:48": {
+  "verdict": "correct"
+ },
+ "is_lm:49": {
+  "verdict": "correct"
+ },
+ "labor_market:25": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:26": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:27": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:28": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:29": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:30": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:31": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:32": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:33": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:34": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:42": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:43": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:44": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:45": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:46": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:47": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:48": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:49": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "labor_market:36": {
+  "verdict": "correct"
+ },
+ "labor_market:37": {
+  "verdict": "correct"
+ },
+ "labor_market:38": {
+  "verdict": "correct"
+ },
+ "labor_market:39": {
+  "verdict": "correct"
+ },
+ "labor_market:41": {
+  "verdict": "correct"
+ },
+ "labor_market:35": {
+  "verdict": "ambiguous",
+  "note": "Labour-embodied/commanded value curves (classical)"
+ },
+ "labor_market:40": {
+  "verdict": "ambiguous",
+  "note": "Labour-embodied/commanded value curves (classical)"
+ },
+ "market_structure:0": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:1": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:2": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:3": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:4": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:5": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:6": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:7": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:8": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:9": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:10": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:11": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:12": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:13": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:14": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:15": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:16": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:17": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:18": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:19": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:20": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:21": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:22": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:23": {
+  "verdict": "off_topic",
+  "note": "flowchart / org chart / document / business matrix"
+ },
+ "market_structure:24": {
+  "verdict": "correct",
+  "true_family": "monopoly",
+  "note": "price regulation of monopoly"
+ },
+ "labor_market:50": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:51": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:52": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:53": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:54": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:55": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:56": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:57": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:58": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:59": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:60": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "labor_market:61": {
+  "verdict": "correct",
+  "note": "minimum wage above equilibrium"
+ },
+ "market_structure:25": {
+  "verdict": "correct",
+  "true_family": "monopolistic_competition"
+ },
+ "market_structure:29": {
+  "verdict": "correct",
+  "true_family": "perfect_competition"
+ },
+ "market_structure:35": {
+  "verdict": "correct",
+  "true_family": "per_unit_tax"
+ },
+ "market_structure:26": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:27": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:28": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:30": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:31": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:32": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:33": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "market_structure:34": {
+  "verdict": "off_topic",
+  "note": "railway drawing / map / photo / business diagram"
+ },
+ "consumer_producer_surplus:0": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:1": {
+  "verdict": "off_topic",
+  "note": "table"
+ },
+ "consumer_producer_surplus:2": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "consumer_producer_surplus:3": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "consumer_producer_surplus:4": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "consumer_producer_surplus:5": {
+  "verdict": "ambiguous",
+  "note": "Surplus labels without shaded areas"
+ },
+ "consumer_producer_surplus:6": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:7": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:8": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:9": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:10": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:11": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "consumer_producer_surplus:12": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:13": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:14": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:15": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:16": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:17": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:18": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:19": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:20": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:21": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:22": {
+  "verdict": "ambiguous",
+  "note": "Blurred, partial CS region"
+ },
+ "consumer_producer_surplus:23": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:24": {
+  "verdict": "correct"
+ },
+ "budget_line:0": {
+  "verdict": "correct"
+ },
+ "budget_line:1": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:2": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:3": {
+  "verdict": "correct"
+ },
+ "budget_line:4": {
+  "verdict": "correct"
+ },
+ "budget_line:5": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:6": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:7": {
+  "verdict": "correct"
+ },
+ "budget_line:8": {
+  "verdict": "off_topic",
+  "note": "fiscal budget chart/map"
+ },
+ "budget_line:9": {
+  "verdict": "off_topic",
+  "note": "fiscal budget chart/map"
+ },
+ "budget_line:10": {
+  "verdict": "off_topic",
+  "note": "fiscal budget chart/map"
+ },
+ "budget_line:11": {
+  "verdict": "ambiguous",
+  "note": "Too faint"
+ },
+ "budget_line:12": {
+  "verdict": "correct"
+ },
+ "budget_line:13": {
+  "verdict": "correct"
+ },
+ "budget_line:14": {
+  "verdict": "correct"
+ },
+ "budget_line:15": {
+  "verdict": "correct"
+ },
+ "budget_line:16": {
+  "verdict": "correct"
+ },
+ "budget_line:17": {
+  "verdict": "correct"
+ },
+ "budget_line:18": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:19": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:20": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:21": {
+  "verdict": "correct"
+ },
+ "budget_line:22": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:23": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:24": {
+  "verdict": "correct",
+  "true_family": "isoquant_isocost"
+ },
+ "keynesian_cross:51": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:52": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:53": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:54": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:55": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:56": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:57": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:58": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:59": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:60": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:61": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:62": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:63": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:64": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:65": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:66": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:67": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:68": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:69": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:70": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:71": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:72": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:73": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:74": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "keynesian_cross:50": {
+  "verdict": "correct",
+  "true_family": "is_lm",
+  "note": "IS derivation I(r)=S(Y,r)"
+ },
+ "elasticity:50": {
+  "verdict": "correct"
+ },
+ "elasticity:51": {
+  "verdict": "correct"
+ },
+ "elasticity:52": {
+  "verdict": "correct"
+ },
+ "elasticity:53": {
+  "verdict": "correct"
+ },
+ "elasticity:54": {
+  "verdict": "correct"
+ },
+ "elasticity:55": {
+  "verdict": "correct"
+ },
+ "elasticity:56": {
+  "verdict": "correct"
+ },
+ "elasticity:57": {
+  "verdict": "correct"
+ },
+ "elasticity:58": {
+  "verdict": "correct"
+ },
+ "elasticity:59": {
+  "verdict": "correct"
+ },
+ "elasticity:60": {
+  "verdict": "correct"
+ },
+ "elasticity:61": {
+  "verdict": "correct"
+ },
+ "elasticity:62": {
+  "verdict": "ambiguous",
+  "note": "Mixed supply curves with ED<0, unclear"
+ },
+ "elasticity:63": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "elasticity:64": {
+  "verdict": "correct"
+ },
+ "elasticity:65": {
+  "verdict": "correct"
+ },
+ "elasticity:66": {
+  "verdict": "correct"
+ },
+ "elasticity:67": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "elasticity:68": {
+  "verdict": "correct"
+ },
+ "elasticity:69": {
+  "verdict": "correct"
+ },
+ "elasticity:70": {
+  "verdict": "correct"
+ },
+ "elasticity:71": {
+  "verdict": "correct"
+ },
+ "elasticity:72": {
+  "verdict": "correct"
+ },
+ "elasticity:73": {
+  "verdict": "correct"
+ },
+ "elasticity:74": {
+  "verdict": "correct"
+ },
+ "price_control:25": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:26": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:27": {
+  "verdict": "correct"
+ },
+ "price_control:28": {
+  "verdict": "correct"
+ },
+ "price_control:29": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:30": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:31": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:32": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:33": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:34": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:35": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:36": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:37": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:38": {
+  "verdict": "ambiguous",
+  "note": "Bar table, not a graph"
+ },
+ "price_control:39": {
+  "verdict": "ambiguous",
+  "note": "Bar table, not a graph"
+ },
+ "price_control:40": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:41": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:42": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:43": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "price_control:44": {
+  "verdict": "correct"
+ },
+ "price_control:45": {
+  "verdict": "correct"
+ },
+ "price_control:46": {
+  "verdict": "correct"
+ },
+ "price_control:47": {
+  "verdict": "correct"
+ },
+ "price_control:48": {
+  "verdict": "correct"
+ },
+ "price_control:49": {
+  "verdict": "correct"
+ },
+ "money_market:0": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:1": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:2": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:3": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:4": {
+  "verdict": "correct",
+  "true_family": "loanable_funds"
+ },
+ "money_market:5": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:6": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:7": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:8": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:9": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:10": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:11": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:12": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:13": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:14": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:15": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:16": {
+  "verdict": "off_topic",
+  "note": "photo / drawing / flowchart / data chart / text"
+ },
+ "money_market:17": {
+  "verdict": "correct",
+  "true_family": "loanable_funds"
+ },
+ "money_market:18": {
+  "verdict": "ambiguous",
+  "note": "Nonstandard"
+ },
+ "money_market:19": {
+  "verdict": "correct"
+ },
+ "money_market:20": {
+  "verdict": "ambiguous",
+  "note": "Nonstandard"
+ },
+ "money_market:21": {
+  "verdict": "correct"
+ },
+ "money_market:22": {
+  "verdict": "correct"
+ },
+ "money_market:23": {
+  "verdict": "correct"
+ },
+ "money_market:24": {
+  "verdict": "correct"
+ },
+ "solow_growth:0": {
+  "verdict": "correct"
+ },
+ "solow_growth:1": {
+  "verdict": "correct"
+ },
+ "solow_growth:2": {
+  "verdict": "correct"
+ },
+ "solow_growth:3": {
+  "verdict": "correct"
+ },
+ "solow_growth:4": {
+  "verdict": "correct"
+ },
+ "solow_growth:5": {
+  "verdict": "correct"
+ },
+ "solow_growth:6": {
+  "verdict": "correct"
+ },
+ "solow_growth:7": {
+  "verdict": "correct"
+ },
+ "solow_growth:8": {
+  "verdict": "ambiguous",
+  "note": "Small multi-panel growth accounting"
+ },
+ "solow_growth:9": {
+  "verdict": "correct"
+ },
+ "solow_growth:10": {
+  "verdict": "correct"
+ },
+ "solow_growth:11": {
+  "verdict": "correct"
+ },
+ "solow_growth:12": {
+  "verdict": "correct"
+ },
+ "solow_growth:13": {
+  "verdict": "correct"
+ },
+ "solow_growth:14": {
+  "verdict": "correct"
+ },
+ "solow_growth:15": {
+  "verdict": "correct"
+ },
+ "solow_growth:16": {
+  "verdict": "correct"
+ },
+ "solow_growth:17": {
+  "verdict": "correct"
+ },
+ "solow_growth:18": {
+  "verdict": "correct"
+ },
+ "solow_growth:19": {
+  "verdict": "correct"
+ },
+ "solow_growth:20": {
+  "verdict": "correct"
+ },
+ "solow_growth:21": {
+  "verdict": "correct"
+ },
+ "solow_growth:22": {
+  "verdict": "correct"
+ },
+ "externality:0": {
+  "verdict": "ambiguous",
+  "note": "Concept flow diagram"
+ },
+ "externality:1": {
+  "verdict": "correct"
+ },
+ "externality:2": {
+  "verdict": "correct"
+ },
+ "externality:3": {
+  "verdict": "correct"
+ },
+ "externality:4": {
+  "verdict": "correct"
+ },
+ "externality:5": {
+  "verdict": "correct"
+ },
+ "externality:6": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "externality:7": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "externality:8": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "externality:9": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "externality:10": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "externality:11": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:12": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:13": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:14": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:15": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:16": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:17": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:18": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:19": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "network externality"
+ },
+ "externality:20": {
+  "verdict": "correct"
+ },
+ "laffer_curve:0": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "Rahn curve"
+ },
+ "laffer_curve:1": {
+  "verdict": "correct"
+ },
+ "laffer_curve:2": {
+  "verdict": "correct"
+ },
+ "laffer_curve:3": {
+  "verdict": "correct"
+ },
+ "laffer_curve:4": {
+  "verdict": "correct"
+ },
+ "laffer_curve:5": {
+  "verdict": "correct"
+ },
+ "laffer_curve:6": {
+  "verdict": "correct"
+ },
+ "laffer_curve:7": {
+  "verdict": "correct"
+ },
+ "laffer_curve:8": {
+  "verdict": "correct"
+ },
+ "laffer_curve:9": {
+  "verdict": "correct"
+ },
+ "laffer_curve:10": {
+  "verdict": "correct"
+ },
+ "laffer_curve:11": {
+  "verdict": "correct"
+ },
+ "laffer_curve:12": {
+  "verdict": "correct"
+ },
+ "laffer_curve:13": {
+  "verdict": "correct"
+ },
+ "laffer_curve:14": {
+  "verdict": "correct"
+ },
+ "laffer_curve:15": {
+  "verdict": "correct"
+ },
+ "laffer_curve:16": {
+  "verdict": "correct"
+ },
+ "laffer_curve:17": {
+  "verdict": "correct"
+ },
+ "laffer_curve:18": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:0": {
+  "verdict": "correct"
+ },
+ "trade:1": {
+  "verdict": "ambiguous",
+  "note": "Labeled quota but shows excess demand at a fixed price"
+ },
+ "trade:2": {
+  "verdict": "correct"
+ },
+ "trade:3": {
+  "verdict": "ambiguous",
+  "note": "Zigzag CS sketch"
+ },
+ "trade:4": {
+  "verdict": "correct",
+  "true_family": "monopoly",
+  "note": "two-part tariff"
+ },
+ "trade:5": {
+  "verdict": "correct",
+  "true_family": "monopoly",
+  "note": "two-part tariff"
+ },
+ "trade:6": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:7": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:8": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:9": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:10": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:11": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:12": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:13": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:14": {
+  "verdict": "correct",
+  "true_family": "monopoly",
+  "note": "two-part tariff"
+ },
+ "trade:15": {
+  "verdict": "correct",
+  "true_family": "monopoly",
+  "note": "two-part tariff"
+ },
+ "trade:16": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "trade:17": {
+  "verdict": "off_topic",
+  "note": "map / photo / infographic / data chart"
+ },
+ "supply_demand:200": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:201": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:202": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:203": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:204": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:205": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:206": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:207": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:208": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:209": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:210": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "supply_demand:211": {
+  "verdict": "correct",
+  "note": "perfectly inelastic supply"
+ },
+ "ppf:75": {
+  "verdict": "correct"
+ },
+ "ppf:76": {
+  "verdict": "correct"
+ },
+ "ppf:77": {
+  "verdict": "correct"
+ },
+ "ppf:78": {
+  "verdict": "correct"
+ },
+ "ppf:79": {
+  "verdict": "correct"
+ },
+ "ppf:80": {
+  "verdict": "correct"
+ },
+ "ppf:81": {
+  "verdict": "correct"
+ },
+ "ppf:82": {
+  "verdict": "correct"
+ },
+ "ppf:83": {
+  "verdict": "correct"
+ },
+ "ppf:84": {
+  "verdict": "correct"
+ },
+ "ppf:85": {
+  "verdict": "correct"
+ },
+ "ppf:86": {
+  "verdict": "correct"
+ },
+ "ppf:87": {
+  "verdict": "correct"
+ },
+ "ppf:88": {
+  "verdict": "correct"
+ },
+ "ppf:89": {
+  "verdict": "correct"
+ },
+ "ppf:90": {
+  "verdict": "correct"
+ },
+ "ppf:91": {
+  "verdict": "correct"
+ },
+ "ppf:92": {
+  "verdict": "correct"
+ },
+ "ppf:93": {
+  "verdict": "correct"
+ },
+ "ppf:94": {
+  "verdict": "correct"
+ },
+ "ppf:95": {
+  "verdict": "correct"
+ },
+ "ppf:96": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:75": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:76": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:77": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:78": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:79": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:80": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:81": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:82": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:83": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:84": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:85": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:86": {
+  "verdict": "correct"
+ },
+ "lorenz_curve:87": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "lorenz_curve:88": {
+  "verdict": "off_topic",
+  "note": "data chart / photo / infographic"
+ },
+ "is_lm:50": {
+  "verdict": "correct"
+ },
+ "is_lm:51": {
+  "verdict": "correct"
+ },
+ "is_lm:52": {
+  "verdict": "correct"
+ },
+ "is_lm:53": {
+  "verdict": "correct"
+ },
+ "is_lm:54": {
+  "verdict": "correct"
+ },
+ "is_lm:55": {
+  "verdict": "correct"
+ },
+ "is_lm:56": {
+  "verdict": "correct"
+ },
+ "is_lm:57": {
+  "verdict": "correct"
+ },
+ "is_lm:58": {
+  "verdict": "correct"
+ },
+ "is_lm:59": {
+  "verdict": "correct"
+ },
+ "is_lm:60": {
+  "verdict": "correct",
+  "true_family": "keynesian_cross"
+ },
+ "is_lm:61": {
+  "verdict": "correct",
+  "true_family": "money_market"
+ },
+ "is_lm:62": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:50": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:51": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:52": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:53": {
+  "verdict": "ambiguous",
+  "note": "Partial / historical sketch"
+ },
+ "consumer_optimum:54": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:55": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:56": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:57": {
+  "verdict": "correct"
+ },
+ "consumer_optimum:58": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "consumer_optimum:59": {
+  "verdict": "correct",
+  "true_family": "utility_function",
+  "note": "prospect-theory value function"
+ },
+ "consumer_optimum:60": {
+  "verdict": "ambiguous",
+  "note": "Partial / historical sketch"
+ },
+ "consumer_optimum:61": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "circular_flow:50": {
+  "verdict": "correct"
+ },
+ "circular_flow:51": {
+  "verdict": "correct"
+ },
+ "circular_flow:52": {
+  "verdict": "correct"
+ },
+ "circular_flow:53": {
+  "verdict": "correct"
+ },
+ "circular_flow:54": {
+  "verdict": "correct"
+ },
+ "circular_flow:55": {
+  "verdict": "correct"
+ },
+ "circular_flow:56": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "circular_flow:57": {
+  "verdict": "correct"
+ },
+ "circular_flow:58": {
+  "verdict": "ambiguous",
+  "note": "Too small to read"
+ },
+ "circular_flow:59": {
+  "verdict": "correct"
+ },
+ "circular_flow:60": {
+  "verdict": "correct"
+ },
+ "circular_flow:61": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "monopoly:25": {
+  "verdict": "correct"
+ },
+ "monopoly:26": {
+  "verdict": "correct"
+ },
+ "monopoly:27": {
+  "verdict": "correct"
+ },
+ "monopoly:28": {
+  "verdict": "correct"
+ },
+ "monopoly:29": {
+  "verdict": "correct"
+ },
+ "monopoly:30": {
+  "verdict": "correct"
+ },
+ "monopoly:31": {
+  "verdict": "correct"
+ },
+ "monopoly:32": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled curves"
+ },
+ "monopoly:33": {
+  "verdict": "correct"
+ },
+ "monopoly:34": {
+  "verdict": "correct"
+ },
+ "monopoly:35": {
+  "verdict": "correct"
+ },
+ "phillips_curve:25": {
+  "verdict": "correct"
+ },
+ "phillips_curve:26": {
+  "verdict": "ambiguous",
+  "note": "Empirical data scatter"
+ },
+ "phillips_curve:27": {
+  "verdict": "ambiguous",
+  "note": "Empirical data scatter"
+ },
+ "phillips_curve:28": {
+  "verdict": "correct"
+ },
+ "phillips_curve:29": {
+  "verdict": "correct"
+ },
+ "phillips_curve:30": {
+  "verdict": "correct"
+ },
+ "phillips_curve:31": {
+  "verdict": "ambiguous",
+  "note": "Empirical data scatter"
+ },
+ "phillips_curve:32": {
+  "verdict": "correct"
+ },
+ "phillips_curve:33": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:1": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:2": {
+  "verdict": "correct",
+  "true_family": "edgeworth_box"
+ },
+ "other_curve:3": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:4": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:5": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:6": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:7": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:8": {
+  "verdict": "correct",
+  "true_family": "business_cycle"
+ },
+ "other_curve:9": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:10": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:11": {
+  "verdict": "correct",
+  "true_family": "ppf"
+ },
+ "other_curve:12": {
+  "verdict": "correct",
+  "true_family": "trade",
+  "note": "offer curve"
+ },
+ "other_curve:13": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:14": {
+  "verdict": "ambiguous",
+  "note": "Unlabeled"
+ },
+ "other_curve:15": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:16": {
+  "verdict": "off_topic",
+  "note": "non-economics chart / photo / table"
+ },
+ "other_curve:17": {
+  "verdict": "correct",
+  "true_family": "ppf"
+ },
+ "utility_function:0": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "utility_function:1": {
+  "verdict": "correct"
+ },
+ "utility_function:2": {
+  "verdict": "correct"
+ },
+ "utility_function:3": {
+  "verdict": "correct"
+ },
+ "utility_function:4": {
+  "verdict": "ambiguous",
+  "note": "IC crosses budget line twice (non-convex preferences illustration)"
+ },
+ "utility_function:5": {
+  "verdict": "correct"
+ },
+ "utility_function:6": {
+  "verdict": "correct"
+ },
+ "utility_function:7": {
+  "verdict": "correct"
+ },
+ "utility_function:8": {
+  "verdict": "correct"
+ },
+ "utility_function:9": {
+  "verdict": "ambiguous",
+  "note": "Circular indifference curve (bliss point)"
+ },
+ "utility_function:10": {
+  "verdict": "correct"
+ },
+ "utility_function:11": {
+  "verdict": "correct"
+ },
+ "utility_function:12": {
+  "verdict": "correct"
+ },
+ "utility_function:13": {
+  "verdict": "correct"
+ },
+ "utility_function:14": {
+  "verdict": "correct"
+ },
+ "utility_function:15": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:0": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:1": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:2": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:3": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:4": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:5": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:6": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:7": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:8": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:9": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:10": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:11": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:12": {
+  "verdict": "correct"
+ },
+ "income_consumption_curve:13": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:25": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:26": {
+  "verdict": "correct",
+  "true_family": "per_unit_tax"
+ },
+ "consumer_producer_surplus:27": {
+  "verdict": "correct",
+  "true_family": "price_control"
+ },
+ "consumer_producer_surplus:28": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:29": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:30": {
+  "verdict": "ambiguous",
+  "note": "Complex fair-trade diagram"
+ },
+ "consumer_producer_surplus:31": {
+  "verdict": "correct"
+ },
+ "consumer_producer_surplus:32": {
+  "verdict": "correct"
+ },
+ "budget_line:28": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "budget_line:29": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "budget_line:30": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "budget_line:31": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "budget_line:25": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:26": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "budget_line:27": {
+  "verdict": "correct",
+  "true_family": "consumer_optimum"
+ },
+ "keynesian_cross:75": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:76": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:77": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:78": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:79": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:80": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:81": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:82": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:83": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:84": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:85": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:86": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:87": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:88": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:89": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:90": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:91": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "keynesian_cross:92": {
+  "verdict": "off_topic",
+  "note": "photo / table / icon / data chart"
+ },
+ "other_curve:0": {
+  "verdict": "incorrect",
+  "true_family": "supply_demand",
+  "error_type": "curves_mislabeled",
+  "severity": "major",
+  "highlight": [
+   "Demande",
+   "Offre_1",
+   "Offre_2"
+  ],
+  "explanation": "The upward-sloping curve is labeled Demande and the downward-sloping curves Offre 1 / Offre 2. Demand slopes down and supply slopes up, so the labels are swapped. (The shift shown, lower P and lower Q, is a decrease in demand.)",
+  "fix": "Label the upward-sloping line Offre and the two downward-sloping lines Demande 1 and Demande 2."
+ },
+ "ad_ia:0": {
+  "verdict": "correct"
+ },
+ "ad_ia:1": {
+  "verdict": "correct"
+ },
+ "ad_ia:2": {
+  "verdict": "correct"
+ },
+ "ad_ia:3": {
+  "verdict": "correct"
+ },
+ "ad_ia:4": {
+  "verdict": "correct"
+ },
+ "ad_ia:5": {
+  "verdict": "correct"
+ },
+ "ad_ia:6": {
+  "verdict": "ambiguous",
+  "note": "Flowchart"
+ },
+ "engel_curve:0": {
+  "verdict": "ambiguous",
+  "note": "Empirical scatter"
+ },
+ "engel_curve:1": {
+  "verdict": "correct"
+ },
+ "engel_curve:2": {
+  "verdict": "correct"
+ },
+ "engel_curve:3": {
+  "verdict": "correct"
+ },
+ "engel_curve:4": {
+  "verdict": "correct"
+ },
+ "engel_curve:5": {
+  "verdict": "correct"
+ },
+ "engel_curve:6": {
+  "verdict": "correct"
+ },
+ "engel_curve:7": {
+  "verdict": "correct"
+ },
+ "engel_curve:8": {
+  "verdict": "correct"
+ },
+ "engel_curve:9": {
+  "verdict": "correct"
+ },
+ "engel_curve:10": {
+  "verdict": "correct"
+ },
+ "price_discrimination:0": {
+  "verdict": "correct"
+ },
+ "price_discrimination:1": {
+  "verdict": "correct"
+ },
+ "price_discrimination:2": {
+  "verdict": "correct"
+ },
+ "price_discrimination:3": {
+  "verdict": "correct"
+ },
+ "price_discrimination:4": {
+  "verdict": "correct"
+ },
+ "price_discrimination:5": {
+  "verdict": "correct"
+ },
+ "price_discrimination:6": {
+  "verdict": "correct"
+ },
+ "price_discrimination:7": {
+  "verdict": "correct"
+ },
+ "price_discrimination:8": {
+  "verdict": "correct"
+ },
+ "price_discrimination:9": {
+  "verdict": "ambiguous",
+  "note": "Too small"
+ },
+ "price_discrimination:10": {
+  "verdict": "correct"
+ },
+ "production_function:0": {
+  "verdict": "correct"
+ },
+ "production_function:1": {
+  "verdict": "correct"
+ },
+ "production_function:2": {
+  "verdict": "correct"
+ },
+ "production_function:3": {
+  "verdict": "correct"
+ },
+ "production_function:4": {
+  "verdict": "correct"
+ },
+ "production_function:5": {
+  "verdict": "correct"
+ },
+ "production_function:6": {
+  "verdict": "correct"
+ },
+ "production_function:7": {
+  "verdict": "correct"
+ },
+ "production_function:8": {
+  "verdict": "correct"
+ },
+ "production_function:9": {
+  "verdict": "correct"
+ },
+ "production_function:10": {
+  "verdict": "correct"
+ },
+ "production_function:11": {
+  "verdict": "correct"
+ },
+ "production_function:12": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:0": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:1": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:2": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:3": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:4": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:5": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:6": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:7": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:8": {
+  "verdict": "correct"
+ },
+ "isoquant_isocost:9": {
+  "verdict": "correct"
+ },
+ "beveridge_curve:0": {
+  "verdict": "correct"
+ },
+ "beveridge_curve:1": {
+  "verdict": "correct"
+ },
+ "beveridge_curve:2": {
+  "verdict": "ambiguous",
+  "note": "Empirical data path"
+ },
+ "beveridge_curve:3": {
+  "verdict": "correct"
+ },
+ "beveridge_curve:4": {
+  "verdict": "correct"
+ },
+ "is_mp:0": {
+  "verdict": "correct"
+ },
+ "is_mp:1": {
+  "verdict": "correct"
+ },
+ "is_mp:2": {
+  "verdict": "correct"
+ },
+ "is_mp:3": {
+  "verdict": "correct"
+ },
+ "is_mp:4": {
+  "verdict": "correct"
+ },
+ "is_mp:5": {
+  "verdict": "correct"
+ },
+ "is_mp:6": {
+  "verdict": "correct"
+ },
+ "is_mp:7": {
+  "verdict": "correct"
+ },
+ "j_curve:0": {
+  "verdict": "correct"
+ },
+ "j_curve:1": {
+  "verdict": "correct"
+ },
+ "j_curve:2": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "private-equity J-curve"
+ },
+ "j_curve:3": {
+  "verdict": "off_topic",
+  "note": "TFR vs HDI scatter"
+ },
+ "j_curve:4": {
+  "verdict": "correct"
+ },
+ "j_curve:5": {
+  "verdict": "correct"
+ },
+ "j_curve:6": {
+  "verdict": "correct",
+  "true_family": "other_curve",
+  "note": "private-equity J-curve"
+ },
+ "monopolistic_competition:0": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:1": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:2": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:3": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:4": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:5": {
+  "verdict": "correct"
+ },
+ "monopolistic_competition:6": {
+  "verdict": "correct"
+ },
+ "monopsony:0": {
+  "verdict": "correct"
+ },
+ "monopsony:1": {
+  "verdict": "correct"
+ },
+ "monopsony:2": {
+  "verdict": "correct"
+ },
+ "monopsony:3": {
+  "verdict": "correct"
+ },
+ "monopsony:4": {
+  "verdict": "correct"
+ },
+ "monopsony:5": {
+  "verdict": "correct"
+ },
+ "monopsony:6": {
+  "verdict": "correct"
+ },
+ "oligopoly:0": {
+  "verdict": "correct"
+ },
+ "oligopoly:1": {
+  "verdict": "correct"
+ },
+ "oligopoly:2": {
+  "verdict": "correct"
+ },
+ "oligopoly:3": {
+  "verdict": "correct"
+ },
+ "oligopoly:4": {
+  "verdict": "correct"
+ },
+ "oligopoly:5": {
+  "verdict": "correct"
+ },
+ "oligopoly:6": {
+  "verdict": "correct"
+ },
+ "marginal_utility:0": {
+  "verdict": "correct"
+ },
+ "marginal_utility:1": {
+  "verdict": "correct"
+ },
+ "marginal_utility:2": {
+  "verdict": "correct"
+ },
+ "marginal_utility:3": {
+  "verdict": "correct"
+ },
+ "negative_externality:0": {
+  "verdict": "correct"
+ },
+ "negative_externality:1": {
+  "verdict": "correct"
+ },
+ "negative_externality:2": {
+  "verdict": "correct"
+ },
+ "negative_externality:3": {
+  "verdict": "correct"
+ },
+ "negative_externality:4": {
+  "verdict": "correct"
+ },
+ "short_run_production:0": {
+  "verdict": "correct"
+ },
+ "short_run_production:1": {
+  "verdict": "correct"
+ },
+ "short_run_production:2": {
+  "verdict": "correct"
+ },
+ "short_run_production:3": {
+  "verdict": "correct"
+ },
+ "short_run_production:4": {
+  "verdict": "off_topic",
+  "note": "non-economics chart"
+ },
+ "elasticity:75": {
+  "verdict": "correct"
+ },
+ "elasticity:77": {
+  "verdict": "correct"
+ },
+ "elasticity:76": {
+  "verdict": "correct",
+  "true_family": "engel_curve"
+ },
+ "money_market:25": {
+  "verdict": "correct"
+ },
+ "money_market:26": {
+  "verdict": "off_topic",
+  "note": "non-economics chart"
+ },
+ "money_market:27": {
+  "verdict": "off_topic",
+  "note": "non-economics chart"
+ },
+ "price_control:50": {
+  "verdict": "correct"
+ },
+ "price_control:51": {
+  "verdict": "correct"
+ },
+ "price_control:52": {
+  "verdict": "correct"
+ },
+ "yield_curve:0": {
+  "verdict": "correct",
+  "note": "normal vs inverted yield curve"
+ }
+}

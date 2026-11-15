@@ -1,0 +1,20 @@
+{
+ "clean": {
+  "n": 196,
+  "graph_type_acc": 1.0,
+  "verdict_acc": 0.908,
+  "error_type_acc_on_wrong": 0.987
+ },
+ "hand_drawn": {
+  "n": 342,
+  "graph_type_acc": 0.985,
+  "verdict_acc": 0.886,
+  "error_type_acc_on_wrong": 0.962
+ },
+ "photo_of_hand_drawn": {
+  "n": 335,
+  "graph_type_acc": 0.988,
+  "verdict_acc": 0.863,
+  "error_type_acc_on_wrong": 0.902
+ }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Econ graph whiteboard</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;display:flex;height:100vh}
+#side{width:300px;border-right:1px solid #ddd;display:flex;flex-direction:column}
+#side select,#side input{margin:4px 8px}
+#list{overflow:auto;flex:1;font-size:12px}
+#list div{padding:3px 8px;cursor:pointer;border-bottom:1px solid #f0f0f0}
+#list div.sel{background:#e8f0fe}.bad{color:#c2185b}.ok{color:#2e7d32}
+#main{flex:1;display:flex;flex-direction:column;padding:10px;overflow:auto}
+#board{position:relative;width:800px;height:600px;border:1px solid #ccc}
+#board img,#board svg{position:absolute;left:0;top:0;width:800px;height:600px}
+#info{max-width:800px;font-size:14px}.btn{margin:6px 6px 0 0}
+.el{cursor:grab;fill:none;stroke:transparent;stroke-width:14;pointer-events:stroke}
+.el.region{pointer-events:all;fill:transparent}
+.el:hover{stroke:rgba(30,136,229,.35)}.el.region:hover{fill:rgba(30,136,229,.15)}
+.hl{stroke:rgba(255,0,170,.6)!important}.el.region.hl{fill:rgba(255,0,170,.25)!important}
+.lbl{fill:none;stroke:transparent}.lbl.hl{stroke:#ff00aa;stroke-width:2}
+#mode label{margin-right:10px}
+</style></head><body>
+<div id="side">
+ <select id="vf"><option value="">all verdicts</option><option>correct</option><option>incorrect</option></select>
+ <select id="gf"><option value="">all graph types</option></select>
+ <div id="list"></div>
+</div>
+<div id="main">
+ <div id="mode"><label><input type="radio" name="m" value="image" checked> raster + overlay</label><label><input type="radio" name="m" value="vector"> vector redraw (drag to move)</label>
+ <button class="btn" id="prev">◀ step</button><button class="btn" id="next">step ▶</button><button class="btn" id="err">show error</button><button class="btn" id="fix">apply fix</button><button class="btn" id="reset">reset</button></div>
+ <div id="board"><img id="img"><svg id="svg" viewBox="0 0 800 600"></svg></div>
+ <div id="info"></div>
+</div>
+<script>
+const ROOT = new URLSearchParams(location.search).get("root") || "../dataset/synthetic/";
+let recs = [], cur = null, step = -1, drag = null;
+const $ = id => document.getElementById(id), NS = "http://www.w3.org/2000/svg";
+fetch(ROOT + "manifest.jsonl").then(r => r.text()).then(t => {
+  recs = t.trim().split("\n").map(JSON.parse);
+  [...new Set(recs.map(r => r.graph_type))].sort().forEach(g => $("gf").add(new Option(g, g)));
+  renderList();
+  const q = new URLSearchParams(location.search), id = q.get("id");
+  if (id) fetch(ROOT + "annotations/" + id + ".json").then(x => x.json()).then(a => { cur = a; step = -1; if (q.get("mode") == "vector") document.querySelector("input[value=vector]").checked = true; draw(); if (q.get("err") && a.error) $("err").onclick(); });
+});
+$("vf").onchange = $("gf").onchange = renderList;
+function renderList() {
+  const v = $("vf").value, g = $("gf").value, L = $("list"); L.innerHTML = "";
+  recs.filter(r => (!v || r.verdict == v) && (!g || r.graph_type == g)).slice(0, 2000).forEach(r => {
+    const d = document.createElement("div"); d.className = r.verdict == "incorrect" ? "bad" : "ok";
+    d.textContent = r.id; d.onclick = () => { [...L.children].forEach(c => c.classList.remove("sel")); d.classList.add("sel"); load(r); }; L.appendChild(d);
+  });
+}
+function load(r) {
+  fetch(ROOT + "annotations/" + r.id + ".json").then(x => x.json()).then(a => { cur = a; step = -1; draw(); });
+}
+const mode = () => document.querySelector("input[name=m]:checked").value;
+document.querySelectorAll("input[name=m]").forEach(i => i.onchange = draw);
+function pathOf(e) {
+  if (e.polyline) return "M" + e.polyline.map(p => p.join(",")).join("L");
+  if (e.polygon) return "M" + e.polygon.map(p => p.join(",")).join("L") + "Z";
+  if (e.center) { const [x, y] = e.center; return `M${x - 6},${y}a6,6 0 1,0 12,0a6,6 0 1,0 -12,0`; }
+  if (e.from && e.to) return `M${e.from.join(",")}L${e.to.join(",")}`;
+  return null;
+}
+function draw() {
+  const a = cur; if (!a) return; const svg = $("svg"); svg.innerHTML = "";
+  const vec = mode() == "vector"; $("img").style.visibility = vec ? "hidden" : "visible"; $("img").src = ROOT + a.image;
+  a._off = a._off || {};
+  for (const e of a.elements) {
+    const off = a._off[e.id] || [0, 0], g = document.createElementNS(NS, "g");
+    g.setAttribute("transform", `translate(${off[0]},${off[1]})`); g.dataset.id = e.id;
+    const d = pathOf(e);
+    if (vec && d) {
+      const v = document.createElementNS(NS, "path"); v.setAttribute("d", d);
+      v.setAttribute("fill", e.kind == "region" ? "rgba(120,120,200,.25)" : e.kind == "point" ? "#222" : "none");
+      v.setAttribute("stroke", e.kind == "guide" ? "#888" : "#222"); v.setAttribute("stroke-width", e.kind == "guide" ? 1 : 2.5);
+      if (e.kind == "guide") v.setAttribute("stroke-dasharray", "5 4"); g.appendChild(v);
+    }
+    if (vec && e.label && e.label_bbox) {
+      const t = document.createElementNS(NS, "text"); const b = e.label_bbox; t.setAttribute("x", b[0]); t.setAttribute("y", b[3] - 3); t.setAttribute("font-size", 15); t.textContent = e.label; g.appendChild(t);
+    }
+    if (d && e.kind != "tick") { const h = document.createElementNS(NS, "path"); h.setAttribute("d", d); h.setAttribute("class", "el " + e.kind); h.dataset.id = e.id; g.appendChild(h); }
+    if (e.label_bbox) { const b = e.label_bbox, r = document.createElementNS(NS, "rect"); r.setAttribute("x", b[0] - 2); r.setAttribute("y", b[1] - 2); r.setAttribute("width", b[2] - b[0] + 4); r.setAttribute("height", b[3] - b[1] + 4); r.setAttribute("class", "lbl"); r.dataset.id = e.id; g.appendChild(r); }
+    g.onmousedown = ev => { if (!vec) return; drag = { id: e.id, x: ev.clientX, y: ev.clientY, o: [...off], g }; };
+    g.onmouseenter = () => info(e); svg.appendChild(g);
+  }
+  info();
+}
+window.onmousemove = ev => { if (!drag) return; const o = [drag.o[0] + ev.clientX - drag.x, drag.o[1] + ev.clientY - drag.y]; cur._off[drag.id] = o; drag.g.setAttribute("transform", `translate(${o[0]},${o[1]})`); };
+window.onmouseup = () => drag = null;
+function highlight(ids) { document.querySelectorAll("#svg [data-id]").forEach(n => n.classList.toggle("hl", ids.includes(n.dataset.id) && !n.tagName.match(/^g$/i))); }
+function info(hover) {
+  const a = cur, steps = a.explanation_steps || [];
+  let h = `<h3>${a.graph_name} — <span class="${a.verdict == "incorrect" ? "bad" : "ok"}">${a.verdict}</span></h3><p>${a.scenario || ""}</p>`;
+  if (hover) h += `<p><b>hover:</b> ${hover.id} · ${hover.kind} · role=${hover.role}${hover.label ? " · “" + hover.label + "”" : ""}</p>`;
+  if (step >= 0 && steps[step]) h += `<p><b>Step ${step + 1}/${steps.length}:</b> ${steps[step].text}</p>`;
+  if (a.error && step == -2) h += `<p class="bad"><b>${a.error.type}</b>: ${a.error.explanation}<br><b>Fix:</b> ${a.error.fix}</p>`;
+  if (step == -3 && a.correction) h += `<p class="ok"><b>Fixed:</b> ${a.correction.fix}<br>${a.correction.actions.filter(x => !x.follows).map(x => x.action + " " + x.element + (x.to_label ? " → “" + x.to_label + "”" : "")).join("<br>")}</p>`;
+  $("info").innerHTML = h;
+}
+const stepIds = s => s.highlight || s.ids || s.element_ids || [];
+$("next").onclick = () => { const s = cur.explanation_steps || []; if (!s.length) return; step = Math.min(step + 1, s.length - 1); highlight(stepIds(s[step])); info(); };
+$("prev").onclick = () => { const s = cur.explanation_steps || []; if (!s.length) return; step = Math.max(step - 1, 0); highlight(stepIds(s[step])); info(); };
+$("err").onclick = () => { if (!cur.error) return; step = -2; highlight(cur.error.highlight); info(); };
+$("reset").onclick = () => { cur._off = {}; load(cur); };
+const GEOM = ["polyline", "polygon", "center", "from", "to", "bbox", "label_bbox"];
+const lerp = (a, b, t) => Array.isArray(a) && Array.isArray(b) && a.length == b.length ? a.map((v, i) => lerp(v, b[i], t)) : typeof a == "number" && typeof b == "number" ? a + (b - a) * t : (t < 1 ? a : b);
+$("fix").onclick = () => {
+  const c = cur && cur.correction; if (!c || cur._fixed) return;
+  document.querySelector("input[value=vector]").checked = true;
+  const start = Object.fromEntries(cur.elements.map(e => [e.id, JSON.parse(JSON.stringify(e))]));
+  let target = cur.elements.map(e => JSON.parse(JSON.stringify(e)));
+  const by = () => Object.fromEntries(target.map(e => [e.id, e])), changed = [];
+  for (const a of c.actions) {
+    const e = by()[a.element]; changed.push(a.element);
+    if (a.action == "move" && e) { for (const g of ["polyline", "polygon", "center", "from", "to", "data_xy"]) if (a["to_" + g]) e[g] = a["to_" + g]; if (a.to_bbox) e.bbox = a.to_bbox; }
+    else if (a.action == "relabel" && e) { e.label = a.to_label; if (a.label_bbox) e.label_bbox = a.label_bbox; }
+    else if (a.action == "add") { const n = { id: a.element, kind: a.kind, role: a.role, label: a.label, bbox: a.bbox }; for (const g of ["polyline", "polygon", "center", "from", "to"]) if (a[g]) n[g] = a[g]; target.push(n); }
+    else if (a.action == "remove") target = target.filter(x => x.id != a.element);
+  }
+  const t0 = performance.now(), D = 700;
+  const frame = now => {
+    const t = Math.min(1, (now - t0) / D), k = t * t * (3 - 2 * t);
+    cur.elements = target.map(e => { const s0 = start[e.id]; if (!s0) return e; const o = { ...e }; for (const g of GEOM) if (s0[g] && e[g]) o[g] = lerp(s0[g], e[g], k); return o; });
+    draw(); highlight(changed);
+    if (t < 1) requestAnimationFrame(frame); else { cur.elements = target; cur._fixed = true; step = -3; draw(); highlight(changed); info(); }
+  };
+  requestAnimationFrame(frame);
+};
+</script></body></html>

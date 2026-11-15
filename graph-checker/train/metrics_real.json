@@ -1,0 +1,7 @@
+{
+ "n": 1234,
+ "n_incorrect": 18,
+ "verdict_acc": 0.9951377633711507,
+ "correct_recall": 0.9983552631578947,
+ "incorrect_recall": 0.7777777777777778
+}

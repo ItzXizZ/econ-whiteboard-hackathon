@@ -85,6 +85,24 @@ Open <http://localhost:5173>, create an account, and paste a problem.
 | 3002 | API server (`PORT` to change it; also update the proxy in `vite.config.ts`) |
 | 8080 | Bonsai model server (`BONSAI_URL` to point the API server elsewhere) |
 
+## Graph checker and training data
+
+`graph-checker/` holds the graph model and the data it was trained on (from [econ-data-hacakthon](https://github.com/chiaraluey/econ-data-hacakthon)):
+
+- `train/model.pt`: the live model (v2, ResNet-18, 46 MB): graph type, right/wrong verdict, kind of mistake, and where it is.
+- `export/records.jsonl.gz`: 20,453 labeled graphs (18,274 synthetic correct/wrong graphs plus reviewed Wikimedia and OpenStax diagrams), with per-element annotations and step-by-step fixes. Schema in `export/schema.json`.
+- `generate.py`, `econgraphs/`, `harvest*.py`: the synthetic generator and the diagram harvesters.
+- `lmstudio/`: the round where Bonsai-2 4B in LM Studio checked curve labels on 1,520 new graphs for a fine-tuning round (v3, kept out of the app; see `graph-checker/README.md`).
+- The images themselves (2.4 GB) are release assets of the econ-data-hacakthon repo (`data-v2`).
+
+Setup once (needs internet once, then runs offline):
+
+```bash
+cd graph-checker && python3 -m venv .venv && .venv/bin/pip install torch torchvision pillow numpy
+```
+
+The API server uses `~/econ-graph-checker` if it exists, otherwise this folder. Set `GRAPH_CHECKER_DIR` to point elsewhere.
+
 ## Tests
 
 ```powershell

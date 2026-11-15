@@ -10,7 +10,7 @@
  * The checker is optional. Without it (folder missing, Python missing, model
  * still loading) graphs are simply set aside as before and nothing breaks.
  *
- *   GRAPH_CHECKER_DIR     folder with train/model.pt   (default ~/econ-graph-checker)
+ *   GRAPH_CHECKER_DIR     folder with train/model.pt   (default ~/econ-graph-checker, else ./graph-checker)
  *   GRAPH_CHECKER_PYTHON  Python to run it with        (default: that folder's .venv)
  *   GRAPH_CHECKER=0       turn graph recognition off
  */
@@ -23,7 +23,13 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ENABLED = process.env.GRAPH_CHECKER !== '0'
-export const GRAPH_CHECKER_DIR = process.env.GRAPH_CHECKER_DIR || path.join(os.homedir(), 'econ-graph-checker')
+const HOME_GRAPH_CHECKER_DIR = path.join(os.homedir(), 'econ-graph-checker')
+const BUNDLED_GRAPH_CHECKER_DIR = path.join(__dirname, '..', 'graph-checker')
+export const GRAPH_CHECKER_DIR =
+  process.env.GRAPH_CHECKER_DIR ||
+  (fs.existsSync(path.join(HOME_GRAPH_CHECKER_DIR, 'train', 'model.pt'))
+    ? HOME_GRAPH_CHECKER_DIR
+    : BUNDLED_GRAPH_CHECKER_DIR)
 const WORKER = path.join(__dirname, 'graph_worker.py')
 const TMP_DIR = path.join(os.tmpdir(), 'econ-coach-graphs')
 const REQUEST_TIMEOUT_MS = 20000

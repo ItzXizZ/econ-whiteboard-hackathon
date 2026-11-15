@@ -1,0 +1,72 @@
+[
+ {
+  "graph_type_acc": 0.9870841487279843,
+  "verdict_acc": 0.8610567514677103,
+  "correct_recall": 0.803448275862069,
+  "incorrect_recall": 0.8779746835443037,
+  "error_type_acc_on_wrong": 0.9108860759493671,
+  "error_location_hit": 0.8781979977753059,
+  "epoch": 0,
+  "train_loss": 1.4244817539878276,
+  "sec": 1332,
+  "real_verdict_acc": 0.9819819819819819,
+  "real_correct_recall": 0.9863636363636363,
+  "real_incorrect_recall": 0.5
+ },
+ {
+  "graph_type_acc": 0.9909980430528376,
+  "verdict_acc": 0.8958904109589041,
+  "correct_recall": 0.9620689655172414,
+  "incorrect_recall": 0.8764556962025316,
+  "error_type_acc_on_wrong": 0.9524050632911393,
+  "error_location_hit": 0.907119021134594,
+  "epoch": 1,
+  "train_loss": 1.0312505478603173,
+  "sec": 1432,
+  "real_verdict_acc": 0.9864864864864865,
+  "real_correct_recall": 0.9954545454545455,
+  "real_incorrect_recall": 0.0
+ },
+ {
+  "graph_type_acc": 0.9894324853228963,
+  "verdict_acc": 0.9162426614481409,
+  "correct_recall": 0.9672413793103448,
+  "incorrect_recall": 0.9012658227848102,
+  "error_type_acc_on_wrong": 0.9159493670886076,
+  "error_location_hit": 0.9043381535038932,
+  "epoch": 2,
+  "train_loss": 0.8298001025599995,
+  "sec": 1383,
+  "real_verdict_acc": 0.9954954954954955,
+  "real_correct_recall": 1.0,
+  "real_incorrect_recall": 0.5
+ },
+ {
+  "graph_type_acc": 0.9953033268101761,
+  "verdict_acc": 0.9256360078277887,
+  "correct_recall": 0.9379310344827586,
+  "incorrect_recall": 0.9220253164556962,
+  "error_type_acc_on_wrong": 0.9539240506329114,
+  "error_location_hit": 0.9243604004449388,
+  "epoch": 3,
+  "train_loss": 0.7031225104784143,
+  "sec": 1396,
+  "real_verdict_acc": 0.9864864864864865,
+  "real_correct_recall": 0.990909090909091,
+  "real_incorrect_recall": 0.5
+ },
+ {
+  "graph_type_acc": 0.9945205479452055,
+  "verdict_acc": 0.9264187866927593,
+  "correct_recall": 0.9741379310344828,
+  "incorrect_recall": 0.9124050632911392,
+  "error_type_acc_on_wrong": 0.970632911392405,
+  "error_location_hit": 0.9271412680756396,
+  "epoch": 4,
+  "train_loss": 0.6367394912745304,
+  "sec": 1256,
+  "real_verdict_acc": 0.9954954954954955,
+  "real_correct_recall": 1.0,
+  "real_incorrect_recall": 0.5
+ }
+]
