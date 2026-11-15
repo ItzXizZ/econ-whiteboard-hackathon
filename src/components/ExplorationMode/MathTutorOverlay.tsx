@@ -519,7 +519,11 @@ function CoachCard({
 
   return (
     <div className="math-coach">
-      <div className="math-coach-avatar" {...drag} style={{ cursor: 'grab', touchAction: 'none' }}>
+      <div
+        className={`math-coach-avatar${thinking ? ' is-thinking' : ''}${talking || revealing ? ' is-speaking' : ''}`}
+        {...drag}
+        style={{ cursor: 'grab', touchAction: 'none' }}
+      >
         <TalkingHead talking={talking || revealing} size={64} />
         <button type="button" onClick={onClose} title="Dismiss" className="math-tutor-dismiss">
           <X size={11} />

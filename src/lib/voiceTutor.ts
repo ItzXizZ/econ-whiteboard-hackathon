@@ -38,6 +38,7 @@ interface STTCallbacks {
   onError?: (err: string) => void
   onEnd?: () => void
   onStart?: () => void
+  onStream?: (stream: MediaStream | null) => void
 }
 
 const BROWSER_STT_ALLOWED = import.meta.env.VITE_ALLOW_BROWSER_STT === '1'
@@ -196,6 +197,7 @@ function createArgmaxRecognizer(cb: STTCallbacks): RecognizerHandle {
   const release = () => {
     if (limit) clearTimeout(limit)
     limit = null
+    cb.onStream?.(null)
     stream?.getTracks().forEach((t) => t.stop())
     stream = null
     recorder = null
@@ -242,6 +244,7 @@ function createArgmaxRecognizer(cb: STTCallbacks): RecognizerHandle {
             return
           }
           stream = s
+          cb.onStream?.(s)
           recorder = new MediaRecorder(s)
           recorder.ondataavailable = (e) => {
             if (e.data.size > 0) chunks.push(e.data)

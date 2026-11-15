@@ -27,6 +27,15 @@ export default function WelcomeScreen({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const uploadRef = useRef<HTMLInputElement | null>(null)
   const [lessonsOpen, setLessonsOpen] = useState(false)
+  const [tabVisible, setTabVisible] = useState(
+    () => typeof document === 'undefined' || document.visibilityState === 'visible'
+  )
+
+  useEffect(() => {
+    const updateVisibility = () => setTabVisible(document.visibilityState === 'visible')
+    document.addEventListener('visibilitychange', updateVisibility)
+    return () => document.removeEventListener('visibilitychange', updateVisibility)
+  }, [])
 
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -73,7 +82,7 @@ export default function WelcomeScreen({
   }
 
   return (
-    <div className="econ-welcome">
+    <div className={`econ-welcome${tabVisible ? '' : ' is-paused'}`}>
       <div
         ref={dialogRef}
         className="econ-welcome-panel"
@@ -82,34 +91,26 @@ export default function WelcomeScreen({
         aria-labelledby="econ-welcome-title"
         tabIndex={-1}
       >
-        <svg className="econ-welcome-graph" viewBox="0 0 820 360" aria-hidden="true">
-          <path className="econ-welcome-graph-axis" pathLength={1} d="M78 48 V286 H746" />
-          <path className="econ-welcome-graph-line is-demand" pathLength={1} d="M144 82 L674 252" />
-          <path className="econ-welcome-graph-line is-supply" pathLength={1} d="M142 258 L674 92" />
-        </svg>
+        <div className="econ-welcome-layout">
+          <div className="econ-welcome-main">
+            <header className="econ-welcome-hero">
+              <div className="econ-welcome-portrait-wrap">
+                <img src={adamPortrait} alt="Adam" className="econ-welcome-portrait" />
+                <span className="econ-welcome-sparkle" aria-hidden="true">
+                  <Sparkles size={16} />
+                </span>
+              </div>
+              <div className="econ-welcome-intro">
+                <p className="econ-welcome-eyebrow">YOUR ON-DEVICE ECONOMICS TUTOR</p>
+                <h1 id="econ-welcome-title">Draw economics with a tutor that draws back.</h1>
+                <p className="econ-welcome-subtitle">
+                  Adam reads your problem, draws with you, and fixes mistakes on the board. Runs
+                  entirely on this laptop, no WiFi needed.
+                </p>
+              </div>
+            </header>
 
-        <div className="econ-welcome-content">
-          <header className="econ-welcome-hero">
-            <div className="econ-welcome-portrait-wrap">
-              <img src={adamPortrait} alt="Adam" className="econ-welcome-portrait" />
-              <span className="econ-welcome-sparkle" aria-hidden="true">
-                <Sparkles size={16} />
-              </span>
-            </div>
-            <div className="econ-welcome-intro">
-              <p className="econ-welcome-eyebrow">YOUR ON-DEVICE ECONOMICS TUTOR</p>
-              <h1 id="econ-welcome-title">Hi, I&apos;m Adam.</h1>
-              <p className="econ-welcome-subtitle">
-                Give me a problem or a worksheet and I&apos;ll walk you through it, as much or as little as
-                you need.
-              </p>
-              <p className="econ-welcome-tagline">
-                The AI tutor that teaches you, instead of doing it for you.
-              </p>
-            </div>
-          </header>
-
-          <div className="econ-welcome-actions" aria-label="Choose how to begin">
+            <div className="econ-welcome-actions" aria-label="Choose how to begin">
             <div className="econ-welcome-action">
               <button
                 type="button"
@@ -184,12 +185,66 @@ export default function WelcomeScreen({
                 </div>
               )}
             </div>
+            </div>
+
+            <div className="econ-welcome-secondary">
+              <button type="button" className="econ-welcome-blank" onClick={onDismiss}>
+                Start with a blank board
+              </button>
+              <p className="econ-welcome-footer">On-device · Bonsai-2 · Argmax</p>
+            </div>
           </div>
 
-          <button type="button" className="econ-welcome-blank" onClick={onDismiss}>
-            Start with a blank board
-          </button>
-          <p className="econ-welcome-footer">Runs entirely on this device · Bonsai-2 · Argmax · works offline</p>
+          <div className="econ-welcome-demo" aria-hidden="true">
+            <div className="econ-welcome-demo-kicker">A little of how we work</div>
+            <svg viewBox="0 0 440 300" className="econ-welcome-demo-board">
+              <defs>
+                <pattern id="econ-welcome-dots" width="18" height="18" patternUnits="userSpaceOnUse">
+                  <circle cx="1" cy="1" r="1" fill="rgba(83, 78, 120, 0.12)" />
+                </pattern>
+                <linearGradient id="econ-welcome-sweep" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stopColor="#8e84ef" stopOpacity="0" />
+                  <stop offset="0.5" stopColor="#8e84ef" stopOpacity="0.22" />
+                  <stop offset="1" stopColor="#8e84ef" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <rect width="440" height="300" rx="20" fill="url(#econ-welcome-dots)" />
+              <path className="econ-welcome-demo-axis" pathLength={1} d="M66 45 V242 H390" />
+              <path
+                className="econ-welcome-demo-demand-sketch"
+                pathLength={1}
+                d="M96 72 C126 78 139 111 171 116 S223 145 253 151 S319 172 359 198"
+              />
+              <path
+                className="econ-welcome-demo-demand-clean"
+                pathLength={1}
+                d="M96 74 L359 198"
+              />
+              <path
+                className="econ-welcome-demo-supply-wrong"
+                pathLength={1}
+                d="M96 202 C151 184 190 164 237 155 S310 121 359 91"
+              />
+              <path
+                className="econ-welcome-demo-supply-highlight"
+                d="M96 202 C151 184 190 164 237 155 S310 121 359 91"
+              />
+              <path
+                className="econ-welcome-demo-supply-clean"
+                pathLength={1}
+                d="M96 202 L359 91"
+              />
+              <path className="econ-welcome-demo-success-flash" d="M96 202 L359 91" />
+              <circle className="econ-welcome-demo-equilibrium" cx="230" cy="137" r="6" />
+              <g className="econ-welcome-demo-cursor">
+                <circle r="13" fill="rgba(91, 82, 195, 0.12)" />
+                <path d="M-3 -10 8 3 2 3 0 9 -3 8 -1 2 -6 3Z" />
+              </g>
+            </svg>
+            <div className="econ-welcome-demo-check">
+              <span>✓</span> Nice work
+            </div>
+          </div>
         </div>
       </div>
     </div>

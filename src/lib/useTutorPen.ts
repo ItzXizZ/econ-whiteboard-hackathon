@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PenLabel, PenOp, PenStroke } from './tutorPen'
 
 type Point = { x: number; y: number }
-type Cursor = Point & { visible: boolean; drawing: boolean }
+type TrailPoint = Point & { at: number }
+type Cursor = Point & { visible: boolean; drawing: boolean; trail?: TrailPoint[] }
 type ActiveOperation = {
   op: PenOp
   phase: 'glide' | 'draw' | 'type'
@@ -55,9 +56,32 @@ export function useTutorPen() {
   const strokeRef = useRef<PenStroke[]>([])
   const labelRef = useRef<PenLabel[]>([])
   const cursorRef = useRef<Point | null>(null)
+  const cursorTrailRef = useRef<TrailPoint[]>([])
+  const cursorTrailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const frameRef = useRef<number | null>(null)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const idRef = useRef(0)
+
+  const updateCursor = useCallback((point: Point, drawing: boolean) => {
+    const now = performance.now()
+    if (reducedMotion()) {
+      cursorTrailRef.current = []
+    } else {
+      const last = cursorTrailRef.current[cursorTrailRef.current.length - 1]
+      if (!last || Math.hypot(point.x - last.x, point.y - last.y) >= 2) {
+        cursorTrailRef.current = [...cursorTrailRef.current, { ...point, at: now }]
+          .filter((sample) => now - sample.at <= 250)
+          .slice(-8)
+      }
+    }
+    setCursor({ ...point, visible: true, drawing, trail: [...cursorTrailRef.current] })
+    if (cursorTrailTimerRef.current) clearTimeout(cursorTrailTimerRef.current)
+    cursorTrailTimerRef.current = setTimeout(() => {
+      cursorTrailTimerRef.current = null
+      cursorTrailRef.current = []
+      setCursor((current) => (current ? { ...current, trail: [] } : null))
+    }, 250)
+  }, [])
 
   const scheduleHide = useCallback(() => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
@@ -95,7 +119,7 @@ export function useTutorPen() {
             : { x: last.label.x, y: last.label.y }
         if (target) {
           cursorRef.current = target
-          setCursor({ ...target, visible: true, drawing: false })
+          updateCursor(target, false)
         }
         setBusy(false)
         scheduleHide()
@@ -122,7 +146,7 @@ export function useTutorPen() {
           const glide = from && Math.hypot(target.x - from.x, target.y - from.y) > 1
           if (glide) {
             activeRef.current = { op, phase: 'glide', start: now, duration: 220, from, target, length: 0 }
-            setCursor({ ...from, visible: true, drawing: false })
+            updateCursor(from, false)
           } else {
             const length = op.kind === 'stroke' ? lengthOf(op.stroke.points) : 0
             activeRef.current = {
@@ -135,7 +159,7 @@ export function useTutorPen() {
               length,
             }
             cursorRef.current = target
-            setCursor({ ...target, visible: true, drawing: op.kind === 'stroke' })
+            updateCursor(target, op.kind === 'stroke')
           }
         }
 
@@ -150,7 +174,7 @@ export function useTutorPen() {
             y: from.y + (active.target.y - from.y) * ease,
           }
           cursorRef.current = position
-          setCursor({ ...position, visible: true, drawing: false })
+          updateCursor(position, false)
           if (progress < 1) {
             frameRef.current = requestAnimationFrame(tick)
             return
@@ -166,7 +190,7 @@ export function useTutorPen() {
                 : Math.max(70, active.op.label.text.length * 70),
             length,
           }
-          setCursor({ ...active.target, visible: true, drawing: active.op.kind === 'stroke' })
+          updateCursor(active.target, active.op.kind === 'stroke')
           frameRef.current = requestAnimationFrame(tick)
           return
         }
@@ -175,7 +199,7 @@ export function useTutorPen() {
           const partial = pointsAtDistance(active.op.stroke.points, active.length * progress)
           setStrokes([...strokeRef.current, { ...active.op.stroke, points: partial }])
           cursorRef.current = partial[partial.length - 1] ?? active.target
-          setCursor({ ...cursorRef.current, visible: true, drawing: true })
+          updateCursor(cursorRef.current, true)
           if (progress < 1) {
             frameRef.current = requestAnimationFrame(tick)
             return
@@ -183,7 +207,7 @@ export function useTutorPen() {
           strokeRef.current = [...strokeRef.current, active.op.stroke]
           setStrokes(strokeRef.current)
           cursorRef.current = active.target
-          setCursor({ ...active.target, visible: true, drawing: false })
+          updateCursor(active.target, false)
         } else if (active.phase === 'type' && active.op.kind === 'label') {
           const revealed = Math.min(active.op.label.text.length, Math.floor((now - active.start) / 70))
           setLabels([...labelRef.current, { ...active.op.label, text: active.op.label.text.slice(0, revealed) }])
@@ -204,7 +228,7 @@ export function useTutorPen() {
       if (frameRef.current === null) frameRef.current = requestAnimationFrame(tick)
       return ids
     },
-    [scheduleHide]
+    [scheduleHide, updateCursor]
   )
 
   const remove = useCallback((ids: string[]) => {
@@ -229,19 +253,22 @@ export function useTutorPen() {
 
   const moveCursor = useCallback((point: Point) => {
     cursorRef.current = point
-    setCursor({ ...point, visible: true, drawing: false })
-  }, [])
+    updateCursor(point, false)
+  }, [updateCursor])
 
   const clear = useCallback(() => {
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    if (cursorTrailTimerRef.current) clearTimeout(cursorTrailTimerRef.current)
     frameRef.current = null
     hideTimerRef.current = null
+    cursorTrailTimerRef.current = null
     queueRef.current = []
     activeRef.current = null
     strokeRef.current = []
     labelRef.current = []
     cursorRef.current = null
+    cursorTrailRef.current = []
     setStrokes([])
     setLabels([])
     setCursor(null)
@@ -252,6 +279,7 @@ export function useTutorPen() {
     () => () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+      if (cursorTrailTimerRef.current) clearTimeout(cursorTrailTimerRef.current)
     },
     []
   )

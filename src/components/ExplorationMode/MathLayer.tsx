@@ -985,6 +985,12 @@ export default function MathLayer({
   const acceptedStepCueIdRef = useRef(0)
   const acceptedStepCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const acceptedPulseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [lessonFinishCue, setLessonFinishCue] = useState<{
+    id: string
+    graph: TogetherRecapGraph
+    point: TogetherPoint | null
+  } | null>(null)
+  const lessonFinishCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [freshTutorStrokeIds, setFreshTutorStrokeIds] = useState<ReadonlySet<string>>(new Set())
   const tutorPenBusyRef = useRef(false)
   const tutorStrokeBaselineRef = useRef<ReadonlySet<string>>(new Set())
@@ -1010,6 +1016,7 @@ export default function MathLayer({
     () => () => {
       if (acceptedStepCueTimerRef.current) clearTimeout(acceptedStepCueTimerRef.current)
       if (acceptedPulseTimerRef.current) clearTimeout(acceptedPulseTimerRef.current)
+      if (lessonFinishCueTimerRef.current) clearTimeout(lessonFinishCueTimerRef.current)
       if (freshTutorInkTimerRef.current) clearTimeout(freshTutorInkTimerRef.current)
     },
     []
@@ -3952,6 +3959,9 @@ export default function MathLayer({
     const session = togetherSessionRef.current
     if (!session) return
     togetherSessionRef.current = null
+    if (lessonFinishCueTimerRef.current) clearTimeout(lessonFinishCueTimerRef.current)
+    lessonFinishCueTimerRef.current = null
+    setLessonFinishCue(null)
     pendingTogetherRef.current = null
     setTogetherStep(null)
     setLessonMenuOpen(false)
@@ -4247,18 +4257,43 @@ export default function MathLayer({
               size,
             })),
           }
-          setCards((current) =>
-            current.map((card) =>
-              card.id === session.id
-                ? {
-                    ...card,
-                    togetherRecap: session.lesson.recap,
-                    togetherGraph,
-                    worksheetPlan: worksheetPlanRef.current ?? card.worksheetPlan,
-                  }
-                : card
+          const point =
+            session.lesson.kind === 'market'
+              ? session.equilibrium ??
+                curveEquilibrium(
+                  session.first?.points ?? null,
+                  session.second?.points ?? null,
+                  session.box
+                )
+              : session.outsidePoint?.points[0] ??
+                session.insidePoint?.points[0] ??
+                session.growth?.points[Math.floor((session.growth.points.length - 1) / 2)] ??
+                null
+          const cueId = uid()
+          const showRecap = () => {
+            lessonFinishCueTimerRef.current = null
+            setLessonFinishCue((current) => (current?.id === cueId ? null : current))
+            if (togetherSessionRef.current !== session) return
+            setCards((current) =>
+              current.map((card) =>
+                card.id === session.id
+                  ? {
+                      ...card,
+                      togetherRecap: session.lesson.recap,
+                      togetherGraph,
+                      worksheetPlan: worksheetPlanRef.current ?? card.worksheetPlan,
+                    }
+                  : card
+              )
             )
-          )
+          }
+          if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+            showRecap()
+          } else {
+            setLessonFinishCue({ id: cueId, graph: togetherGraph, point })
+            if (lessonFinishCueTimerRef.current) clearTimeout(lessonFinishCueTimerRef.current)
+            lessonFinishCueTimerRef.current = setTimeout(showRecap, 900)
+          }
           pen.hideCursor()
           return
         }
@@ -4621,6 +4656,9 @@ export default function MathLayer({
 
   const startDrawWithAdam = useCallback(
     async (lesson: TogetherLesson = selectedLesson, worksheetItemId?: string) => {
+    if (lessonFinishCueTimerRef.current) clearTimeout(lessonFinishCueTimerRef.current)
+    lessonFinishCueTimerRef.current = null
+    setLessonFinishCue(null)
     clearTutorPen()
     clearGhostGuideTimers()
     setGhostGuide(null)
@@ -4737,6 +4775,8 @@ export default function MathLayer({
   /** True between "stop" and the words coming back from the speech model. */
   const [transcribing, setTranscribing] = useState(false)
   const [recording, setRecording] = useState(false)
+  const [voiceStream, setVoiceStream] = useState<MediaStream | null>(null)
+  const [micWaveform, setMicWaveform] = useState<number[]>([])
   const [listening, setListening] = useState(false)
   const [speaking, setSpeaking] = useState(false)
   const [thinking, setThinking] = useState(false)
@@ -4757,6 +4797,61 @@ export default function MathLayer({
   const recognizerRef = useRef<RecognizerHandle | null>(null)
   const voiceHistoryRef = useRef<HintTurn[]>([])
   const voiceBusyRef = useRef(false)
+
+  useEffect(() => {
+    if (!recording || !voiceStream || typeof AudioContext === 'undefined') {
+      setMicWaveform([])
+      return
+    }
+
+    let context: AudioContext
+    let source: MediaStreamAudioSourceNode
+    let analyser: AnalyserNode
+    try {
+      context = new AudioContext()
+      source = context.createMediaStreamSource(voiceStream)
+      analyser = context.createAnalyser()
+      analyser.fftSize = 128
+      analyser.smoothingTimeConstant = 0.72
+      source.connect(analyser)
+      void context.resume()
+    } catch {
+      setMicWaveform([])
+      return
+    }
+
+    const samples = new Uint8Array(analyser.frequencyBinCount)
+    let frame = 0
+    let lastUpdate = 0
+    const sample = (now: number) => {
+      analyser.getByteFrequencyData(samples)
+      if (now - lastUpdate >= 48) {
+        lastUpdate = now
+        const next = Array.from({ length: 7 }, (_, band) => {
+          const start = Math.floor((band * samples.length) / 7)
+          const end = Math.max(start + 1, Math.floor(((band + 1) * samples.length) / 7))
+          let total = 0
+          for (let index = start; index < end; index++) total += samples[index]
+          return Math.min(1, total / ((end - start) * 175))
+        })
+        setMicWaveform((current) =>
+          current.length === next.length &&
+          current.every((value, index) => Math.abs(value - next[index]) < 0.035)
+            ? current
+            : next
+        )
+      }
+      frame = requestAnimationFrame(sample)
+    }
+    frame = requestAnimationFrame(sample)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      source.disconnect()
+      analyser.disconnect()
+      if (context.state !== 'closed') void context.close()
+    }
+  }, [recording, voiceStream])
 
   useEffect(() => {
     void probeTTS().then(setTtsOK)
@@ -5020,6 +5115,7 @@ export default function MathLayer({
     setVoiceUser('')
     const rec = createRecognizer({
       onStart: () => setListening(true),
+      onStream: setVoiceStream,
       onEnd: () => {
         setListening(false)
         if (finishRecordingRef.current) {
@@ -5088,6 +5184,7 @@ export default function MathLayer({
       setInterim('')
       const rec = createRecognizer({
         onStart: () => setListening(true),
+        onStream: setVoiceStream,
         onEnd: () => {
           setListening(false)
           if (finishRecordingRef.current) {
@@ -5977,6 +6074,96 @@ export default function MathLayer({
           )
         })()}
 
+      {lessonFinishCue &&
+        (() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          const toScreen = (point: TogetherPoint) => {
+            const screen = rf.flowToScreenPosition(point)
+            return { x: screen.x - wrap.left, y: screen.y - wrap.top }
+          }
+          const keyPoint = lessonFinishCue.point ? toScreen(lessonFinishCue.point) : null
+          return (
+            <svg
+              data-html2canvas-ignore
+              aria-hidden="true"
+              className="math-lesson-finish-layer"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 47,
+                pointerEvents: 'none',
+              }}
+            >
+              {lessonFinishCue.graph.strokes.map((stroke, index) => {
+                const points = stroke.points.map(toScreen)
+                const first = points[0]
+                if (!first) return null
+                const path = points
+                  .map((point, pointIndex) =>
+                    `${pointIndex === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+                  )
+                  .join(' ')
+                return (
+                  <path
+                    key={`${lessonFinishCue.id}-${index}`}
+                    className="math-lesson-finish-stroke"
+                    d={path}
+                    pathLength={1}
+                    strokeWidth={Math.max(4, stroke.width * zoom * 2.5)}
+                    style={{ animationDelay: `${Math.min(index, 10) * 42}ms` }}
+                  />
+                )
+              })}
+              {keyPoint && (
+                <circle
+                  className="math-lesson-finish-point"
+                  cx={keyPoint.x}
+                  cy={keyPoint.y}
+                  r="10"
+                />
+              )}
+            </svg>
+          )
+        })()}
+
+      {pen.cursor?.trail?.length
+        ? (() => {
+            const wrap = paneRect()
+            if (!wrap) return null
+            return (
+              <svg
+                data-html2canvas-ignore
+                aria-hidden="true"
+                className="math-adam-cursor-trail"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 46,
+                  pointerEvents: 'none',
+                }}
+              >
+                {pen.cursor.trail.map((sample, index) => {
+                  const point = rf.flowToScreenPosition(sample)
+                  return (
+                    <circle
+                      key={`${sample.at}-${index}`}
+                      className="math-adam-cursor-trail-dot"
+                      cx={point.x - wrap.left}
+                      cy={point.y - wrap.top}
+                      r={1.5 + ((index + 1) / pen.cursor!.trail!.length) * 2.5}
+                    />
+                  )
+                })}
+              </svg>
+            )
+          })()
+        : null}
+
       {pen.cursor?.visible &&
         (() => {
           const cursor = pen.cursor
@@ -6544,6 +6731,23 @@ export default function MathLayer({
           >
             {recording ? <MicOff size={17} /> : <Mic size={17} />}
           </button>
+          {recording && (
+            <div
+              className={`math-mic-waveform${micWaveform.length ? ' is-live' : ' is-idle'}`}
+              aria-hidden="true"
+            >
+              {Array.from({ length: 7 }, (_, index) => (
+                <span
+                  key={index}
+                  style={
+                    micWaveform.length
+                      ? { transform: `scaleY(${0.45 + (micWaveform[index] ?? 0) * 1.5})` }
+                      : undefined
+                  }
+                />
+              ))}
+            </div>
+          )}
           <button
             type="button"
             className={speakerOn ? 'btn-primary' : 'btn-ghost'}
@@ -6619,6 +6823,7 @@ export default function MathLayer({
             </span>
           )}
           {micAvailable && (
+            <>
             <button
               type="button"
               onClick={toggleRecording}
@@ -6639,6 +6844,24 @@ export default function MathLayer({
             >
               {recording ? <MicOff size={16} /> : <Mic size={16} />}
             </button>
+            {recording && (
+              <div
+                className={`math-mic-waveform${micWaveform.length ? ' is-live' : ' is-idle'}`}
+                aria-hidden="true"
+              >
+                {Array.from({ length: 7 }, (_, index) => (
+                  <span
+                    key={index}
+                    style={
+                      micWaveform.length
+                        ? { transform: `scaleY(${0.45 + (micWaveform[index] ?? 0) * 1.5})` }
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+            )}
+            </>
           )}
           <button
             type="button"
