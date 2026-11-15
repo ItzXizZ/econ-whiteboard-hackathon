@@ -42,6 +42,7 @@ import {
 import MathLayer from '../components/ExplorationMode/MathLayer'
 import { useStore } from '../store/useStore'
 import econLogo from './assets/econ-logo.svg'
+import WelcomeScreen from './WelcomeScreen'
 
 /* ────────────────────────── Login / Register ────────────────────────── */
 
@@ -268,7 +269,13 @@ function BoardMenu({
 
 /* ────────────────────────── Whiteboard host ────────────────────────── */
 
-function EconBoardCanvas({ boardId }: { boardId: string }) {
+function EconBoardCanvas({
+  boardId,
+  onVoiceAvailabilityChange,
+}: {
+  boardId: string
+  onVoiceAvailabilityChange?: (available: boolean) => void
+}) {
   const [hasContent, setHasContent] = useState(false)
 
   return (
@@ -301,7 +308,12 @@ function EconBoardCanvas({ boardId }: { boardId: string }) {
         </div>
       )}
 
-      <MathLayer adventureId={boardId} onHasContentChange={setHasContent} competition />
+      <MathLayer
+        adventureId={boardId}
+        onHasContentChange={setHasContent}
+        onVoiceAvailabilityChange={onVoiceAvailabilityChange}
+        competition
+      />
     </div>
   )
 }
@@ -311,6 +323,15 @@ function EconBoardCanvas({ boardId }: { boardId: string }) {
 function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: () => void }) {
   const [boards, setBoards] = useState<EconBoard[] | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const welcomeStorageKey = `econ-welcome-seen:${session.username.toLowerCase()}`
+  const [welcomeOpen, setWelcomeOpen] = useState(() => {
+    try {
+      return window.sessionStorage.getItem(welcomeStorageKey) !== '1'
+    } catch {
+      return true
+    }
+  })
+  const [voiceEnabled, setVoiceEnabled] = useState(false)
   // The board id whose server snapshot has been pulled into local storage.
   // MathLayer only mounts once its board is ready, so it never restores stale ink.
   const [readyBoardId, setReadyBoardId] = useState<string | null>(null)
@@ -459,6 +480,34 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
     [session]
   )
 
+  useEffect(() => {
+    if (!welcomeOpen) return
+    try {
+      window.sessionStorage.setItem(welcomeStorageKey, '1')
+    } catch {
+      // The screen still works when storage is unavailable.
+    }
+  }, [welcomeOpen, welcomeStorageKey])
+
+  const handleWelcomeUpload = useCallback((file: File) => {
+    setWelcomeOpen(false)
+    window.dispatchEvent(new CustomEvent<File>('econ:place-image', { detail: file }))
+  }, [])
+
+  const handleWelcomeDismiss = useCallback(() => setWelcomeOpen(false), [])
+
+  const handleWelcomeAsk = useCallback(() => {
+    setWelcomeOpen(false)
+    window.requestAnimationFrame(() => window.dispatchEvent(new Event('econ:focus-question')))
+  }, [])
+
+  const handleWelcomeLesson = useCallback((lessonId: string) => {
+    setWelcomeOpen(false)
+    window.requestAnimationFrame(() =>
+      window.dispatchEvent(new CustomEvent<string>('econ:start-lesson', { detail: lessonId }))
+    )
+  }, [])
+
   const initial = session.username.charAt(0).toUpperCase()
 
   return (
@@ -466,7 +515,15 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
       <main className="econ-main">
         <div className="econ-float" data-html2canvas-ignore>
           <div className="econ-float-left card">
-            <img src={econLogo} alt="Econ Coach" className="econ-float-logo" />
+            <button
+              type="button"
+              className="econ-float-logo-button"
+              onClick={() => setWelcomeOpen(true)}
+              aria-label="Open Econ Coach welcome screen"
+              title="Welcome"
+            >
+              <img src={econLogo} alt="" className="econ-float-logo" />
+            </button>
             <BoardMenu
               boards={boards ?? []}
               activeId={activeId ?? ''}
@@ -538,7 +595,7 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
         </div>
         {activeId && readyBoardId === activeId ? (
           <ReactFlowProvider>
-            <EconBoardCanvas boardId={activeId} />
+            <EconBoardCanvas boardId={activeId} onVoiceAvailabilityChange={setVoiceEnabled} />
           </ReactFlowProvider>
         ) : (
           <div className="econ-board-loading">
@@ -547,6 +604,15 @@ function EconStudio({ session, onSignOut }: { session: EconSession; onSignOut: (
           </div>
         )}
       </main>
+      {welcomeOpen && activeId && readyBoardId === activeId && (
+        <WelcomeScreen
+          showMicHint={voiceEnabled}
+          onDismiss={handleWelcomeDismiss}
+          onUploadFile={handleWelcomeUpload}
+          onAskQuestion={handleWelcomeAsk}
+          onStartLesson={handleWelcomeLesson}
+        />
+      )}
     </div>
   )
 }

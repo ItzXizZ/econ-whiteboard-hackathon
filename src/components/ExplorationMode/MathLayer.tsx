@@ -832,10 +832,12 @@ function strokeCentroid(strokes: Stroke[]): { x: number; y: number } | null {
 export default function MathLayer({
   adventureId,
   onHasContentChange,
+  onVoiceAvailabilityChange,
   competition = false,
 }: {
   adventureId?: string | null
   onHasContentChange?: (hasContent: boolean) => void
+  onVoiceAvailabilityChange?: (available: boolean) => void
   /**
    * Whiteboard-app mode (the Econ Coach shell): compact bottom controls, and
    * boards never adopt orphaned ink from other scopes, because every board is
@@ -851,6 +853,7 @@ export default function MathLayer({
   useEffect(() => void (adventuresRef.current = adventures), [adventures])
 
   const overlayRef = useRef<HTMLDivElement | null>(null)
+  const questionInputRef = useRef<HTMLInputElement | null>(null)
   const spaceMoveRef = useRef(false)
   const panGestureRef = useRef<{
     pointerId: number
@@ -2174,6 +2177,16 @@ export default function MathLayer({
     [rf, pushHistory, markProblemSet]
   )
 
+  const placeImageFile = useCallback(
+    (file: File) => {
+      if (!file.type.startsWith('image/')) return
+      const reader = new FileReader()
+      reader.onload = () => placeImage(String(reader.result))
+      reader.readAsDataURL(file)
+    },
+    [placeImage]
+  )
+
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items
@@ -2182,9 +2195,7 @@ export default function MathLayer({
         if (item.type.startsWith('image/')) {
           const file = item.getAsFile()
           if (file) {
-            const reader = new FileReader()
-            reader.onload = () => placeImage(String(reader.result))
-            reader.readAsDataURL(file)
+            placeImageFile(file)
             e.preventDefault()
             return
           }
@@ -2192,15 +2203,30 @@ export default function MathLayer({
       }
     }
     window.addEventListener('paste', onPaste)
-    return () => window.removeEventListener('paste', onPaste)
-  }, [placeImage])
+    const onPlaceImage = (event: Event) => {
+      const file = (event as CustomEvent<File>).detail
+      if (file instanceof File) placeImageFile(file)
+    }
+    const onFocusQuestion = () => {
+      const input = questionInputRef.current ?? document.querySelector<HTMLInputElement>(
+        'input[placeholder="Ask Adam a question about this problem"]'
+      )
+      if (input) input.focus()
+      else document.querySelector<HTMLButtonElement>('.math-mic-bar button')?.focus()
+    }
+    window.addEventListener('econ:place-image', onPlaceImage)
+    window.addEventListener('econ:focus-question', onFocusQuestion)
+    return () => {
+      window.removeEventListener('paste', onPaste)
+      window.removeEventListener('econ:place-image', onPlaceImage)
+      window.removeEventListener('econ:focus-question', onFocusQuestion)
+    }
+  }, [placeImageFile])
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => placeImage(String(reader.result))
-    reader.readAsDataURL(file)
+    placeImageFile(file)
     e.target.value = ''
   }
 
@@ -3990,6 +4016,16 @@ export default function MathLayer({
     runTogetherAdamStep(1, tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes))
   }, [clearTutorPen, fitMobileLessonFrame, placeTutorContent, runTogetherAdamStep, selectedLesson])
 
+  useEffect(() => {
+    const onStartLesson = (event: Event) => {
+      const lessonId = (event as CustomEvent<string>).detail
+      const lesson = TOGETHER_LESSONS.find((item) => item.id === lessonId)
+      if (lesson) void startDrawWithAdam(lesson)
+    }
+    window.addEventListener('econ:start-lesson', onStartLesson)
+    return () => window.removeEventListener('econ:start-lesson', onStartLesson)
+  }, [startDrawWithAdam])
+
   const closeCard = (id: string) => {
     if (togetherSessionRef.current?.id === id) {
       endDrawWithAdam()
@@ -4709,6 +4745,10 @@ export default function MathLayer({
   })
   const secureMicContext = typeof window === 'undefined' || window.isSecureContext
   const micAvailable = sttOK && secureMicContext
+
+  useEffect(() => {
+    onVoiceAvailabilityChange?.(micAvailable)
+  }, [micAvailable, onVoiceAvailabilityChange])
 
   return (
     <>
@@ -5584,6 +5624,7 @@ export default function MathLayer({
           }}
         >
           <input
+            ref={questionInputRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={(e) => {
