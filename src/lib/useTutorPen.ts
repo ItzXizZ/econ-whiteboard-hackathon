@@ -227,6 +227,11 @@ export function useTutorPen() {
     setCursor((current) => (current ? { ...current, visible: false, drawing: false } : null))
   }, [])
 
+  const moveCursor = useCallback((point: Point) => {
+    cursorRef.current = point
+    setCursor({ ...point, visible: true, drawing: false })
+  }, [])
+
   const clear = useCallback(() => {
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
@@ -251,5 +256,5 @@ export function useTutorPen() {
     []
   )
 
-  return { strokes, labels, cursor, enqueue, remove, hideCursor, clear, busy }
+  return { strokes, labels, cursor, enqueue, remove, hideCursor, moveCursor, clear, busy }
 }

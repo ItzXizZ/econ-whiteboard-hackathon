@@ -251,28 +251,39 @@ export function graphWrongCurveStrokes<T extends { id: string; points: { x: numb
   return ranked.slice(0, count).map(({ stroke }) => stroke)
 }
 
-export function correctionOps(
+export function wrongCurveHighlightOps(
+  wrongCurves: readonly { points: { x: number; y: number }[]; width?: number }[]
+): PenOp[] {
+  return wrongCurves.flatMap((curve, index) => {
+    const points = resample(curve.points, 4)
+    return points.length > 1
+      ? [
+          makeStroke(
+            `wrong-curve-highlight-${index}`,
+            points,
+            'rgba(220,38,38,0.35)',
+            Math.max(12, (curve.width ?? 2) * 5)
+          ),
+        ]
+      : []
+  })
+}
+
+export function mistakeHighlightOps(
   graph: GraphInfo,
   wrongCurves: readonly { points: { x: number; y: number }[]; width?: number }[] = []
 ): PenOp[] {
   if (graph.status !== 'mistake') return []
-  const wholeCurve = isWholeCurveMistake(graph)
-  const ops = !wholeCurve && graph.errorBox ? circleOps(graph.errorBox, graph.mistake) : []
-  if (wholeCurve) {
-    for (const curve of wrongCurves) {
-      const points = resample(curve.points, 4)
-      if (points.length > 1) {
-        ops.push(
-          makeStroke(
-            `wrong-curve-highlight-${ops.length}`,
-            points,
-            'rgba(220,38,38,0.35)',
-            Math.max(12, (curve.width ?? 2) * 5)
-          )
-        )
-      }
-    }
-  }
+  return isWholeCurveMistake(graph)
+    ? wrongCurveHighlightOps(wrongCurves)
+    : graph.errorBox
+      ? circleOps(graph.errorBox, graph.mistake)
+      : []
+}
+
+export function correctionRedrawOps(graph: GraphInfo): PenOp[] {
+  if (graph.status !== 'mistake') return []
+  const ops: PenOp[] = []
   let strokeIndex = 0
   let labelIndex = 0
   for (const line of graph.correction?.lines ?? []) {
@@ -287,4 +298,11 @@ export function correctionOps(
     ops.push(makeLabel(`correction-label-${labelIndex++}`, item.x, item.y, item.text, '#059669', 14))
   }
   return ops
+}
+
+export function correctionOps(
+  graph: GraphInfo,
+  wrongCurves: readonly { points: { x: number; y: number }[]; width?: number }[] = []
+): PenOp[] {
+  return [...mistakeHighlightOps(graph, wrongCurves), ...correctionRedrawOps(graph)]
 }

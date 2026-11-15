@@ -29,14 +29,21 @@ const drawTogetherJs = ts.transpileModule(drawTogetherSource, {
 }).outputText
 const {
   curveEquilibrium,
+  beautifyStroke,
+  fitGhostGuideToStroke,
   equilibriumLabelPositions,
+  ghostGuideFor,
   hasStrokeSlope,
   isBowedOut,
   isCurveShifted,
   isPointRelativeToCurve,
   isPpfCurve,
   isPpfGrowth,
+  isValidCurveStroke,
   labelOverlapsStroke,
+  matchTogetherLesson,
+  mirrorStrokeHorizontally,
+  togetherLessonRationale,
   placeLabelAwayFromStrokes,
   pointLabelPosition,
   polylineIntersection,
@@ -44,6 +51,7 @@ const {
   ppfBulgePoint,
   replaceCorrectionOpIds,
   shiftedEquilibriumLabel,
+  splitWorksheetQuestions,
   SUPPLY_DEMAND_LESSON,
   TOGETHER_LESSONS,
 } = await import(`data:text/javascript;base64,${Buffer.from(drawTogetherJs).toString('base64')}`)
@@ -417,6 +425,87 @@ check('draw-together lesson configs and problem picker cover all five graph type
   assert.equal(pickTogetherLesson('The Fed buys bonds').id, 'bonds')
   assert.equal(pickTogetherLesson('Find the market equilibrium').id, 'supply-demand')
   assert.equal(pickTogetherLesson('exchange rate and bonds').id, 'fx')
+  assert.equal(matchTogetherLesson('The Fed buys bonds').id, 'bonds')
+  assert.equal(matchTogetherLesson('The dollar depreciates against the yen').id, 'fx')
+  assert.equal(matchTogetherLesson('Define opportunity cost').id, 'ppf')
+  assert.equal(matchTogetherLesson('What is GDP?'), null)
+  assert.match(togetherLessonRationale('budget deficit'), /budget deficit.*loanable funds/i)
+  assert.equal(matchTogetherLesson('Budget deficit and loanable funds').id, 'loanable-funds')
+  assert.deepEqual(
+    splitWorksheetQuestions('1. Budget deficit affects loanable funds. 2) The Fed buys bonds.'),
+    ['Budget deficit affects loanable funds.', 'The Fed buys bonds.']
+  )
+  assert.deepEqual(splitWorksheetQuestions('(a) First part\nb. Second part'), ['First part', 'Second part'])
+  assert.deepEqual(splitWorksheetQuestions('Define opportunity cost.'), ['Define opportunity cost.'])
+  const worksheetItems = splitWorksheetQuestions(
+    '1. The government runs a budget deficit. Show the effect on the loanable funds market.\n' +
+      '2. The Fed buys bonds.\n' +
+      '3. Define opportunity cost.'
+  )
+  assert.equal(worksheetItems.length, 3)
+  assert.deepEqual(
+    worksheetItems.map((item) => matchTogetherLesson(item)?.id ?? null),
+    ['loanable-funds', 'bonds', 'ppf']
+  )
+})
+
+check('draw-together recap copy exactly matches the supplied lesson wording', () => {
+  const expected = {
+    'Supply and demand': {
+      headline: 'You built a supply and demand market',
+      takeaways: [
+        'Demand slopes down: at higher prices, people buy less.',
+        'Supply slopes up: higher prices make producers offer more.',
+        'When demand increases, D shifts right, so equilibrium price and quantity both rise.',
+      ],
+      practice: 'A drought cuts the wheat harvest. What happens to the equilibrium price and quantity of wheat?',
+      answer: 'Supply shifts left, so the price rises and the quantity falls.',
+    },
+    'Market for dollars': {
+      headline: 'You built the market for dollars',
+      takeaways: [
+        'Demand for dollars slopes down: a cheaper dollar makes US goods and assets cheaper for foreigners.',
+        'Supply of dollars slopes up: a stronger dollar makes foreign goods cheaper, so Americans sell more dollars.',
+        'Higher US interest rates raise demand for dollars, so the dollar appreciates.',
+      ],
+      practice: 'Americans start buying many more European cars. What happens to the value of the dollar in euros?',
+      answer: 'Americans sell dollars to buy euros, so the supply of dollars shifts right and the dollar depreciates.',
+    },
+    'Loanable funds': {
+      headline: 'You built the loanable funds market',
+      takeaways: [
+        'Saving supplies loanable funds; investment demands them.',
+        'The real interest rate balances saving and investment.',
+        'A budget deficit lowers national saving, so the interest rate rises and private investment falls: crowding out.',
+      ],
+      practice: 'The government adds a new tax credit for business investment. What happens to the interest rate and the quantity of loanable funds?',
+      answer: 'Investment demand shifts right, so the interest rate rises and the quantity of loanable funds rises.',
+    },
+    'Bond market': {
+      headline: 'You built the bond market',
+      takeaways: [
+        'Bond prices and interest rates move in opposite directions.',
+        'When the Fed buys bonds, demand for bonds shifts right.',
+        'Bond prices rise, so interest rates fall: expansionary monetary policy.',
+      ],
+      practice: 'The Fed sells bonds in an open-market sale. What happens to bond prices and interest rates?',
+      answer: 'More bonds come onto the market, so bond prices fall and interest rates rise.',
+    },
+    'Production possibilities frontier': {
+      headline: 'You built a production possibilities frontier',
+      takeaways: [
+        'Points on the PPF are efficient; points inside it leave resources unused.',
+        "Points outside the PPF can't be reached with today's resources and technology.",
+        'Economic growth shifts the PPF outward, so once-unattainable points become possible.',
+      ],
+      practice: 'A country on its PPF decides to produce more capital goods. What does it give up, and why does each extra unit cost more?',
+      answer: "It gives up consumer goods. Resources aren't equally suited to both, so the opportunity cost rises as it specializes: that's why the PPF bows out.",
+    },
+  }
+  for (const lesson of TOGETHER_LESSONS) {
+    assert.deepEqual(lesson.recap, expected[lesson.title], lesson.title)
+    assert.equal(lesson.recap.takeaways.length, 3)
+  }
 })
 
 check('draw-together shift tests require a six-percent horizontal move', () => {
@@ -429,6 +518,46 @@ check('draw-together shift tests require a six-percent horizontal move', () => {
   assert.equal(isCurveShifted(original, left, 'left', box), true)
   assert.equal(isCurveShifted(original, tooSmall, 'right', box), false)
   assert.equal(isCurveShifted(original, right, 'left', box), false)
+})
+
+check('draw-together beautifies near-lines and preserves curve endpoints and PPF bow', () => {
+  const jitteryLine = Array.from({ length: 20 }, (_, index) => ({
+    x: index * 5,
+    y: index * 3 + Math.sin(index * 4.7) * 1.2,
+  }))
+  const straightened = beautifyStroke(jitteryLine, 'line')
+  assert.equal(straightened.length, 48)
+  const start = straightened[0]
+  const end = straightened[straightened.length - 1]
+  const residuals = straightened.map((point) =>
+    Math.abs(
+      (end.x - start.x) * (start.y - point.y) -
+        (start.x - point.x) * (end.y - start.y)
+    ) / Math.hypot(end.x - start.x, end.y - start.y)
+  )
+  assert.ok(Math.max(...residuals) < 1e-8)
+  assert.ok(Math.hypot(start.x - jitteryLine[0].x, start.y - jitteryLine[0].y) < 1)
+  assert.ok(Math.hypot(end.x - jitteryLine.at(-1).x, end.y - jitteryLine.at(-1).y) < 1)
+
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const ppf = [{ x: 42, y: 22 }, { x: 130, y: 42 }, { x: 230, y: 106 }, { x: 346, y: 254 }]
+  const smoothedPpf = { points: beautifyStroke(ppf, 'curve') }
+  assert.equal(smoothedPpf.points.length, 48)
+  assert.deepEqual(smoothedPpf.points[0], ppf[0])
+  assert.deepEqual(smoothedPpf.points.at(-1), ppf.at(-1))
+  assert.equal(isBowedOut(smoothedPpf, box), true)
+})
+
+check('draw-together correction morphs fit the rejected stroke and reverse its slope', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const wrongDemand = {
+    points: [{ x: 16, y: 220 }, { x: 170, y: 130 }, { x: 344, y: 40 }],
+  }
+  const mirrored = { points: mirrorStrokeHorizontally(wrongDemand) }
+  assert.equal(hasStrokeSlope(mirrored, 'down'), true)
+  const guide = ghostGuideFor(SUPPLY_DEMAND_LESSON, 'first', { box })
+  const corrected = { points: fitGhostGuideToStroke(guide, wrongDemand) }
+  assert.equal(isValidCurveStroke(corrected, box, 'down'), true)
 })
 
 check('draw-together distinguishes shifted equilibrium labels', () => {
@@ -503,6 +632,37 @@ check('draw-together classifies dash marks around a bowed-out PPF', () => {
   assert.equal(isPointRelativeToCurve(phoneDash, bowedOut, box, 'outside'), false)
   assert.equal(isPointRelativeToCurve(phoneDash, bowedOut, box, 'outside', 0.5), true)
   assert.equal(isPointRelativeToCurve(tooLong, bowedOut, box, 'inside'), false)
+})
+
+check('draw-together ghost guides satisfy each market and PPF step validator', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  for (const lesson of TOGETHER_LESSONS.filter((item) => item.kind === 'market')) {
+    const first = { points: ghostGuideFor(lesson, 'first', { box }).points }
+    const second = { points: ghostGuideFor(lesson, 'second', { box }).points }
+    assert.equal(isValidCurveStroke(first, box, lesson.first.slope), true, lesson.id)
+    assert.equal(isValidCurveStroke(second, box, lesson.second.slope), true, lesson.id)
+    const base = lesson.shift.curve === 'first' ? first : second
+    const shifted = {
+      points: ghostGuideFor(lesson, 'shift', { box, first, second }).points,
+    }
+    const curve = lesson.shift.curve === 'first' ? lesson.first : lesson.second
+    assert.equal(isValidCurveStroke(shifted, box, curve.slope), true, lesson.id)
+    assert.equal(isCurveShifted(base, shifted, lesson.shift.dir, box), true, lesson.id)
+  }
+
+  const ppf = TOGETHER_LESSONS.find((item) => item.kind === 'ppf')
+  const frontier = { points: ghostGuideFor(ppf, 'ppf-frontier', { box }).points }
+  const growth = { points: ghostGuideFor(ppf, 'ppf-growth', { box, frontier }).points }
+  assert.equal(isPpfCurve(frontier, box), true)
+  assert.equal(isPpfCurve(growth, box), true)
+  assert.equal(isPpfGrowth(frontier, growth, box), true)
+  for (const [need, side] of [
+    ['inside-point', 'inside'],
+    ['outside-point', 'outside'],
+  ]) {
+    const mark = { points: ghostGuideFor(ppf, need, { box, frontier }).points }
+    assert.equal(isPointRelativeToCurve(mark, frontier, box, side), true, need)
+  }
 })
 
 check('draw-together replaces previous wrong-attempt correction circles', () => {

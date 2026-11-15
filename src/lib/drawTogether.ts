@@ -36,6 +36,24 @@ export interface TogetherBox {
   h: number
 }
 
+export interface TogetherRecapCopy {
+  headline: string
+  takeaways: readonly [string, string, string]
+  practice: string
+  answer: string
+}
+
+export interface TogetherRecapGraph {
+  box: TogetherBox
+  strokes: {
+    points: TogetherPoint[]
+    color: string
+    width: number
+    dashed?: boolean
+  }[]
+  labels: { x: number; y: number; text: string; color: string; size: number }[]
+}
+
 export interface TogetherViewport {
   minX: number
   minY: number
@@ -63,6 +81,7 @@ export interface MarketLesson {
   kind: 'market'
   id: string
   title: string
+  recap: TogetherRecapCopy
   keywords: string[]
   yLabel: string
   xLabel: string
@@ -77,6 +96,7 @@ export interface PpfLesson {
   kind: 'ppf'
   id: 'ppf'
   title: string
+  recap: TogetherRecapCopy
   yLabel: string
   xLabel: string
   steps: readonly TogetherStep[]
@@ -90,10 +110,41 @@ export interface PpfLesson {
 
 export type TogetherLesson = MarketLesson | PpfLesson
 
+export type TogetherNeed =
+  | 'first'
+  | 'second'
+  | 'shift'
+  | 'ppf-frontier'
+  | 'inside-point'
+  | 'outside-point'
+  | 'ppf-growth'
+
+export interface TogetherGuideSession {
+  box: TogetherBox
+  first?: TogetherStroke
+  second?: TogetherStroke
+  frontier?: TogetherStroke
+}
+
+export interface TogetherGhostGuide {
+  kind: 'curve' | 'point'
+  points: TogetherPoint[]
+}
+
 export const SUPPLY_DEMAND_LESSON: MarketLesson = {
   kind: 'market',
   id: 'supply-demand',
   title: 'Supply and demand',
+  recap: {
+    headline: 'You built a supply and demand market',
+    takeaways: [
+      'Demand slopes down: at higher prices, people buy less.',
+      'Supply slopes up: higher prices make producers offer more.',
+      'When demand increases, D shifts right, so equilibrium price and quantity both rise.',
+    ],
+    practice: 'A drought cuts the wheat harvest. What happens to the equilibrium price and quantity of wheat?',
+    answer: 'Supply shifts left, so the price rises and the quantity falls.',
+  },
   keywords: ['supply', 'demand', 'equilibrium'],
   yLabel: 'P',
   xLabel: 'Q',
@@ -144,6 +195,16 @@ export const FX_LESSON: MarketLesson = {
   kind: 'market',
   id: 'fx',
   title: 'Market for dollars',
+  recap: {
+    headline: 'You built the market for dollars',
+    takeaways: [
+      'Demand for dollars slopes down: a cheaper dollar makes US goods and assets cheaper for foreigners.',
+      'Supply of dollars slopes up: a stronger dollar makes foreign goods cheaper, so Americans sell more dollars.',
+      'Higher US interest rates raise demand for dollars, so the dollar appreciates.',
+    ],
+    practice: 'Americans start buying many more European cars. What happens to the value of the dollar in euros?',
+    answer: 'Americans sell dollars to buy euros, so the supply of dollars shifts right and the dollar depreciates.',
+  },
   keywords: ['exchange rate', 'currency', 'forex', 'dollar', 'euro', 'yen', 'peso', '€', '£', '¥'],
   yLabel: '€ per $',
   xLabel: 'Q of $',
@@ -184,6 +245,16 @@ export const LOANABLE_FUNDS_LESSON: MarketLesson = {
   kind: 'market',
   id: 'loanable-funds',
   title: 'Loanable funds',
+  recap: {
+    headline: 'You built the loanable funds market',
+    takeaways: [
+      'Saving supplies loanable funds; investment demands them.',
+      'The real interest rate balances saving and investment.',
+      'A budget deficit lowers national saving, so the interest rate rises and private investment falls: crowding out.',
+    ],
+    practice: 'The government adds a new tax credit for business investment. What happens to the interest rate and the quantity of loanable funds?',
+    answer: 'Investment demand shifts right, so the interest rate rises and the quantity of loanable funds rises.',
+  },
   keywords: ['loanable', 'national saving', 'crowding out', 'budget deficit'],
   yLabel: 'r',
   xLabel: 'Q of loanable funds',
@@ -233,6 +304,16 @@ export const BONDS_LESSON: MarketLesson = {
   kind: 'market',
   id: 'bonds',
   title: 'Bond market',
+  recap: {
+    headline: 'You built the bond market',
+    takeaways: [
+      'Bond prices and interest rates move in opposite directions.',
+      'When the Fed buys bonds, demand for bonds shifts right.',
+      'Bond prices rise, so interest rates fall: expansionary monetary policy.',
+    ],
+    practice: 'The Fed sells bonds in an open-market sale. What happens to bond prices and interest rates?',
+    answer: 'More bonds come onto the market, so bond prices fall and interest rates rise.',
+  },
   keywords: ['bond', 'bonds'],
   yLabel: 'Price of bonds',
   xLabel: 'Q of bonds',
@@ -276,6 +357,16 @@ export const PPF_LESSON: PpfLesson = {
   kind: 'ppf',
   id: 'ppf',
   title: 'Production possibilities frontier',
+  recap: {
+    headline: 'You built a production possibilities frontier',
+    takeaways: [
+      'Points on the PPF are efficient; points inside it leave resources unused.',
+      "Points outside the PPF can't be reached with today's resources and technology.",
+      'Economic growth shifts the PPF outward, so once-unattainable points become possible.',
+    ],
+    practice: 'A country on its PPF decides to produce more capital goods. What does it give up, and why does each extra unit cost more?',
+    answer: "It gives up consumer goods. Resources aren't equally suited to both, so the opportunity cost rises as it specializes: that's why the PPF bows out.",
+  },
   yLabel: 'Capital goods',
   xLabel: 'Consumer goods',
   steps: [
@@ -330,12 +421,51 @@ export function lessonById(id: string): TogetherLesson | undefined {
 }
 
 export function pickTogetherLesson(text: string): TogetherLesson {
+  return matchTogetherLesson(text) ?? SUPPLY_DEMAND_LESSON
+}
+
+export function matchTogetherLesson(text: string): TogetherLesson | null {
   const value = text.toLocaleLowerCase()
-  if (/ppf|production possibilit/.test(value)) return PPF_LESSON
-  if (/exchange rate|currency|forex|dollar|euro|yen|peso|€|£|¥/.test(value)) return FX_LESSON
+  if (/ppf|production possibilit|opportunity cost/.test(value)) return PPF_LESSON
+  if (/exchange rate|currency|forex|dollar|euro|yen|peso|appreciat|depreciat|€|£|¥/.test(value)) return FX_LESSON
   if (/loanable|national saving|crowding out|budget deficit/.test(value)) return LOANABLE_FUNDS_LESSON
-  if (/\bbonds?\b/.test(value)) return BONDS_LESSON
-  return SUPPLY_DEMAND_LESSON
+  if (/\bbonds?\b|open market|bond price/.test(value)) return BONDS_LESSON
+  if (/\bsupply\b|\bdemand\b|\bequilibrium\b/.test(value)) return SUPPLY_DEMAND_LESSON
+  return null
+}
+
+export function togetherLessonRationale(text: string): string | null {
+  const lesson = matchTogetherLesson(text)
+  if (!lesson || lesson.id === SUPPLY_DEMAND_LESSON.id) return null
+  const value = text.toLocaleLowerCase()
+  const topic =
+    /\bbudget deficit\b/.test(value) ? 'a budget deficit'
+      : /\bopportunity cost\b/.test(value) ? 'opportunity cost'
+        : /appreciat|depreciat/.test(value) ? 'a currency change'
+          : /exchange rate/.test(value) ? 'an exchange rate'
+            : /open market|bond price|\bbonds?\b/.test(value) ? 'bonds'
+              : /loanable|national saving|crowding out/.test(value) ? 'loanable funds'
+                : /production possibilit|ppf/.test(value) ? 'production possibilities'
+                  : lesson.title.toLocaleLowerCase()
+  return `This problem is about ${topic}, so let's draw the ${lesson.title.toLocaleLowerCase()}.`
+}
+
+export function splitWorksheetQuestions(text: string): string[] {
+  const normalized = text.replace(/\r/g, '\n').trim()
+  if (!normalized) return []
+  const markers = [...normalized.matchAll(/(?:^|\s)(\d+[.)])\s+/g)]
+  const matches =
+    markers.length > 0
+      ? markers
+      : [...normalized.matchAll(/(?:^|\n)\s*(\([a-z]\)|[a-z][.)])\s+/gi)]
+  if (matches.length === 0) return [normalized]
+  const starts = matches.map((match) => match.index! + match[0].search(/\S/))
+  return starts
+    .map((start, index) => {
+      const end = starts[index + 1] ?? normalized.length
+      return normalized.slice(start, end).replace(/^\s*(?:\d+[.)]|\([a-z]\)|[a-z][.)])\s*/i, '').trim()
+    })
+    .filter(Boolean)
 }
 
 export function hasStrokeSlope(stroke: TogetherStroke, direction: 'up' | 'down'): boolean {
@@ -373,6 +503,157 @@ export function isValidCurveStroke(
   direction: 'up' | 'down'
 ): boolean {
   return strokeFitsBox(stroke, box) && hasStrokeSlope(stroke, direction)
+}
+
+export function resampleStroke(points: TogetherPoint[], count = 48): TogetherPoint[] {
+  if (points.length === 0) return []
+  if (points.length === 1) return Array.from({ length: count }, () => ({ ...points[0] }))
+  const lengths = [0]
+  for (let i = 1; i < points.length; i++) {
+    lengths.push(lengths[i - 1] + Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y))
+  }
+  const total = lengths[lengths.length - 1]
+  if (total === 0) return Array.from({ length: count }, () => ({ ...points[0] }))
+  const output: TogetherPoint[] = []
+  let segment = 1
+  for (let i = 0; i < count; i++) {
+    const target = (total * i) / (count - 1)
+    while (segment < lengths.length - 1 && lengths[segment] < target) segment++
+    const start = points[segment - 1]
+    const end = points[segment]
+    const span = lengths[segment] - lengths[segment - 1]
+    const t = span === 0 ? 0 : (target - lengths[segment - 1]) / span
+    output.push({
+      x: start.x + (end.x - start.x) * t,
+      y: start.y + (end.y - start.y) * t,
+    })
+  }
+  output[0] = { ...points[0] }
+  output[output.length - 1] = { ...points[points.length - 1] }
+  return output
+}
+
+function chaikin(points: TogetherPoint[]): TogetherPoint[] {
+  if (points.length < 3) return points.map((point) => ({ ...point }))
+  const output = [{ ...points[0] }]
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1]
+    const b = points[i]
+    output.push(
+      { x: a.x * 0.75 + b.x * 0.25, y: a.y * 0.75 + b.y * 0.25 },
+      { x: a.x * 0.25 + b.x * 0.75, y: a.y * 0.25 + b.y * 0.75 }
+    )
+  }
+  output.push({ ...points[points.length - 1] })
+  return output
+}
+
+export function beautifyStroke(points: TogetherPoint[], kind: 'line' | 'curve'): TogetherPoint[] {
+  const source = resampleStroke(points)
+  if (source.length < 3) return source
+  let shape = source
+  if (kind === 'line') {
+    const center = source.reduce(
+      (sum, point) => ({ x: sum.x + point.x / source.length, y: sum.y + point.y / source.length }),
+      { x: 0, y: 0 }
+    )
+    let xx = 0
+    let xy = 0
+    let yy = 0
+    for (const point of source) {
+      const x = point.x - center.x
+      const y = point.y - center.y
+      xx += x * x
+      xy += x * y
+      yy += y * y
+    }
+    const angle = 0.5 * Math.atan2(2 * xy, xx - yy)
+    let direction = { x: Math.cos(angle), y: Math.sin(angle) }
+    const original = { x: source[source.length - 1].x - source[0].x, y: source[source.length - 1].y - source[0].y }
+    if (direction.x * original.x + direction.y * original.y < 0) {
+      direction = { x: -direction.x, y: -direction.y }
+    }
+    const normal = { x: -direction.y, y: direction.x }
+    let maxResidual = 0
+    for (const point of source) {
+      maxResidual = Math.max(
+        maxResidual,
+        Math.abs((point.x - center.x) * normal.x + (point.y - center.y) * normal.y)
+      )
+    }
+    const strokeLength = Math.hypot(original.x, original.y)
+    if (strokeLength > 0 && maxResidual < strokeLength * 0.06) {
+      const projectEndpoint = (point: TogetherPoint) => {
+        const distance = (point.x - center.x) * direction.x + (point.y - center.y) * direction.y
+        return { x: center.x + distance * direction.x, y: center.y + distance * direction.y }
+      }
+      const start = projectEndpoint(source[0])
+      const end = projectEndpoint(source[source.length - 1])
+      return Array.from({ length: 48 }, (_, i) => {
+        const t = i / 47
+        return { x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t }
+      })
+    }
+  }
+  for (let i = 0; i < 3; i++) shape = chaikin(shape)
+  const smoothed = resampleStroke(shape)
+  smoothed[0] = { ...points[0] }
+  smoothed[smoothed.length - 1] = { ...points[points.length - 1] }
+  return smoothed
+}
+
+export function mirrorStrokeHorizontally(stroke: TogetherStroke): TogetherPoint[] {
+  if (stroke.points.length === 0) return []
+  const xs = stroke.points.map((point) => point.x)
+  const axis = (Math.min(...xs) + Math.max(...xs)) / 2
+  return stroke.points.map((point) => ({ x: axis * 2 - point.x, y: point.y }))
+}
+
+export function fitGhostGuideToStroke(
+  guide: TogetherGhostGuide,
+  stroke: TogetherStroke
+): TogetherPoint[] {
+  if (guide.points.length === 0 || stroke.points.length === 0) return []
+  const strokeXs = stroke.points.map((point) => point.x)
+  const strokeYs = stroke.points.map((point) => point.y)
+  const guideXs = guide.points.map((point) => point.x)
+  const guideYs = guide.points.map((point) => point.y)
+  const strokeBounds = {
+    minX: Math.min(...strokeXs),
+    maxX: Math.max(...strokeXs),
+    minY: Math.min(...strokeYs),
+    maxY: Math.max(...strokeYs),
+  }
+  if (guide.kind === 'point') {
+    const guideCenter = guide.points.reduce(
+      (sum, point) => ({ x: sum.x + point.x / guide.points.length, y: sum.y + point.y / guide.points.length }),
+      { x: 0, y: 0 }
+    )
+    const strokeCenter = stroke.points.reduce(
+      (sum, point) => ({ x: sum.x + point.x / stroke.points.length, y: sum.y + point.y / stroke.points.length }),
+      { x: 0, y: 0 }
+    )
+    return stroke.points.map((point) => ({
+      x: point.x + guideCenter.x - strokeCenter.x,
+      y: point.y + guideCenter.y - strokeCenter.y,
+    }))
+  }
+  const guideBounds = {
+    minX: Math.min(...guideXs),
+    maxX: Math.max(...guideXs),
+    minY: Math.min(...guideYs),
+    maxY: Math.max(...guideYs),
+  }
+  const guideWidth = guideBounds.maxX - guideBounds.minX
+  const guideHeight = guideBounds.maxY - guideBounds.minY
+  const strokeWidth = strokeBounds.maxX - strokeBounds.minX
+  const strokeHeight = strokeBounds.maxY - strokeBounds.minY
+  return guide.points.map((point) => ({
+    x: strokeBounds.minX +
+      ((point.x - guideBounds.minX) / (guideWidth || 1)) * strokeWidth,
+    y: strokeBounds.minY +
+      ((point.y - guideBounds.minY) / (guideHeight || 1)) * strokeHeight,
+  }))
 }
 
 function segmentIntersectsRect(
@@ -814,4 +1095,83 @@ export function replaceCorrectionOpIds(
   next: string[]
 ): { remove: string[]; active: string[] } {
   return { remove: [...previous], active: [...next] }
+}
+
+function marketGuideCurve(curve: MarketCurveConfig, box: TogetherBox): TogetherPoint[] {
+  const { left, top, right, bottom } = axesFor(box)
+  return curve.slope === 'down'
+    ? [
+        { x: left + 12, y: top + 14 },
+        { x: left + box.w * 0.38, y: top + box.h * 0.4 },
+        { x: right - 12, y: bottom - 14 },
+      ]
+    : [
+        { x: left + 12, y: bottom - 14 },
+        { x: left + box.w * 0.38, y: top + box.h * 0.6 },
+        { x: right - 12, y: top + 14 },
+      ]
+}
+
+function ppfGuideCurve(box: TogetherBox, growth: boolean): TogetherPoint[] {
+  const { left, top, right, bottom } = axesFor(box)
+  return [
+    { x: left + 3, y: top + 8 },
+    { x: left + box.w * 0.22, y: top + box.h * (growth ? 0.08 : 0.16) },
+    { x: left + box.w * 0.48, y: top + box.h * (growth ? 0.025 : 0.19) },
+    { x: left + box.w * 0.73, y: top + box.h * (growth ? 0.13 : 0.43) },
+    { x: right - 10, y: bottom - 2 },
+  ]
+}
+
+function yOnPolyline(points: TogetherPoint[], x: number): number {
+  const ordered = [...points].sort((a, b) => a.x - b.x)
+  for (let i = 1; i < ordered.length; i++) {
+    const a = ordered[i - 1]
+    const b = ordered[i]
+    if (x > b.x) continue
+    const t = (x - a.x) / (b.x - a.x || 1)
+    return a.y + (b.y - a.y) * t
+  }
+  return ordered[ordered.length - 1]?.y ?? 0
+}
+
+export function ghostGuideFor(
+  lesson: TogetherLesson,
+  need: TogetherNeed,
+  session: TogetherGuideSession
+): TogetherGhostGuide | null {
+  const { box } = session
+  if (lesson.kind === 'market') {
+    if (need === 'first' || need === 'second') {
+      const curve = need === 'first' ? lesson.first : lesson.second
+      return { kind: 'curve', points: marketGuideCurve(curve, box) }
+    }
+    if (need === 'shift') {
+      const shift = lesson.shift
+      const baseStroke = shift.curve === 'first' ? session.first : session.second
+      const base = baseStroke?.points ?? marketGuideCurve(
+        shift.curve === 'first' ? lesson.first : lesson.second,
+        box
+      )
+      const dx = box.w * 0.11 * (shift.dir === 'right' ? 1 : -1)
+      return { kind: 'curve', points: base.map((point) => ({ x: point.x + dx, y: point.y })) }
+    }
+    return null
+  }
+
+  if (need === 'ppf-frontier' || need === 'ppf-growth') {
+    return { kind: 'curve', points: ppfGuideCurve(box, need === 'ppf-growth') }
+  }
+
+  if ((need === 'inside-point' || need === 'outside-point') && session.frontier) {
+    const { left, top, bottom } = axesFor(box)
+    const x = left + box.w * (need === 'inside-point' ? 0.12 : 0.76)
+    const curveY = yOnPolyline(session.frontier.points, x)
+    const y =
+      need === 'inside-point'
+        ? bottom - box.h * 0.07
+        : Math.max(top + 5, curveY - box.h * 0.16)
+    return { kind: 'point', points: [{ x: x - 4, y }, { x: x + 4, y }] }
+  }
+  return null
 }

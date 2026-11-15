@@ -1,10 +1,11 @@
-import { Mic, MicOff, X } from 'lucide-react'
+import { Mic, MicOff, Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import katex from 'katex'
 import type { ReactFlowInstance } from 'reactflow'
 import TalkingHead from './TalkingHead'
 import Markdown from '../Markdown'
 import type { TutorGraphSpec } from '../../lib/mathHint'
+import type { TogetherRecapCopy, TogetherRecapGraph } from '../../lib/drawTogether'
 import {
   boundsFromPoints,
   computeHintPlacement,
@@ -37,7 +38,16 @@ export interface TutorSession {
   togetherStep?: number
   togetherTitle?: string
   togetherTotal?: number
+  togetherWordIndex?: number
+  togetherSpeakerOn?: boolean
+  togetherCorrectionAvailable?: boolean
+  togetherRecap?: TogetherRecapCopy
+  togetherGraph?: TogetherRecapGraph
   successPulse?: boolean
+  worksheetPlan?: {
+    items: { id: string; text: string; lessonId: string | null; completed: boolean }[]
+  }
+  worksheetNextItem?: string
   hintType?: HintTypeId
   level: number
   tracked: boolean
@@ -239,6 +249,110 @@ function useDragHandle(onDragBy: (dx: number, dy: number) => void) {
   }
 }
 
+function TogetherRecapGraphThumbnail({ graph }: { graph?: TogetherRecapGraph }) {
+  if (!graph) return null
+  const { box } = graph
+  const margin = 20
+  const pathFor = (points: { x: number; y: number }[]) =>
+    points
+      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x - box.x} ${point.y - box.y}`)
+      .join(' ')
+  return (
+    <svg
+      className="math-coach-recap-graph"
+      viewBox={`${-margin} ${-margin} ${box.w + margin * 2} ${box.h + margin * 2}`}
+      role="img"
+      aria-label="Your finished graph"
+    >
+      <rect
+        x={-margin}
+        y={-margin}
+        width={box.w + margin * 2}
+        height={box.h + margin * 2}
+        fill="#fffefa"
+      />
+      {graph.strokes.map((stroke, index) => (
+        <path
+          key={`stroke-${index}`}
+          d={pathFor(stroke.points)}
+          fill="none"
+          stroke={stroke.color}
+          strokeWidth={stroke.width}
+          strokeDasharray={stroke.dashed ? '7 6' : undefined}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+      {graph.labels.map((label, index) => (
+        <text
+          key={`label-${index}`}
+          x={label.x - box.x}
+          y={label.y - box.y}
+          fill={label.color}
+          fontSize={label.size}
+          fontFamily="system-ui, sans-serif"
+          fontWeight="600"
+        >
+          {label.text}
+        </text>
+      ))}
+    </svg>
+  )
+}
+
+function WorksheetPlanChecklist({
+  plan,
+  nextItem,
+  onDraw,
+  onAsk,
+}: {
+  plan: NonNullable<TutorSession['worksheetPlan']>
+  nextItem?: string
+  onDraw: (itemId: string) => void
+  onAsk: (itemId: string) => void
+}) {
+  return (
+    <div className="math-worksheet-plan">
+      <strong>I found {plan.items.length} questions</strong>
+      {plan.items.map((item, index) => {
+        const excerpt = item.text.replace(/\s+/g, ' ').slice(0, 80)
+        return (
+          <div className="math-worksheet-plan-item" key={item.id}>
+            <span
+              className={`math-worksheet-plan-check${item.completed ? ' is-complete' : ''}`}
+              aria-label={item.completed ? 'Completed' : `Question ${index + 1}`}
+            >
+              {item.completed ? (
+                <svg className="math-worksheet-check-mark" viewBox="0 0 16 16" aria-hidden="true">
+                  <path pathLength="1" d="M2.5 8.5 6.1 12 13.5 4" />
+                </svg>
+              ) : (
+                index + 1
+              )}
+            </span>
+            <span className="math-worksheet-plan-text" title={item.text}>
+              {excerpt}{item.text.length > 80 ? '…' : ''}
+            </span>
+            <button
+              type="button"
+              className="math-worksheet-plan-action"
+              onClick={() => (item.lessonId ? onDraw(item.id) : onAsk(item.id))}
+            >
+              {item.lessonId ? 'Draw it with Adam' : 'Ask Adam'}
+            </button>
+          </div>
+        )
+      })}
+      {nextItem && (
+        <p className="math-worksheet-plan-next">
+          Next up: {nextItem.replace(/\s+/g, ' ').slice(0, 80)}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function CoachCard({
   session,
   talking,
@@ -258,6 +372,13 @@ function CoachCard({
   onReexplainStep,
   onEndTogether,
   onStartSuggestedLesson,
+  onDrawWorksheetItem,
+  onAskWorksheetItem,
+  onToggleTogetherSpeaker,
+  onFixTogether,
+  onTryTogether,
+  onNextWorksheetQuestion,
+  onAnotherLesson,
 }: {
   session: TutorSession
   talking: boolean
@@ -277,8 +398,16 @@ function CoachCard({
   onReexplainStep: () => void
   onEndTogether: () => void
   onStartSuggestedLesson: (lessonId: string) => void
+  onDrawWorksheetItem: (itemId: string) => void
+  onAskWorksheetItem: (itemId: string) => void
+  onToggleTogetherSpeaker: () => void
+  onFixTogether: (id: string) => void
+  onTryTogether: (id: string) => void
+  onNextWorksheetQuestion: () => void
+  onAnotherLesson: () => void
 }) {
   const [revealing, setRevealing] = useState(false)
+  const [showRecapAnswer, setShowRecapAnswer] = useState(false)
   const [outgoingTogetherText, setOutgoingTogetherText] = useState('')
   const previousTogetherTextRef = useRef(session.text)
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -308,6 +437,8 @@ function CoachCard({
     return () => window.clearTimeout(timer)
   }, [session.text, session.togetherMode])
 
+  useEffect(() => setShowRecapAnswer(false), [session.id])
+
   // A multi-step hint pauses after each non-final step until the student
   // confirms it made sense — the typewriter must have fully caught up first,
   // so speech/text never race ahead of what's visually settled.
@@ -321,19 +452,39 @@ function CoachCard({
     !revealing &&
     !session.reexplaining
   const reexplainAttempts = session.reexplainCounts?.[stepIndex] ?? 0
-  const renderCopy = (text: string) =>
-    session.mode === 'voice' ? (
+  const renderCopy = (text: string) => {
+    if (session.togetherMode) {
+      let wordIndex = 0
+      return (
+        <p className="math-coach-say math-together-spoken-copy" style={{ marginTop: 0 }}>
+          {text.split(/(\s+)/).map((part, index) => {
+            if (!part.trim()) return part
+            const current = wordIndex++
+            return (
+              <span
+                key={index}
+                className={current === session.togetherWordIndex ? 'is-speaking-word' : undefined}
+              >
+                {part}
+              </span>
+            )
+          })}
+        </p>
+      )
+    }
+    return session.mode === 'voice' ? (
       <p className="math-coach-say" style={{ marginTop: 0 }}>
         <RichLine text={text} />
       </p>
     ) : (
       <Markdown size="text-sm">{text}</Markdown>
     )
+  }
 
   useEffect(() => {
     const el = bodyRef.current
-    if (el) el.scrollTop = el.scrollHeight
-  }, [session.clarifications, clarifyLiveTranscript, clarifyInterim, session.text])
+    if (el) el.scrollTop = session.togetherRecap ? 0 : el.scrollHeight
+  }, [session.clarifications, clarifyLiveTranscript, clarifyInterim, session.text, session.togetherRecap])
 
   return (
     <div className="math-coach">
@@ -392,12 +543,24 @@ function CoachCard({
               {session.togetherTitle ?? 'Draw with Adam'} · Step {session.togetherStep ?? 1} of {session.togetherTotal ?? 7}
             </span>
           )}
+          {session.togetherMode && (
+            <button
+              type="button"
+              className="math-coach-speaker-toggle"
+              aria-label={session.togetherSpeakerOn === false ? 'Unmute Adam' : 'Mute Adam'}
+              title={session.togetherSpeakerOn === false ? 'Unmute Adam' : 'Mute Adam'}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={onToggleTogetherSpeaker}
+            >
+              {session.togetherSpeakerOn === false ? <VolumeX size={14} /> : <Volume2 size={14} />}
+            </button>
+          )}
           <span className="math-coach-grip" aria-hidden>
             <span /><span /><span />
           </span>
         </div>
 
-        {session.togetherMode && togetherTotal > 0 && (
+        {session.togetherMode && !session.togetherRecap && togetherTotal > 0 && (
           <div
             className="math-coach-progress"
             role="progressbar"
@@ -417,7 +580,73 @@ function CoachCard({
           </div>
         )}
 
-        <div className="math-coach-scroll" ref={bodyRef}>
+        <div
+          className={`math-coach-scroll${session.togetherRecap ? ' is-recap' : ''}`}
+          ref={bodyRef}
+        >
+          {session.togetherRecap ? (
+            <section className="math-coach-recap">
+              <h3>{session.togetherRecap.headline}</h3>
+              <TogetherRecapGraphThumbnail graph={session.togetherGraph} />
+              <ol className="math-coach-recap-takeaways">
+                {session.togetherRecap.takeaways.map((takeaway, index) => (
+                  <li key={takeaway} style={{ animationDelay: `${index * 140}ms` }}>
+                    {takeaway}
+                  </li>
+                ))}
+              </ol>
+              {session.worksheetPlan && (
+                <WorksheetPlanChecklist
+                  plan={session.worksheetPlan}
+                  nextItem={session.worksheetNextItem}
+                  onDraw={onDrawWorksheetItem}
+                  onAsk={onAskWorksheetItem}
+                />
+              )}
+              <div className="math-coach-recap-practice">
+                <strong>Try one more</strong>
+                <p>{session.togetherRecap.practice}</p>
+                {showRecapAnswer ? (
+                  <p className="math-coach-recap-answer">{session.togetherRecap.answer}</p>
+                ) : (
+                  <button
+                    type="button"
+                    className="math-coach-recap-answer-button"
+                    onClick={() => setShowRecapAnswer(true)}
+                  >
+                    Show answer
+                  </button>
+                )}
+              </div>
+              <div className="math-coach-recap-actions">
+                {session.worksheetPlan && (
+                  <button
+                    type="button"
+                    className="math-tutor-actions-primary"
+                    onClick={onNextWorksheetQuestion}
+                    disabled={!session.worksheetPlan.items.some((item) => !item.completed)}
+                  >
+                    Next question
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="math-tutor-actions-secondary"
+                  onClick={onAnotherLesson}
+                >
+                  Another lesson
+                </button>
+                <button
+                  type="button"
+                  className="math-tutor-actions-secondary"
+                  onClick={onEndTogether}
+                >
+                  Done
+                </button>
+              </div>
+            </section>
+          ) : (
+            <>
           {waiting && (
             <p className="math-coach-say math-coach-waiting">
               reading your work…
@@ -467,6 +696,15 @@ function CoachCard({
             )
           )}
 
+          {session.worksheetPlan && (
+            <WorksheetPlanChecklist
+              plan={session.worksheetPlan}
+              nextItem={session.worksheetNextItem}
+              onDraw={onDrawWorksheetItem}
+              onAsk={onAskWorksheetItem}
+            />
+          )}
+
           {session.equations?.length ? (
             <div className="math-coach-equations">
               {session.equations.map((equation, index) => (
@@ -498,13 +736,25 @@ function CoachCard({
               <p className="math-coach-clarify-live">{clarifyLiveTranscript || 'Listening…'}</p>
             </div>
           )}
+            </>
+          )}
         </div>
 
         <div className="math-coach-footer">
-          {session.togetherMode && (
+          {session.togetherMode && !session.togetherRecap && (
             <button type="button" className="math-coach-end-together" onClick={onEndTogether}>
               End
             </button>
+          )}
+          {session.togetherMode && session.togetherCorrectionAvailable && (
+            <div className="math-tutor-correction-actions">
+              <button type="button" onClick={() => onFixTogether(session.id)}>
+                Fix it for me
+              </button>
+              <button type="button" onClick={() => onTryTogether(session.id)}>
+                I&apos;ll fix it
+              </button>
+            </div>
           )}
           {session.status === 'done' && (session.mode === 'hint' || session.mode === 'voice') && (
             <button
@@ -525,7 +775,7 @@ function CoachCard({
                 className="math-tutor-actions-primary"
                 onClick={() => onStartSuggestedLesson(session.suggestedLesson!.id)}
               >
-                Draw {session.suggestedLesson.title} with Adam
+                Draw it with Adam: {session.suggestedLesson.title}
               </button>
             </div>
           )}
@@ -680,6 +930,13 @@ export function MathTutorScreenLayer({
   onReexplainStep,
   onEndTogether,
   onStartSuggestedLesson,
+  onDrawWorksheetItem,
+  onAskWorksheetItem,
+  onToggleTogetherSpeaker,
+  onFixTogether,
+  onTryTogether,
+  onNextWorksheetQuestion,
+  onAnotherLesson,
 }: {
   sessions: TutorSession[]
   rf: ReactFlowInstance
@@ -708,6 +965,13 @@ export function MathTutorScreenLayer({
   onReexplainStep: (id: string) => void
   onEndTogether: () => void
   onStartSuggestedLesson: (lessonId: string) => void
+  onDrawWorksheetItem: (itemId: string) => void
+  onAskWorksheetItem: (itemId: string) => void
+  onToggleTogetherSpeaker: () => void
+  onFixTogether: (id: string) => void
+  onTryTogether: (id: string) => void
+  onNextWorksheetQuestion: () => void
+  onAnotherLesson: () => void
 }) {
   const [pane, setPane] = useState<DOMRect | null>(null)
   /** Manual drag offsets per card — once the user moves a bubble, we respect it. */
@@ -978,7 +1242,14 @@ export function MathTutorScreenLayer({
               onAdvanceStep={() => onAdvanceStep(session.id)}
               onReexplainStep={() => onReexplainStep(session.id)}
               onEndTogether={onEndTogether}
+              onFixTogether={() => onFixTogether(session.id)}
+              onTryTogether={() => onTryTogether(session.id)}
               onStartSuggestedLesson={onStartSuggestedLesson}
+              onDrawWorksheetItem={onDrawWorksheetItem}
+              onAskWorksheetItem={onAskWorksheetItem}
+              onToggleTogetherSpeaker={onToggleTogetherSpeaker}
+              onNextWorksheetQuestion={onNextWorksheetQuestion}
+              onAnotherLesson={onAnotherLesson}
             />
           </div>
         )

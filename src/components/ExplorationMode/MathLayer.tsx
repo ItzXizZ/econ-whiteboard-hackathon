@@ -17,14 +17,19 @@ import { streamMathHint, type HintTurn } from '../../lib/mathHint'
 import type { TutorGraphSpec } from '../../lib/mathHint'
 import {
   circleOps,
+  correctionRedrawOps,
   correctionOps,
   graphWrongCurveStrokes,
   isWholeCurveMistake,
+  mistakeHighlightOps,
   specToPenOps,
   type PenOp,
+  wrongCurveHighlightOps,
 } from '../../lib/tutorPen'
 import { useTutorPen } from '../../lib/useTutorPen'
 import {
+  beautifyStroke,
+  fitGhostGuideToStroke,
   isCurveShifted,
   isPointRelativeToCurve,
   isPpfCurve,
@@ -32,16 +37,28 @@ import {
   isValidCurveStroke,
   curveEquilibrium,
   equilibriumLabelPositions,
+  ghostGuideFor,
+  matchTogetherLesson,
+  hasStrokeSlope,
+  togetherLessonRationale,
+  mirrorStrokeHorizontally,
   pickTogetherLesson,
   placeLabelAwayFromStrokes,
   pointLabelPosition,
   ppfBulgePoint,
   replaceCorrectionOpIds,
+  resampleStroke,
   shiftedEquilibriumLabel,
+  splitWorksheetQuestions,
   strokeFitsBox,
   TOGETHER_LESSONS,
   type TogetherLesson,
   type TogetherBox,
+  type TogetherGhostGuide,
+  type TogetherNeed,
+  type TogetherPoint,
+  type TogetherRecapCopy,
+  type TogetherRecapGraph,
   type TogetherStroke,
   type TogetherViewport,
 } from '../../lib/drawTogether'
@@ -59,6 +76,7 @@ import {
   probeTTS,
   IncrementalSpeaker,
   cancelSpeech,
+  speakWithWordHighlights,
   type RecognizerHandle,
 } from '../../lib/voiceTutor'
 import { loadMathBoard, saveMathBoard, clearMathBoard } from '../../lib/mathBoardStorage'
@@ -321,6 +339,7 @@ interface Stroke {
   /** Width in flow units (so it scales with zoom, like ink on paper). */
   width: number
   points: InkPoint[]
+  opacity?: number
 }
 
 function graphCorrectionOps(
@@ -330,15 +349,6 @@ function graphCorrectionOps(
 ): PenOp[] {
   return correctionOps(graph, graphWrongCurveStrokes(graph, strokeIds, strokes))
 }
-
-type TogetherNeed =
-  | 'first'
-  | 'second'
-  | 'shift'
-  | 'ppf-frontier'
-  | 'inside-point'
-  | 'outside-point'
-  | 'ppf-growth'
 
 interface TogetherSession {
   id: string
@@ -358,7 +368,21 @@ interface TogetherSession {
   outsidePoint?: Stroke
   growth?: Stroke
   completed?: boolean
+  worksheetItemId?: string
   equilibrium?: { x: number; y: number }
+  rejectedStrokeId?: string
+  rejectedNeed?: TogetherNeed
+  manualCorrectionStrokeId?: string
+}
+
+interface ManualGraphCorrection {
+  graphKey: string
+  rejectedStrokeId: string | null
+  baselineIds: Set<string>
+  direction: 'up' | 'down'
+  box: TogetherBox
+  guide: TogetherPoint[]
+  highlightIds: string[]
 }
 
 /** A pasted / uploaded image placed on the board, in flow coordinates. */
@@ -417,7 +441,14 @@ interface HintCard {
   togetherStep?: number
   togetherTitle?: string
   togetherTotal?: number
+  togetherWordIndex?: number
+  togetherSpeakerOn?: boolean
+  togetherCorrectionAvailable?: boolean
+  togetherRecap?: TogetherRecapCopy
+  togetherGraph?: TogetherRecapGraph
   suggestedLesson?: { id: string; title: string }
+  worksheetPlan?: WorksheetPlan
+  worksheetNextItem?: string
   successPulse?: boolean
   level: number
   hintType?: HintTypeId
@@ -461,6 +492,17 @@ interface HintCard {
   reexplainCounts: Record<number, number>
   /** True while a re-explain request for the currently-gating step is in flight. */
   reexplaining?: boolean
+}
+
+interface WorksheetPlanItem {
+  id: string
+  text: string
+  lessonId: string | null
+  completed: boolean
+}
+
+interface WorksheetPlan {
+  items: WorksheetPlanItem[]
 }
 
 const DEFAULT_HINT_PROMPT =
@@ -927,11 +969,18 @@ export default function MathLayer({
   const [cards, setCards] = useState<HintCard[]>([])
   const worksheetCardIdRef = useRef<string | null>(null)
   const worksheetReadSeqRef = useRef(0)
+  const [worksheetPlan, setWorksheetPlan] = useState<WorksheetPlan | null>(null)
+  const worksheetPlanRef = useRef<WorksheetPlan | null>(null)
+  const [worksheetPlanAdventureId, setWorksheetPlanAdventureId] = useState<string | null>(null)
   const [hintSize, setHintSize] = useState<1 | 2 | 4>(2)
   const [sel, setSel] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
   const [prompt, setPrompt] = useState('')
   const [lessonContext, setLessonContext] = useState('')
   const pen = useTutorPen()
+  const tutorStrokesRef = useRef(pen.strokes)
+  useEffect(() => {
+    tutorStrokesRef.current = pen.strokes
+  }, [pen.strokes])
   const [acceptedStepCue, setAcceptedStepCue] = useState<{ id: number; x: number; y: number } | null>(null)
   const acceptedStepCueIdRef = useRef(0)
   const acceptedStepCueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -967,6 +1016,18 @@ export default function MathLayer({
   )
   const togetherSessionRef = useRef<TogetherSession | null>(null)
   const pendingTogetherRef = useRef<(() => void) | null>(null)
+  const [ghostGuide, setGhostGuide] = useState<{
+    sessionId: string
+    guide: TogetherGhostGuide
+    visible: boolean
+  } | null>(null)
+  const [activeGraphCorrectionKey, setActiveGraphCorrectionKey] = useState<string | null>(null)
+  const [freehandGhostGuide, setFreehandGhostGuide] = useState<TogetherPoint[] | null>(null)
+  const manualGraphCorrectionRef = useRef<ManualGraphCorrection | null>(null)
+  const ghostGuideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const ghostGuideFadeRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const ghostGuideRevealFrameRef = useRef<number | null>(null)
+  const graphHighlightOpIdsRef = useRef(new Map<string, string[]>())
   const exitTogetherRef = useRef<() => void>(() => {})
   const [togetherStep, setTogetherStep] = useState<number | null>(null)
   const [lessonOverrideId, setLessonOverrideId] = useState<string | null>(null)
@@ -988,6 +1049,11 @@ export default function MathLayer({
   const clearTutorPen = useCallback(() => {
     exitTogetherRef.current()
     pen.clear()
+    graphHighlightOpIdsRef.current.clear()
+    manualGraphCorrectionRef.current = null
+    setActiveGraphCorrectionKey(null)
+    setFreehandGhostGuide(null)
+    tutorStrokesRef.current = []
     tutorPenBoundsRef.current = []
     equationDrawnCardIdsRef.current.clear()
     drawnGraphKeysRef.current.clear()
@@ -1071,11 +1137,13 @@ export default function MathLayer({
       if (!graph || graph.status !== 'mistake') continue
       const key = `${[...line.strokeIds].sort().join(',')}|${graph.mistake ?? ''}`
       if (drawnGraphKeysRef.current.has(key)) continue
-      const ops = graphCorrectionOps(graph, line.strokeIds, strokesRef.current)
+      const wrongCurves = graphWrongCurveStrokes(graph, line.strokeIds, strokesRef.current)
+      const ops = mistakeHighlightOps(graph, wrongCurves)
       if (ops.length === 0) continue
       drawnGraphKeysRef.current.add(key)
       setDrawnGraphKeys(new Set(drawnGraphKeysRef.current))
-      pen.enqueue(ops)
+      setActiveGraphCorrectionKey(key)
+      graphHighlightOpIdsRef.current.set(key, pen.enqueue(ops))
     }
   }, [inkModel.lines, pen.enqueue, strokes, togetherStep])
 
@@ -1313,9 +1381,23 @@ export default function MathLayer({
 
   const [ttsOK, setTtsOK] = useState(false)
   const hintSpeakerRef = useRef<IncrementalSpeaker | null>(null)
-  const speakerRef = useRef<IncrementalSpeaker | null>(null)
+  const speakerRef = useRef<{ cancel: () => void } | null>(null)
   const [hintSpeakingId, setHintSpeakingId] = useState<string | null>(null)
-  const [speakerOn, setSpeakerOn] = useState(true)
+  const [speakerOn, setSpeakerOn] = useState(() => {
+    try {
+      return localStorage.getItem('econ-tutor-speaker') !== 'false'
+    } catch {
+      return true
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('econ-tutor-speaker', String(speakerOn))
+    } catch {
+      // Speech preference remains in memory when storage is unavailable.
+    }
+  }, [speakerOn])
 
   useEffect(() => {
     let active = true
@@ -1462,6 +1544,16 @@ export default function MathLayer({
     clearTutorPen()
     boardHydratedRef.current = false
     boardAdventureRef.current = adventureId
+    let savedWorksheetPlan: WorksheetPlan | null = null
+    try {
+      const saved = localStorage.getItem(`econ-worksheet-plan:${adventureId}`)
+      if (saved) savedWorksheetPlan = JSON.parse(saved) as WorksheetPlan
+    } catch {
+      savedWorksheetPlan = null
+    }
+    worksheetPlanRef.current = savedWorksheetPlan
+    setWorksheetPlan(savedWorksheetPlan)
+    setWorksheetPlanAdventureId(adventureId)
 
     const snap = loadMathBoard(
       adventureId,
@@ -1537,6 +1629,17 @@ export default function MathLayer({
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
     }
   }, [adventureId, strokes, images, prompt, lessonContext, recognitionOverrides, flushBoardPersist])
+
+  useEffect(() => {
+    if (!adventureId || worksheetPlanAdventureId !== adventureId) return
+    try {
+      const key = `econ-worksheet-plan:${adventureId}`
+      if (worksheetPlan) localStorage.setItem(key, JSON.stringify(worksheetPlan))
+      else localStorage.removeItem(key)
+    } catch {
+      // A worksheet remains usable for this session when storage is unavailable.
+    }
+  }, [adventureId, worksheetPlan, worksheetPlanAdventureId])
 
   useEffect(() => {
     const onUnload = () => flushBoardPersist()
@@ -1968,6 +2071,7 @@ export default function MathLayer({
 
   // ── Pointer handling ──
   const onPointerDown = (e: React.PointerEvent) => {
+    hideGhostGuide()
     if (e.pointerType === 'touch') {
       const touchPointers = touchPointersRef.current
       touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -2303,19 +2407,27 @@ export default function MathLayer({
       if (!text) throw new Error('No worksheet text recognized')
       if (worksheetReadSeqRef.current !== request) return
 
-      const lesson = pickTogetherLesson(text)
-      const excerpt = text.replace(/\s+/g, ' ').slice(0, 110)
-      lessonContextRef.current = text
-      setLessonContext(text)
-      setLessonOverrideId(lesson.id)
+      const plan: WorksheetPlan = {
+        items: splitWorksheetQuestions(text).map((question) => ({
+          id: uid(),
+          text: question,
+          lessonId: matchTogetherLesson(question)?.id ?? null,
+          completed: false,
+        })),
+      }
+      worksheetPlanRef.current = plan
+      setWorksheetPlan(plan)
+      lessonContextRef.current = ''
+      setLessonContext('')
+      setLessonOverrideId(null)
       setCards((current) =>
         current.map((card) =>
           card.id === id
             ? {
                 ...card,
-                text: `I read your worksheet: “${excerpt}${text.length > 110 ? '…' : ''}” This looks like a ${lesson.title.toLowerCase()} problem. Want to draw it together?`,
+                text: '',
                 status: 'done',
-                suggestedLesson: { id: lesson.id, title: lesson.title },
+                worksheetPlan: plan,
               }
             : card
         )
@@ -2725,7 +2837,6 @@ export default function MathLayer({
         cancelSpeech()
         speakerRef.current?.cancel()
         hintSpeakerRef.current?.cancel()
-        setSpeakerOn(true)
         hintSpeakerRef.current = ttsOK
           ? new IncrementalSpeaker((on) => setHintSpeakingId(on ? cardId : null))
           : null
@@ -3475,7 +3586,6 @@ export default function MathLayer({
         cancelSpeech()
         speakerRef.current?.cancel()
         hintSpeakerRef.current?.cancel()
-        setSpeakerOn(true)
         hintSpeakerRef.current = ttsOK
           ? new IncrementalSpeaker((on) => setHintSpeakingId(on ? cardId : null))
           : null
@@ -3613,7 +3723,6 @@ export default function MathLayer({
         cancelSpeech()
         speakerRef.current?.cancel()
         hintSpeakerRef.current?.cancel()
-        setSpeakerOn(true)
         hintSpeakerRef.current = ttsOK
           ? new IncrementalSpeaker((on) => setHintSpeakingId(on ? cardId : null))
           : null
@@ -3720,13 +3829,29 @@ export default function MathLayer({
 
   const speakTogetherStep = useCallback(
     (id: string, text: string) => {
-      if (!speakerOn || !ttsOK) return
       speakerRef.current?.cancel()
-      const speaker = new IncrementalSpeaker((talking) =>
-        setHintSpeakingId(talking ? id : null)
+      speakerRef.current = null
+      hintSpeakerRef.current?.cancel()
+      cancelSpeech()
+      if (!speakerOn || !ttsOK) {
+        setCards((current) =>
+          current.map((card) =>
+            card.id === id ? { ...card, togetherWordIndex: -1, togetherSpeakerOn: speakerOn } : card
+          )
+        )
+        return
+      }
+      const speech = speakWithWordHighlights(
+        text,
+        (togetherWordIndex) =>
+          setCards((current) =>
+            current.map((card) =>
+              card.id === id ? { ...card, togetherWordIndex } : card
+            )
+          ),
+        (talking) => setHintSpeakingId(talking ? id : null)
       )
-      speakerRef.current = speaker
-      speaker.pushSentence(text)
+      speakerRef.current = speech
     },
     [speakerOn, ttsOK]
   )
@@ -3744,12 +3869,84 @@ export default function MathLayer({
               togetherTotal:
                 session?.id === id ? session.lesson.steps.length : card.togetherTotal,
               text,
+              togetherWordIndex: -1,
+              togetherSpeakerOn: speakerOn,
               status: 'done',
             }
           : card
       )
     )
+  }, [speakerOn])
+
+  const completeWorksheetPlanItem = useCallback((itemId: string) => {
+    const plan = worksheetPlanRef.current
+    if (!plan) return
+    const nextPlan = {
+      items: plan.items.map((item) =>
+        item.id === itemId ? { ...item, completed: true } : item
+      ),
+    }
+    worksheetPlanRef.current = nextPlan
+    setWorksheetPlan(nextPlan)
+    const nextItem = nextPlan.items.find((item) => !item.completed)?.text
+    setCards((current) =>
+      current.map((card) =>
+        card.worksheetPlan
+          ? { ...card, worksheetPlan: nextPlan, worksheetNextItem: nextItem }
+          : card
+      )
+    )
   }, [])
+
+  const clearGhostGuideTimers = useCallback(() => {
+    if (ghostGuideTimerRef.current) clearTimeout(ghostGuideTimerRef.current)
+    if (ghostGuideFadeRef.current) clearTimeout(ghostGuideFadeRef.current)
+    if (ghostGuideRevealFrameRef.current !== null) {
+      window.cancelAnimationFrame(ghostGuideRevealFrameRef.current)
+    }
+    ghostGuideTimerRef.current = null
+    ghostGuideFadeRef.current = null
+    ghostGuideRevealFrameRef.current = null
+  }, [])
+
+  const hideGhostGuide = useCallback(() => {
+    if (ghostGuideTimerRef.current) clearTimeout(ghostGuideTimerRef.current)
+    ghostGuideTimerRef.current = null
+    if (ghostGuideRevealFrameRef.current !== null) {
+      window.cancelAnimationFrame(ghostGuideRevealFrameRef.current)
+      ghostGuideRevealFrameRef.current = null
+    }
+    setGhostGuide((current) => (current ? { ...current, visible: false } : null))
+    if (ghostGuideFadeRef.current) clearTimeout(ghostGuideFadeRef.current)
+    ghostGuideFadeRef.current = setTimeout(() => {
+      ghostGuideFadeRef.current = null
+      setGhostGuide(null)
+    }, 420)
+  }, [])
+
+  const scheduleGhostGuide = useCallback(
+    (session: TogetherSession, need: TogetherNeed, delay: number) => {
+      clearGhostGuideTimers()
+      setGhostGuide(null)
+      const guide = ghostGuideFor(session.lesson, need, session)
+      if (!guide) return
+      ghostGuideTimerRef.current = setTimeout(() => {
+        ghostGuideTimerRef.current = null
+        setGhostGuide({ sessionId: session.id, guide, visible: false })
+        ghostGuideRevealFrameRef.current = window.requestAnimationFrame(() => {
+          ghostGuideRevealFrameRef.current = window.requestAnimationFrame(() => {
+            ghostGuideRevealFrameRef.current = null
+            setGhostGuide((current) =>
+              current?.sessionId === session.id ? { ...current, visible: true } : current
+            )
+          })
+        })
+      }, delay)
+    },
+    [clearGhostGuideTimers]
+  )
+
+  useEffect(() => () => clearGhostGuideTimers(), [clearGhostGuideTimers])
 
   const endDrawWithAdam = useCallback(() => {
     const session = togetherSessionRef.current
@@ -3764,10 +3961,12 @@ export default function MathLayer({
     acceptedStepCueTimerRef.current = null
     acceptedPulseTimerRef.current = null
     setAcceptedStepCue(null)
+    clearGhostGuideTimers()
+    setGhostGuide(null)
     speakerRef.current?.cancel()
     speakerRef.current = null
     setHintSpeakingId(null)
-  }, [])
+  }, [clearGhostGuideTimers])
 
   useEffect(() => {
     exitTogetherRef.current = endDrawWithAdam
@@ -3837,6 +4036,14 @@ export default function MathLayer({
       const bounds = rememberTutorPenBounds(ops)
       pendingTogetherRef.current = after
       const ids = pen.enqueue(ops)
+      const queuedStrokes = ops.flatMap((op, index) =>
+        op.kind === 'stroke'
+          ? [{ ...op.stroke, id: ids[index], points: op.stroke.points.map((point) => ({ ...point })) }]
+          : []
+      )
+      if (queuedStrokes.length) {
+        tutorStrokesRef.current = [...tutorStrokesRef.current, ...queuedStrokes]
+      }
       const session = togetherSessionRef.current
       if (session) {
         ops.forEach((op, index) => {
@@ -3867,6 +4074,8 @@ export default function MathLayer({
     (session: TogetherSession) => {
       const replacement = replaceCorrectionOpIds(session.correctionOpIds, [])
       if (replacement.remove.length) pen.remove(replacement.remove)
+      const removedOpIds = new Set(replacement.remove)
+      tutorStrokesRef.current = tutorStrokesRef.current.filter((stroke) => !removedOpIds.has(stroke.id))
       const removedBounds = new Set(session.correctionBounds)
       tutorPenBoundsRef.current = tutorPenBoundsRef.current.filter((bounds) => !removedBounds.has(bounds))
       session.correctionOpIds = replacement.active
@@ -3921,9 +4130,73 @@ export default function MathLayer({
       session.step = step
       session.awaiting = need
       session.baselineIds = new Set(strokesRef.current.map((stroke) => stroke.id))
+      scheduleGhostGuide(session, need, 5000)
       updateTogetherCard(session.id, step, lessonStep.say)
+      speakTogetherStep(session.id, lessonStep.say)
     },
-    [updateTogetherCard]
+    [scheduleGhostGuide, speakTogetherStep, updateTogetherCard]
+  )
+
+  const morphStrokeToPoints = useCallback(
+    (stroke: Stroke, target: TogetherPoint[], movePen = false): Promise<Stroke> => {
+      const from = resampleStroke(stroke.points)
+      const to = resampleStroke(target)
+      pushHistory()
+      const commit = (points: TogetherPoint[]) => {
+        const nextStroke = { ...stroke, points }
+        const next = strokesRef.current.map((item) => (item.id === stroke.id ? nextStroke : item))
+        strokesRef.current = next
+        setStrokes(next)
+        return nextStroke
+      }
+      if (
+        typeof window === 'undefined' ||
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ) {
+        return Promise.resolve(commit(to))
+      }
+      return new Promise((resolve) => {
+        const started = performance.now()
+        const travelDuration = movePen ? 180 : 0
+        const cursorStart = movePen && pen.cursor
+          ? { x: pen.cursor.x, y: pen.cursor.y }
+          : from[0]
+        const frame = (now: number) => {
+          const elapsed = now - started
+          const progress = Math.min(1, Math.max(0, (elapsed - travelDuration) / 450))
+          const eased = 1 - (1 - progress) ** 3
+          const points = from.map((point, index) => ({
+            x: point.x + (to[index].x - point.x) * eased,
+            y: point.y + (to[index].y - point.y) * eased,
+          }))
+          if (movePen && points.length) {
+            if (elapsed < travelDuration) {
+              const travel = 1 - (1 - elapsed / travelDuration) ** 3
+              pen.moveCursor({
+                x: cursorStart.x + (from[0].x - cursorStart.x) * travel,
+                y: cursorStart.y + (from[0].y - cursorStart.y) * travel,
+              })
+            } else {
+              pen.moveCursor(points[Math.floor(progress * (points.length - 1))])
+            }
+          }
+          const result = commit(points)
+          if (elapsed < travelDuration + 450) window.requestAnimationFrame(frame)
+          else {
+            if (movePen) pen.hideCursor()
+            resolve(result)
+          }
+        }
+        window.requestAnimationFrame(frame)
+      })
+    },
+    [pen.hideCursor, pen.moveCursor, pushHistory]
+  )
+
+  const morphAcceptedStroke = useCallback(
+    (stroke: Stroke, kind: 'line' | 'curve') =>
+      morphStrokeToPoints(stroke, beautifyStroke(stroke.points, kind)),
+    [morphStrokeToPoints]
   )
 
   const runTogetherAdamStep = useCallback(
@@ -3941,17 +4214,69 @@ export default function MathLayer({
         speakTogetherStep(session.id, say)
         if (step >= session.lesson.steps.length) {
           session.completed = true
+          if (session.worksheetItemId) completeWorksheetPlanItem(session.worksheetItemId)
+          const studentStrokes = [
+            session.first,
+            session.second,
+            session.shifted,
+            session.frontier,
+            session.insidePoint,
+            session.outsidePoint,
+            session.growth,
+          ].filter((stroke): stroke is Stroke => Boolean(stroke))
+          const togetherGraph: TogetherRecapGraph = {
+            box: { ...session.box },
+            strokes: [
+              ...tutorStrokesRef.current.map((stroke) => ({
+                points: stroke.points.map((point) => ({ ...point })),
+                color: stroke.color,
+                width: stroke.width,
+                dashed: stroke.dashed,
+              })),
+              ...studentStrokes.map((stroke) => ({
+                points: stroke.points.map((point) => ({ x: point.x, y: point.y })),
+                color: stroke.color,
+                width: stroke.width,
+              })),
+            ],
+            labels: session.tutorLabels.map(({ x, y, text, color, size }) => ({
+              x,
+              y,
+              text,
+              color,
+              size,
+            })),
+          }
+          setCards((current) =>
+            current.map((card) =>
+              card.id === session.id
+                ? {
+                    ...card,
+                    togetherRecap: session.lesson.recap,
+                    togetherGraph,
+                    worksheetPlan: worksheetPlanRef.current ?? card.worksheetPlan,
+                  }
+                : card
+            )
+          )
           pen.hideCursor()
           return
         }
         if (session.lesson.steps[step]?.who === 'student') beginTogetherStudentTurn(step + 1)
       })
     },
-    [beginTogetherStudentTurn, pen.hideCursor, runTogetherOps, speakTogetherStep, updateTogetherCard]
+    [
+      beginTogetherStudentTurn,
+      completeWorksheetPlanItem,
+      pen.hideCursor,
+      runTogetherOps,
+      speakTogetherStep,
+      updateTogetherCard,
+    ]
   )
 
   const handleTogetherStudentStroke = useCallback(
-    (stroke: Stroke) => {
+    async (stroke: Stroke, alreadyMorphed = false) => {
       const session = togetherSessionRef.current
       const need = session?.awaiting
       if (!session || !need) return
@@ -4008,12 +4333,27 @@ export default function MathLayer({
       if (feedback) {
         clearTogetherCorrectionInk(session)
         const strokeBounds = tutorStrokeBounds(stroke)
-        const correction = runTogetherOps(strokeBounds ? circleOps(strokeBounds) : [], () => {
+        const curveAttempt = need === 'first' || need === 'second' || need === 'shift' || need === 'ppf-frontier' || need === 'ppf-growth'
+        const highlight = curveAttempt
+          ? wrongCurveHighlightOps([{ points: stroke.points, width: stroke.width }])
+          : strokeBounds
+            ? circleOps(strokeBounds)
+            : []
+        session.rejectedStrokeId = stroke.id
+        session.rejectedNeed = need
+        const correction = runTogetherOps(highlight, () => {
           if (togetherSessionRef.current !== session) return
-          updateTogetherCard(session.id, step, feedback)
+          setCards((current) =>
+            current.map((card) =>
+              card.id === session.id
+                ? { ...card, text: feedback, togetherCorrectionAvailable: true }
+                : card
+            )
+          )
           speakTogetherStep(session.id, feedback)
           session.baselineIds = new Set(strokesRef.current.map((item) => item.id))
           session.awaiting = need
+          scheduleGhostGuide(session, need, 1500)
         })
         session.correctionOpIds = replaceCorrectionOpIds(
           session.correctionOpIds,
@@ -4023,18 +4363,46 @@ export default function MathLayer({
         return
       }
 
+      const curveKind =
+        need === 'ppf-frontier' || need === 'ppf-growth'
+          ? 'curve'
+          : need === 'first' || need === 'second' || need === 'shift'
+            ? 'line'
+            : null
+      const acceptedStroke = curveKind
+        ? alreadyMorphed ? stroke : await morphAcceptedStroke(stroke, curveKind)
+        : stroke
+      if (togetherSessionRef.current !== session) return
+      reflowTogetherLabels(session, [acceptedStroke])
       clearTogetherCorrectionInk(session)
-      showAcceptedStepFeedback(session.id, stroke)
+      setCards((current) =>
+        current.map((card) =>
+          card.id === session.id ? { ...card, togetherCorrectionAvailable: false } : card
+        )
+      )
+      if (session.manualCorrectionStrokeId && session.manualCorrectionStrokeId !== stroke.id) {
+        pushHistory()
+        const rejectedId = session.manualCorrectionStrokeId
+        const faded = strokesRef.current.map((item) =>
+          item.id === rejectedId ? { ...item, opacity: 0.3 } : item
+        )
+        strokesRef.current = faded
+        setStrokes(faded)
+      }
+      session.manualCorrectionStrokeId = undefined
+      session.rejectedStrokeId = undefined
+      session.rejectedNeed = undefined
+      showAcceptedStepFeedback(session.id, acceptedStroke)
       if (session.lesson.kind === 'market') {
         if (need === 'first') {
-          session.first = stroke
+          session.first = acceptedStroke
           runTogetherAdamStep(
             3,
             [
               tutorCurveLabel(
-                stroke,
+                acceptedStroke,
                 session.lesson.first.label,
-                getTogetherObstacles([stroke]),
+                getTogetherObstacles([acceptedStroke]),
                 undefined,
                 getViewportFlowBounds()
               ),
@@ -4043,14 +4411,18 @@ export default function MathLayer({
           return
         }
         if (need === 'second') {
-          session.second = stroke
-          const equilibrium = curveEquilibrium(session.first?.points ?? null, stroke.points, session.box)
+          session.second = acceptedStroke
+          const equilibrium = curveEquilibrium(
+            session.first?.points ?? null,
+            acceptedStroke.points,
+            session.box
+          )
           session.equilibrium = equilibrium
           runTogetherAdamStep(5, [
             tutorCurveLabel(
-              stroke,
+              acceptedStroke,
               session.lesson.second.label,
-              getTogetherObstacles([stroke]),
+              getTogetherObstacles([acceptedStroke]),
               undefined,
               getViewportFlowBounds()
             ),
@@ -4059,7 +4431,7 @@ export default function MathLayer({
               equilibrium,
               session.lesson.eqLabels.y,
               session.lesson.eqLabels.x,
-              getTogetherObstacles([stroke]),
+              getTogetherObstacles([acceptedStroke]),
               undefined,
               getViewportFlowBounds()
             ),
@@ -4068,18 +4440,18 @@ export default function MathLayer({
         }
 
         if (need === 'shift') {
-          session.shifted = stroke
+          session.shifted = acceptedStroke
           const newEquilibrium =
             session.lesson.shift.curve === 'first'
-              ? curveEquilibrium(stroke.points, session.second?.points ?? null, session.box)
-              : curveEquilibrium(session.first?.points ?? null, stroke.points, session.box)
+              ? curveEquilibrium(acceptedStroke.points, session.second?.points ?? null, session.box)
+              : curveEquilibrium(session.first?.points ?? null, acceptedStroke.points, session.box)
           const oldEquilibrium = session.equilibrium
           session.equilibrium = newEquilibrium
           runTogetherAdamStep(7, [
             tutorCurveLabel(
-              stroke,
+              acceptedStroke,
               session.lesson.shift.newLabel,
-              getTogetherObstacles([stroke]),
+              getTogetherObstacles([acceptedStroke]),
               undefined,
               getViewportFlowBounds()
             ),
@@ -4099,12 +4471,12 @@ export default function MathLayer({
       }
 
       if (need === 'ppf-frontier') {
-        session.frontier = stroke
-        const start = stroke.points[0]
+        session.frontier = acceptedStroke
+        const start = acceptedStroke.points[0]
         runTogetherAdamStep(
           3,
           [
-            tutorCurveLabel(stroke, 'PPF', getTogetherObstacles([stroke]), {
+            tutorCurveLabel(acceptedStroke, 'PPF', getTogetherObstacles([acceptedStroke]), {
               x: start.x + 4,
               y: start.y - 28,
             }, getViewportFlowBounds()),
@@ -4140,14 +4512,14 @@ export default function MathLayer({
           'Now show economic growth: draw the new PPF.'
         )
       } else if (need === 'ppf-growth') {
-        session.growth = stroke
+        session.growth = acceptedStroke
         const oldBulge = session.frontier && ppfBulgePoint(session.frontier)
-        const newBulge = ppfBulgePoint(stroke)
+        const newBulge = ppfBulgePoint(acceptedStroke)
         runTogetherAdamStep(8, [
           tutorCurveLabel(
-            stroke,
+            acceptedStroke,
             'PPF₂',
-            getTogetherObstacles([stroke]),
+            getTogetherObstacles([acceptedStroke]),
             undefined,
             getViewportFlowBounds()
           ),
@@ -4160,15 +4532,54 @@ export default function MathLayer({
       getTogetherObstacles,
       getViewportFlowBounds,
       isValidCurveStroke,
+      morphAcceptedStroke,
+      pushHistory,
       zoom,
       reflowTogetherLabels,
       runTogetherAdamStep,
       runTogetherOps,
       showAcceptedStepFeedback,
       speakTogetherStep,
+      scheduleGhostGuide,
       updateTogetherCard,
     ]
   )
+
+  const fixTogetherCorrection = useCallback(async (cardId: string) => {
+    const session = togetherSessionRef.current
+    const need = session?.rejectedNeed
+    const rejected = session?.rejectedStrokeId
+    const stroke = rejected ? strokesRef.current.find((item) => item.id === rejected) : undefined
+    if (!session || session.id !== cardId || !need || !stroke) return
+    const guide = ghostGuideFor(session.lesson, need, session)
+    if (!guide) return
+    const target = fitGhostGuideToStroke(guide, stroke)
+    if (target.length < 2) return
+    clearGhostGuideTimers()
+    setGhostGuide(null)
+    setCards((current) =>
+      current.map((card) => card.id === cardId ? { ...card, togetherCorrectionAvailable: false } : card)
+    )
+    const corrected = await morphStrokeToPoints(stroke, target, true)
+    if (togetherSessionRef.current !== session) return
+    session.awaiting = need
+    session.rejectedStrokeId = undefined
+    session.rejectedNeed = undefined
+    await handleTogetherStudentStroke(corrected, true)
+  }, [clearGhostGuideTimers, fitGhostGuideToStroke, ghostGuideFor, handleTogetherStudentStroke, morphStrokeToPoints])
+
+  const letStudentFixTogether = useCallback((cardId: string) => {
+    const session = togetherSessionRef.current
+    if (!session || session.id !== cardId || !session.awaiting) return
+    session.manualCorrectionStrokeId = session.rejectedStrokeId
+    const guide = ghostGuideFor(session.lesson, session.awaiting, session)
+    if (!guide) return
+    setGhostGuide({ sessionId: session.id, guide, visible: true })
+    clearGhostGuideTimers()
+    setCards((current) =>
+      current.map((card) => card.id === cardId ? { ...card, togetherCorrectionAvailable: false } : card)
+    )
+  }, [clearGhostGuideTimers, ghostGuideFor])
 
   useEffect(() => {
     if (pen.busy) return
@@ -4184,11 +4595,35 @@ export default function MathLayer({
     const next = strokes.find((stroke) => !session.baselineIds.has(stroke.id))
     if (!next) return
     session.baselineIds.add(next.id)
-    handleTogetherStudentStroke(next)
+    void handleTogetherStudentStroke(next)
   }, [handleTogetherStudentStroke, strokes])
 
-  const startDrawWithAdam = useCallback(async (lesson: TogetherLesson = selectedLesson) => {
+  useEffect(() => {
+    const pending = manualGraphCorrectionRef.current
+    if (!pending) return
+    const candidate = strokes.find((stroke) => !pending.baselineIds.has(stroke.id))
+    if (!candidate) return
+    pending.baselineIds.add(candidate.id)
+    if (!hasStrokeSlope(candidate, pending.direction) || !strokeFitsBox(candidate, pending.box)) return
+    if (pending.rejectedStrokeId) {
+      pushHistory()
+      const faded = strokesRef.current.map((stroke) =>
+        stroke.id === pending.rejectedStrokeId ? { ...stroke, opacity: 0.3 } : stroke
+      )
+      strokesRef.current = faded
+      setStrokes(faded)
+    }
+    pen.remove(pending.highlightIds)
+    graphHighlightOpIdsRef.current.delete(pending.graphKey)
+    manualGraphCorrectionRef.current = null
+    setFreehandGhostGuide(null)
+  }, [pen.remove, pushHistory, strokes])
+
+  const startDrawWithAdam = useCallback(
+    async (lesson: TogetherLesson = selectedLesson, worksheetItemId?: string) => {
     clearTutorPen()
+    clearGhostGuideTimers()
+    setGhostGuide(null)
     speakerRef.current?.cancel()
     hintSpeakerRef.current?.cancel()
     setHintSpeakingId(null)
@@ -4196,7 +4631,7 @@ export default function MathLayer({
     const phone = window.matchMedia('(max-width: 600px)').matches
     const box = placeTutorContent(360, 280, !phone)
     const id = uid()
-    togetherSessionRef.current = {
+      togetherSessionRef.current = {
       id,
       box,
       lesson,
@@ -4205,8 +4640,9 @@ export default function MathLayer({
       baselineIds: new Set(strokesRef.current.map((stroke) => stroke.id)),
       correctionOpIds: [],
       correctionBounds: [],
-      tutorLabels: [],
-    }
+        tutorLabels: [],
+        worksheetItemId,
+      }
     setTool('pen')
     setTogetherStep(1)
     setCards([
@@ -4214,7 +4650,7 @@ export default function MathLayer({
         id,
         anchor: { x: box.x + box.w + 24, y: box.y },
         boardBounds: { minX: box.x, minY: box.y, maxX: box.x + box.w, maxY: box.y + box.h },
-        text: lesson.steps[0].say,
+        text: [togetherLessonRationale(lessonContextRef.current), lesson.steps[0].say].filter(Boolean).join('\n\n'),
         status: 'done',
         history: [],
         followup: '',
@@ -4223,6 +4659,8 @@ export default function MathLayer({
         togetherStep: 1,
         togetherTitle: lesson.title,
         togetherTotal: lesson.steps.length,
+        togetherSpeakerOn: speakerOn,
+        worksheetPlan: worksheetPlanRef.current ?? undefined,
         level: 1,
         tracked: false,
         firedMarkers: 0,
@@ -4239,18 +4677,23 @@ export default function MathLayer({
       points: stroke.points,
       width: stroke.width,
     }))
-    runTogetherAdamStep(
+      runTogetherAdamStep(
       1,
-      tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes, getViewportFlowBounds())
+      tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes, getViewportFlowBounds()),
+      [togetherLessonRationale(lessonContextRef.current), lesson.steps[0].say].filter(Boolean).join('\n\n')
     )
-  }, [
-    clearTutorPen,
-    fitMobileLessonFrame,
-    getViewportFlowBounds,
-    placeTutorContent,
-    runTogetherAdamStep,
-    selectedLesson,
-  ])
+    },
+    [
+      clearGhostGuideTimers,
+      clearTutorPen,
+      fitMobileLessonFrame,
+      getViewportFlowBounds,
+      placeTutorContent,
+      runTogetherAdamStep,
+      speakerOn,
+      selectedLesson,
+    ]
+  )
 
   useEffect(() => {
     const onStartLesson = (event: Event) => {
@@ -4328,6 +4771,12 @@ export default function MathLayer({
         (c) => c.status === 'done' || c.status === 'streaming' || c.status === 'loading'
       )
       if (latest && (latest.mode === 'hint' || latest.mode === 'voice') && latest.status !== 'error') {
+        const suggestedLesson = matchTogetherLesson([lessonContextRef.current, trimmed].join('\n'))
+        setCards((current) =>
+          current.map((card) =>
+            card.id === latest.id ? { ...card, suggestedLesson: suggestedLesson ?? undefined } : card
+          )
+        )
         runClarifyHint(latest.id, trimmed)
         return
       }
@@ -4356,6 +4805,7 @@ export default function MathLayer({
           history: [],
           followup: '',
           mode: 'voice',
+          suggestedLesson: matchTogetherLesson([lessonContextRef.current, trimmed].join('\n')) ?? undefined,
           level: hintSize,
           maxLevel: hintSize,
           tracked: false,
@@ -4688,6 +5138,7 @@ export default function MathLayer({
     setSpeakerOn((on) => {
       if (on) {
         speakerRef.current?.cancel()
+        speakerRef.current = null
         hintSpeakerRef.current?.cancel()
         setHintSpeakingId(null)
         cancelSpeech()
@@ -4695,6 +5146,16 @@ export default function MathLayer({
       return !on
     })
   }, [])
+
+  useEffect(() => {
+    setCards((current) =>
+      current.map((card) =>
+        card.togetherMode
+          ? { ...card, togetherSpeakerOn: speakerOn, ...(speakerOn ? {} : { togetherWordIndex: -1 }) }
+          : card
+      )
+    )
+  }, [speakerOn])
 
   useEffect(() => cleanupVoice, [cleanupVoice]) // stop mic/speech on unmount
 
@@ -5088,12 +5549,14 @@ export default function MathLayer({
           {strokes.map((st) => (
             <path
               key={st.id}
+              className="math-student-ink"
               d={pointsToPath(st.points)}
               fill="none"
               stroke={st.color}
               strokeWidth={st.width}
               strokeLinecap="round"
               strokeLinejoin="round"
+              opacity={st.opacity ?? 1}
             />
           ))}
           {draft && (
@@ -5244,7 +5707,7 @@ export default function MathLayer({
                   : g.name
             const tip =
               g.status === 'mistake'
-                ? [g.explanation, g.fix, replayable ? 'Click to draw the correction again.' : ''].filter(Boolean).join(' ')
+                ? [g.explanation, g.fix, replayable ? 'Click to choose a correction.' : ''].filter(Boolean).join(' ')
                 : g.status === 'recognized' && g.checked
                   ? 'Checked: demand slopes down, supply slopes up, and the labels are on the right curves.'
                   : g.status === 'recognized'
@@ -5257,7 +5720,7 @@ export default function MathLayer({
                 title={tip}
                 onClick={
                   replayable
-                    ? () => pen.enqueue(graphCorrectionOps(g, line.strokeIds, strokesRef.current))
+                    ? () => setActiveGraphCorrectionKey((current) => current === graphKey ? null : graphKey)
                     : undefined
                 }
                 style={{ left: Math.max(4, tl.x - wrap.left), top: Math.max(4, tl.y - wrap.top - 30) }}
@@ -5318,8 +5781,93 @@ export default function MathLayer({
                 />
               )
             }
+            if (activeGraphCorrectionKey === graphKey && replayable) {
+              const rejected = wrongCurves[0]
+              const target = rejected
+                ? mirrorStrokeHorizontally(rejected as TogetherStroke)
+                : g.correction?.lines?.[0]?.pts ?? []
+              const direction =
+                target.length > 1 && target[target.length - 1].y > target[0].y ? 'down' : 'up'
+              const targetXs = target.map((point) => point.x)
+              const targetYs = target.map((point) => point.y)
+              out.push(
+                <div
+                  key={`gchoices-${graphKey}`}
+                  className="math-tutor-correction-actions math-graph-correction-actions"
+                  style={{ left: Math.max(8, tl.x - wrap.left), top: Math.max(38, tl.y - wrap.top + 2) }}
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const source = rejected && strokesRef.current.find((stroke) => stroke.id === rejected.id)
+                      if (wholeCurve && source && /\bslope|sloping\b/i.test(g.mistake ?? '')) {
+                        void morphStrokeToPoints(source, mirrorStrokeHorizontally(source), true).then(() => {
+                          pen.remove(graphHighlightOpIdsRef.current.get(graphKey) ?? [])
+                          graphHighlightOpIdsRef.current.delete(graphKey)
+                        })
+                      } else {
+                        pushHistory()
+                        pen.remove(graphHighlightOpIdsRef.current.get(graphKey) ?? [])
+                        pen.enqueue(correctionRedrawOps(g))
+                      }
+                      setActiveGraphCorrectionKey(null)
+                    }}
+                  >
+                    Fix it for me
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      manualGraphCorrectionRef.current = {
+                        graphKey,
+                        rejectedStrokeId: rejected?.id ?? null,
+                        baselineIds: new Set(strokesRef.current.map((stroke) => stroke.id)),
+                        direction,
+                        box: {
+                          x: Math.min(...targetXs),
+                          y: Math.min(...targetYs),
+                          w: Math.max(1, Math.max(...targetXs) - Math.min(...targetXs)),
+                          h: Math.max(1, Math.max(...targetYs) - Math.min(...targetYs)),
+                        },
+                        guide: target,
+                        highlightIds: graphHighlightOpIdsRef.current.get(graphKey) ?? [],
+                      }
+                      setFreehandGhostGuide(target)
+                      setActiveGraphCorrectionKey(null)
+                    }}
+                  >
+                    I&apos;ll fix it
+                  </button>
+                </div>
+              )
+            }
             return out
           })
+        })()}
+        {freehandGhostGuide && (() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          const points = freehandGhostGuide.map((point) => {
+            const screen = rf.flowToScreenPosition(point)
+            return { x: screen.x - wrap.left, y: screen.y - wrap.top }
+          })
+          return (
+            <svg
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}
+            >
+              <path
+                d={pointsToPath(points)}
+                fill="none"
+                stroke="#6256d9"
+                strokeWidth="3"
+                strokeDasharray="8 7"
+                strokeLinecap="round"
+                opacity="0.38"
+              />
+            </svg>
+          )
         })()}
       </div>
 
@@ -5376,6 +5924,55 @@ export default function MathLayer({
           })
         })()}
       </div>
+
+      {ghostGuide && ghostGuide.sessionId === togetherSessionRef.current?.id &&
+        (() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          const points = ghostGuide.guide.points.map((point) => {
+            const screen = rf.flowToScreenPosition(point)
+            return { x: screen.x - wrap.left, y: screen.y - wrap.top }
+          })
+          const first = points[0]
+          const path = points
+            .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+            .join(' ')
+          return (
+            <svg
+              data-html2canvas-ignore
+              aria-hidden="true"
+              className="math-ghost-guide-layer"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 45,
+                pointerEvents: 'none',
+              }}
+            >
+              <g
+                className="math-ghost-guide"
+                style={{ opacity: ghostGuide.visible ? 0.35 : 0 }}
+              >
+                {ghostGuide.guide.kind === 'point' ? (
+                  <>
+                    <circle className="math-ghost-guide-dot-halo" cx={first.x} cy={first.y} r="13" />
+                    <circle className="math-ghost-guide-dot" cx={first.x} cy={first.y} r="4" />
+                  </>
+                ) : (
+                  <path
+                    d={path}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeDasharray="8 7"
+                  />
+                )}
+              </g>
+            </svg>
+          )
+        })()}
 
       {pen.cursor?.visible &&
         (() => {
@@ -5521,6 +6118,45 @@ export default function MathLayer({
           const lesson = TOGETHER_LESSONS.find((item) => item.id === lessonId)
           if (lesson) void startDrawWithAdam(lesson)
         }}
+        onDrawWorksheetItem={(itemId) => {
+          const item = worksheetPlanRef.current?.items.find((candidate) => candidate.id === itemId)
+          const lesson = item?.lessonId
+            ? TOGETHER_LESSONS.find((candidate) => candidate.id === item.lessonId)
+            : undefined
+          if (!item || !lesson) return
+          lessonContextRef.current = item.text
+          setLessonContext(item.text)
+          setLessonOverrideId(lesson.id)
+          void startDrawWithAdam(lesson, item.id)
+        }}
+        onAskWorksheetItem={(itemId) => {
+          const item = worksheetPlanRef.current?.items.find((candidate) => candidate.id === itemId)
+          if (!item) return
+          lessonContextRef.current = item.text
+          setLessonContext(item.text)
+          void askVoiceTutor(item.text)
+        }}
+          onToggleTogetherSpeaker={toggleSpeaker}
+          onFixTogether={fixTogetherCorrection}
+          onTryTogether={letStudentFixTogether}
+        onNextWorksheetQuestion={() => {
+          const item = worksheetPlanRef.current?.items.find((candidate) => !candidate.completed)
+          if (!item) return
+          lessonContextRef.current = item.text
+          setLessonContext(item.text)
+          if (item.lessonId) {
+            const lesson = TOGETHER_LESSONS.find((candidate) => candidate.id === item.lessonId)
+            if (!lesson) return
+            setLessonOverrideId(lesson.id)
+            void startDrawWithAdam(lesson, item.id)
+          } else {
+            void askVoiceTutor(item.text)
+          }
+        }}
+        onAnotherLesson={() => {
+          endDrawWithAdam()
+          setLessonMenuOpen(true)
+        }}
       />
 
       {/* Dock preview — faint silhouette of where the bar will land */}
@@ -5651,7 +6287,7 @@ export default function MathLayer({
                 onClick={() => startDrawWithAdam()}
               >
                 <PenLine size={14} />
-                Draw with Adam
+                Draw {selectedLesson.title} with Adam
               </button>
               <button
                 type="button"

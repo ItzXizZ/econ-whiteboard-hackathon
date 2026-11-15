@@ -343,6 +343,81 @@ export function cancelSpeech() {
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel()
 }
 
+export interface WordSpeechHandle {
+  cancel: () => void
+}
+
+export function speakWithWordHighlights(
+  text: string,
+  onWord: (index: number) => void,
+  onSpeaking: (speaking: boolean) => void
+): WordSpeechHandle {
+  const clean = sanitizeForSpeech(text)
+  if (!clean || !preferredVoice || typeof speechSynthesis === 'undefined') {
+    onWord(-1)
+    onSpeaking(false)
+    return { cancel: () => {} }
+  }
+  speechSynthesis.cancel()
+  const utterance = new SpeechSynthesisUtterance(clean)
+  utterance.voice = preferredVoice
+  utterance.lang = preferredVoice.lang
+  utterance.rate = 1.02
+  utterance.pitch = 1
+  const words = clean.match(/\S+/g) ?? []
+  let cancelled = false
+  let boundarySeen = false
+  let fallbackTimer: ReturnType<typeof setTimeout> | null = null
+  let wordTimer: ReturnType<typeof setTimeout> | null = null
+  const clearTimers = () => {
+    if (fallbackTimer) clearTimeout(fallbackTimer)
+    if (wordTimer) clearTimeout(wordTimer)
+    fallbackTimer = null
+    wordTimer = null
+  }
+  utterance.onstart = () => onSpeaking(true)
+  utterance.onboundary = (event) => {
+    if (event.name && event.name !== 'word') return
+    boundarySeen = true
+    clearTimers()
+    const prefix = clean.slice(0, Math.max(0, event.charIndex)).trim()
+    const index = prefix ? prefix.split(/\s+/).length : 0
+    onWord(Math.min(words.length - 1, index))
+  }
+  const finish = () => {
+    clearTimers()
+    if (cancelled) return
+    onWord(-1)
+    onSpeaking(false)
+  }
+  utterance.onend = finish
+  utterance.onerror = finish
+  fallbackTimer = setTimeout(() => {
+    fallbackTimer = null
+    if (cancelled || boundarySeen || words.length === 0) return
+    let index = 0
+    const advance = () => {
+      if (cancelled || boundarySeen || index >= words.length) return
+      onWord(index)
+      const duration = Math.max(130, (words[index].length * 62 + 65) / utterance.rate)
+      index++
+      wordTimer = setTimeout(advance, duration)
+    }
+    advance()
+  }, 600)
+  speechSynthesis.speak(utterance)
+  return {
+    cancel: () => {
+      if (cancelled) return
+      cancelled = true
+      clearTimers()
+      speechSynthesis.cancel()
+      onWord(-1)
+      onSpeaking(false)
+    },
+  }
+}
+
 /**
  * Turn tutor text into clean spoken words: formulas become spoken English,
  * markdown and stray symbols are scrubbed.
