@@ -304,50 +304,81 @@ function TogetherRecapGraphThumbnail({ graph }: { graph?: TogetherRecapGraph }) 
 function WorksheetPlanChecklist({
   plan,
   nextItem,
+  collapsed = false,
   onDraw,
   onAsk,
 }: {
   plan: NonNullable<TutorSession['worksheetPlan']>
   nextItem?: string
+  collapsed?: boolean
   onDraw: (itemId: string) => void
   onAsk: (itemId: string) => void
 }) {
+  const [expanded, setExpanded] = useState(false)
+  useEffect(() => setExpanded(false), [nextItem])
+  const completedCount = plan.items.filter((item) => item.completed).length
+  const nextIndex = plan.items.findIndex((item) => item.text === nextItem)
+  const firstIncompleteIndex = plan.items.findIndex((item) => !item.completed)
+  const currentIndex =
+    nextIndex >= 0
+      ? nextIndex
+      : firstIncompleteIndex >= 0
+        ? firstIncompleteIndex
+        : Math.max(0, plan.items.length - 1)
+  const isCollapsed = collapsed && !expanded
   return (
-    <div className="math-worksheet-plan">
-      <strong>I found {plan.items.length} questions</strong>
-      {plan.items.map((item, index) => {
-        const excerpt = item.text.replace(/\s+/g, ' ').slice(0, 80)
-        return (
-          <div className="math-worksheet-plan-item" key={item.id}>
-            <span
-              className={`math-worksheet-plan-check${item.completed ? ' is-complete' : ''}`}
-              aria-label={item.completed ? 'Completed' : `Question ${index + 1}`}
-            >
-              {item.completed ? (
-                <svg className="math-worksheet-check-mark" viewBox="0 0 16 16" aria-hidden="true">
-                  <path pathLength="1" d="M2.5 8.5 6.1 12 13.5 4" />
-                </svg>
-              ) : (
-                index + 1
-              )}
-            </span>
-            <span className="math-worksheet-plan-text" title={item.text}>
-              {excerpt}{item.text.length > 80 ? '…' : ''}
-            </span>
-            <button
-              type="button"
-              className="math-worksheet-plan-action"
-              onClick={() => (item.lessonId ? onDraw(item.id) : onAsk(item.id))}
-            >
-              {item.lessonId ? 'Draw it with Adam' : 'Ask Adam'}
-            </button>
-          </div>
-        )
-      })}
-      {nextItem && (
-        <p className="math-worksheet-plan-next">
-          Next up: {nextItem.replace(/\s+/g, ' ').slice(0, 80)}
-        </p>
+    <div className={`math-worksheet-plan${isCollapsed ? ' is-collapsed' : ''}`}>
+      {collapsed && (
+        <button
+          type="button"
+          className="math-worksheet-plan-summary"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <span>
+            Question {currentIndex + 1} of {plan.items.length} · ✓ {completedCount} done
+          </span>
+          <span aria-hidden="true">{expanded ? '−' : '+'}</span>
+        </button>
+      )}
+      {!isCollapsed && (
+        <>
+          <strong>I found {plan.items.length} questions</strong>
+          {plan.items.map((item, index) => {
+            const excerpt = item.text.replace(/\s+/g, ' ').slice(0, 80)
+            return (
+              <div className="math-worksheet-plan-item" key={item.id}>
+                <span
+                  className={`math-worksheet-plan-check${item.completed ? ' is-complete' : ''}`}
+                  aria-label={item.completed ? 'Completed' : `Question ${index + 1}`}
+                >
+                  {item.completed ? (
+                    <svg className="math-worksheet-check-mark" viewBox="0 0 16 16" aria-hidden="true">
+                      <path pathLength="1" d="M2.5 8.5 6.1 12 13.5 4" />
+                    </svg>
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+                <span className="math-worksheet-plan-text" title={item.text}>
+                  {excerpt}{item.text.length > 80 ? '…' : ''}
+                </span>
+                <button
+                  type="button"
+                  className="math-worksheet-plan-action"
+                  onClick={() => (item.lessonId ? onDraw(item.id) : onAsk(item.id))}
+                >
+                  {item.lessonId ? 'Draw it with Adam' : 'Ask Adam'}
+                </button>
+              </div>
+            )
+          })}
+          {nextItem && (
+            <p className="math-worksheet-plan-next">
+              Next up: {nextItem.replace(/\s+/g, ' ').slice(0, 80)}
+            </p>
+          )}
+        </>
       )}
     </div>
   )
@@ -700,6 +731,7 @@ function CoachCard({
             <WorksheetPlanChecklist
               plan={session.worksheetPlan}
               nextItem={session.worksheetNextItem}
+              collapsed={session.togetherMode}
               onDraw={onDrawWorksheetItem}
               onAsk={onAskWorksheetItem}
             />
@@ -1078,10 +1110,16 @@ export function MathTutorScreenLayer({
         // so multiple open hint cards never stack on top of each other.
         const placedRects: ScreenRect[] = []
         return sessions.map((session, idx) => {
-        const cardW = BUBBLE_W + 96
-        const cardH = heights[session.id] ?? 300
-        const clampX = (v: number) => Math.max(10, Math.min(v, pane.width - cardW))
-        const clampY = (v: number) => Math.max(10, Math.min(v, Math.max(10, pane.height - cardH - 10)))
+        const margin = 12
+        const cardW = Math.min(BUBBLE_W + 96, Math.max(0, pane.width - margin * 2))
+        const cardH = Math.min(
+          heights[session.id] ?? 300,
+          Math.max(0, pane.height - margin * 2)
+        )
+        const clampX = (v: number) =>
+          Math.max(margin, Math.min(v, Math.max(margin, pane.width - cardW - margin)))
+        const clampY = (v: number) =>
+          Math.max(margin, Math.min(v, Math.max(margin, pane.height - cardH - margin)))
 
         // Dock beside the student's actual work — to its right, vertically
         // centered on it, in whatever open space is there; below it if the
@@ -1096,22 +1134,29 @@ export function MathTutorScreenLayer({
           const computed = (() => {
             if (inkUnionRect) {
               const spaceRight = pane.width - inkUnionRect.right - dockMargin
-              if (spaceRight >= cardW * 0.6) {
+              if (spaceRight >= cardW) {
                 return {
                   left: clampX(inkUnionRect.right + dockMargin),
                   top: clampY((inkUnionRect.top + inkUnionRect.bottom) / 2 - cardH / 2 + idx * 48),
                 }
               }
-              const spaceBelow = pane.height - inkUnionRect.bottom - dockMargin
-              if (spaceBelow >= cardH * 0.6) {
+              const spaceLeft = inkUnionRect.left - dockMargin
+              if (spaceLeft >= cardW) {
                 return {
-                  left: clampX(inkUnionRect.left),
-                  top: clampY(inkUnionRect.bottom + dockMargin + idx * 48),
+                  left: clampX(inkUnionRect.left - cardW - dockMargin),
+                  top: clampY((inkUnionRect.top + inkUnionRect.bottom) / 2 - cardH / 2 + idx * 48),
                 }
+              }
+              const inkCenterX = (inkUnionRect.left + inkUnionRect.right) / 2
+              return {
+                left: clampX(
+                  inkCenterX < pane.width / 2 ? pane.width - cardW - margin : margin
+                ),
+                top: clampY((inkUnionRect.top + inkUnionRect.bottom) / 2 - cardH / 2 + idx * 48),
               }
             }
             return {
-              left: clampX(pane.width - cardW - 16),
+              left: clampX(pane.width - cardW - margin),
               top: clampY(pane.height * 0.18 + idx * 48),
             }
           })()
@@ -1130,6 +1175,7 @@ export function MathTutorScreenLayer({
           cardWidth: cardW,
           cardHeight: cardH,
           obstacles: [...chrome, ...inkAndImageRects, ...placedRects],
+          margin,
           preferred,
         })
         let left = clampX(placement.left)
@@ -1222,7 +1268,15 @@ export function MathTutorScreenLayer({
             key={session.id}
             ref={(el) => measure(session.id, el)}
             className={`math-tutor-presence${session.successPulse ? ' is-success' : ''}`}
-            style={{ position: 'absolute', left, top, pointerEvents: 'none' }}
+            style={{
+              position: 'absolute',
+              left,
+              top,
+              width: cardW,
+              maxWidth: cardW,
+              boxSizing: 'border-box',
+              pointerEvents: 'none',
+            }}
           >
             <CoachCard
               session={session}

@@ -81,6 +81,7 @@ export interface MarketLesson {
   kind: 'market'
   id: string
   title: string
+  shortTitle: string
   recap: TogetherRecapCopy
   keywords: string[]
   yLabel: string
@@ -96,6 +97,7 @@ export interface PpfLesson {
   kind: 'ppf'
   id: 'ppf'
   title: string
+  shortTitle: string
   recap: TogetherRecapCopy
   yLabel: string
   xLabel: string
@@ -135,6 +137,7 @@ export const SUPPLY_DEMAND_LESSON: MarketLesson = {
   kind: 'market',
   id: 'supply-demand',
   title: 'Supply and demand',
+  shortTitle: 'Supply & demand',
   recap: {
     headline: 'You built a supply and demand market',
     takeaways: [
@@ -195,6 +198,7 @@ export const FX_LESSON: MarketLesson = {
   kind: 'market',
   id: 'fx',
   title: 'Market for dollars',
+  shortTitle: 'Currency',
   recap: {
     headline: 'You built the market for dollars',
     takeaways: [
@@ -245,6 +249,7 @@ export const LOANABLE_FUNDS_LESSON: MarketLesson = {
   kind: 'market',
   id: 'loanable-funds',
   title: 'Loanable funds',
+  shortTitle: 'Loanable funds',
   recap: {
     headline: 'You built the loanable funds market',
     takeaways: [
@@ -304,6 +309,7 @@ export const BONDS_LESSON: MarketLesson = {
   kind: 'market',
   id: 'bonds',
   title: 'Bond market',
+  shortTitle: 'Bonds',
   recap: {
     headline: 'You built the bond market',
     takeaways: [
@@ -357,6 +363,7 @@ export const PPF_LESSON: PpfLesson = {
   kind: 'ppf',
   id: 'ppf',
   title: 'Production possibilities frontier',
+  shortTitle: 'PPF',
   recap: {
     headline: 'You built a production possibilities frontier',
     takeaways: [
@@ -1105,22 +1112,45 @@ function marketGuideCurve(curve: MarketCurveConfig, box: TogetherBox): TogetherP
         { x: left + box.w * 0.38, y: top + box.h * 0.4 },
         { x: right - 12, y: bottom - 14 },
       ]
-    : [
+      : [
         { x: left + 12, y: bottom - 14 },
         { x: left + box.w * 0.38, y: top + box.h * 0.6 },
         { x: right - 12, y: top + 14 },
       ]
 }
 
+function smoothGuideCurve(points: TogetherPoint[]): TogetherPoint[] {
+  return beautifyStroke(points, 'curve')
+}
+
 function ppfGuideCurve(box: TogetherBox, growth: boolean): TogetherPoint[] {
   const { left, top, right, bottom } = axesFor(box)
-  return [
-    { x: left + 3, y: top + 8 },
-    { x: left + box.w * 0.22, y: top + box.h * (growth ? 0.08 : 0.16) },
-    { x: left + box.w * 0.48, y: top + box.h * (growth ? 0.025 : 0.19) },
-    { x: left + box.w * 0.73, y: top + box.h * (growth ? 0.13 : 0.43) },
-    { x: right - 10, y: bottom - 2 },
-  ]
+  const start = { x: left + 3, y: top + 8 }
+  const control1 = {
+    x: left + box.w * (growth ? 0.22 : 0.28),
+    y: top + box.h * (growth ? 0.02 : 0.06),
+  }
+  const control2 = {
+    x: left + box.w * (growth ? 0.74 : 0.78),
+    y: top + box.h * (growth ? 0.3 : 0.5),
+  }
+  const end = { x: right - 10, y: bottom - 2 }
+  return Array.from({ length: 48 }, (_, index) => {
+    const t = index / 47
+    const inverse = 1 - t
+    return {
+      x:
+        inverse ** 3 * start.x +
+        3 * inverse ** 2 * t * control1.x +
+        3 * inverse * t ** 2 * control2.x +
+        t ** 3 * end.x,
+      y:
+        inverse ** 3 * start.y +
+        3 * inverse ** 2 * t * control1.y +
+        3 * inverse * t ** 2 * control2.y +
+        t ** 3 * end.y,
+    }
+  })
 }
 
 function yOnPolyline(points: TogetherPoint[], x: number): number {
@@ -1144,7 +1174,7 @@ export function ghostGuideFor(
   if (lesson.kind === 'market') {
     if (need === 'first' || need === 'second') {
       const curve = need === 'first' ? lesson.first : lesson.second
-      return { kind: 'curve', points: marketGuideCurve(curve, box) }
+      return { kind: 'curve', points: smoothGuideCurve(marketGuideCurve(curve, box)) }
     }
     if (need === 'shift') {
       const shift = lesson.shift
@@ -1154,13 +1184,19 @@ export function ghostGuideFor(
         box
       )
       const dx = box.w * 0.11 * (shift.dir === 'right' ? 1 : -1)
-      return { kind: 'curve', points: base.map((point) => ({ x: point.x + dx, y: point.y })) }
+      return {
+        kind: 'curve',
+        points: smoothGuideCurve(base.map((point) => ({ x: point.x + dx, y: point.y }))),
+      }
     }
     return null
   }
 
   if (need === 'ppf-frontier' || need === 'ppf-growth') {
-    return { kind: 'curve', points: ppfGuideCurve(box, need === 'ppf-growth') }
+    return {
+      kind: 'curve',
+      points: smoothGuideCurve(ppfGuideCurve(box, need === 'ppf-growth')),
+    }
   }
 
   if ((need === 'inside-point' || need === 'outside-point') && session.frontier) {

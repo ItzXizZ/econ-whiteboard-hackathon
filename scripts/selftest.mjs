@@ -382,6 +382,10 @@ check('draw-together finds polyline intersections', () => {
 })
 
 check('draw-together lesson configs and problem picker cover all five graph types', () => {
+  assert.deepEqual(
+    TOGETHER_LESSONS.map((lesson) => lesson.shortTitle),
+    ['Supply & demand', 'Currency', 'Loanable funds', 'Bonds', 'PPF']
+  )
   assert.equal(TOGETHER_LESSONS.length, 5)
   assert.deepEqual(
     TOGETHER_LESSONS.filter((lesson) => lesson.kind === 'market').map((lesson) => lesson.id),
@@ -639,12 +643,15 @@ check('draw-together ghost guides satisfy each market and PPF step validator', (
   for (const lesson of TOGETHER_LESSONS.filter((item) => item.kind === 'market')) {
     const first = { points: ghostGuideFor(lesson, 'first', { box }).points }
     const second = { points: ghostGuideFor(lesson, 'second', { box }).points }
+    assert.equal(first.points.length, 48, `${lesson.id} first guide is smooth`)
+    assert.equal(second.points.length, 48, `${lesson.id} second guide is smooth`)
     assert.equal(isValidCurveStroke(first, box, lesson.first.slope), true, lesson.id)
     assert.equal(isValidCurveStroke(second, box, lesson.second.slope), true, lesson.id)
     const base = lesson.shift.curve === 'first' ? first : second
     const shifted = {
       points: ghostGuideFor(lesson, 'shift', { box, first, second }).points,
     }
+    assert.equal(shifted.points.length, 48, `${lesson.id} shift guide is smooth`)
     const curve = lesson.shift.curve === 'first' ? lesson.first : lesson.second
     assert.equal(isValidCurveStroke(shifted, box, curve.slope), true, lesson.id)
     assert.equal(isCurveShifted(base, shifted, lesson.shift.dir, box), true, lesson.id)
@@ -653,6 +660,8 @@ check('draw-together ghost guides satisfy each market and PPF step validator', (
   const ppf = TOGETHER_LESSONS.find((item) => item.kind === 'ppf')
   const frontier = { points: ghostGuideFor(ppf, 'ppf-frontier', { box }).points }
   const growth = { points: ghostGuideFor(ppf, 'ppf-growth', { box, frontier }).points }
+  assert.equal(frontier.points.length, 48)
+  assert.equal(growth.points.length, 48)
   assert.equal(isPpfCurve(frontier, box), true)
   assert.equal(isPpfCurve(growth, box), true)
   assert.equal(isPpfGrowth(frontier, growth, box), true)

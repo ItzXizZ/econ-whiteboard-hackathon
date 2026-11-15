@@ -8276,6 +8276,8 @@ kbd {
 .math-coach {
   display: flex;
   align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
   gap: 10px;
   pointer-events: none;
 }
@@ -8288,8 +8290,12 @@ kbd {
 
 .math-coach-bubble {
   position: relative;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
   pointer-events: auto;
-  min-width: 250px;
+  min-width: 0;
+  max-width: 400px;
   max-height: min(480px, 62vh);
   display: flex;
   flex-direction: column;
@@ -10890,11 +10896,12 @@ kbd {
 
   .math-tutor-presence {
     top: auto !important;
-    right: 8px !important;
+    right: 12px !important;
     bottom: calc(96px + env(safe-area-inset-bottom)) !important;
-    left: 8px !important;
+    left: 12px !important;
     width: auto !important;
     max-height: 48vh;
+    box-sizing: border-box;
     overflow: auto;
     z-index: 78;
     pointer-events: auto !important;
@@ -11386,6 +11393,44 @@ kbd {
   background: rgba(250, 249, 245, 0.82);
   color: #292a32;
   font-size: 13px;
+}
+
+.math-worksheet-plan.is-collapsed {
+  display: block;
+  margin: 8px 0 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.math-worksheet-plan-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 1px solid #e8e6dc;
+  border-radius: 12px;
+  background: rgba(250, 249, 245, 0.88);
+  color: #55545a;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.math-worksheet-plan-summary > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.math-worksheet-plan-summary:focus-visible {
+  outline: 2px solid #8174c9;
+  outline-offset: 2px;
 }
 
 .math-worksheet-plan-item {

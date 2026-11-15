@@ -3865,7 +3865,7 @@ export default function MathLayer({
           ? {
               ...card,
               togetherStep: step,
-              togetherTitle: session?.id === id ? session.lesson.title : card.togetherTitle,
+              togetherTitle: session?.id === id ? session.lesson.shortTitle : card.togetherTitle,
               togetherTotal:
                 session?.id === id ? session.lesson.steps.length : card.togetherTotal,
               text,
@@ -4657,10 +4657,13 @@ export default function MathLayer({
         mode: 'together',
         togetherMode: true,
         togetherStep: 1,
-        togetherTitle: lesson.title,
+        togetherTitle: lesson.shortTitle,
         togetherTotal: lesson.steps.length,
         togetherSpeakerOn: speakerOn,
         worksheetPlan: worksheetPlanRef.current ?? undefined,
+        worksheetNextItem:
+          worksheetPlanRef.current?.items.find((item) => item.id === worksheetItemId)?.text ??
+          worksheetPlanRef.current?.items.find((item) => !item.completed)?.text,
         level: 1,
         tracked: false,
         firedMarkers: 0,
@@ -6282,12 +6285,12 @@ export default function MathLayer({
               <button
                 type="button"
                 className="btn-ghost math-draw-together-btn"
-                title={`Draw ${selectedLesson.title} with Adam`}
+                title={`Draw ${selectedLesson.shortTitle} with Adam`}
                 aria-pressed={togetherStep !== null}
                 onClick={() => startDrawWithAdam()}
               >
                 <PenLine size={14} />
-                Draw {selectedLesson.title} with Adam
+                Draw {selectedLesson.shortTitle} with Adam
               </button>
               <button
                 type="button"
@@ -6310,7 +6313,7 @@ export default function MathLayer({
                       setLessonMenuOpen(false)
                     }}
                   >
-                    Automatic · {detectedLesson.title}
+                    Automatic · {detectedLesson.shortTitle}
                   </button>
                   {TOGETHER_LESSONS.map((lesson) => (
                     <button
@@ -6323,7 +6326,7 @@ export default function MathLayer({
                         setLessonMenuOpen(false)
                       }}
                     >
-                      {lesson.title}
+                      {lesson.shortTitle}
                     </button>
                   ))}
                 </div>
