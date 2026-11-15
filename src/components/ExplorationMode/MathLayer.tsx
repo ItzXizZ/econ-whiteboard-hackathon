@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { EdgeLabelRenderer, useReactFlow, useViewport } from 'reactflow'
 import {
+  AlertTriangle,
   Check,
+  ChevronDown,
+  LineChart,
   Loader2,
+  PenLine,
   Mic,
   MicOff,
   Volume2,
@@ -10,6 +14,27 @@ import {
 } from 'lucide-react'
 import { useStore } from '../../store/useStore'
 import { streamMathHint, type HintTurn } from '../../lib/mathHint'
+import type { TutorGraphSpec } from '../../lib/mathHint'
+import { circleOps, correctionOps, specToPenOps, type PenOp } from '../../lib/tutorPen'
+import { useTutorPen } from '../../lib/useTutorPen'
+import {
+  isCurveShifted,
+  isPointRelativeToCurve,
+  isPpfCurve,
+  isPpfGrowth,
+  isValidCurveStroke,
+  nearestPolylineApproach,
+  pickTogetherLesson,
+  polylineIntersection,
+  placeLabelAwayFromStrokes,
+  ppfBulgePoint,
+  shiftedEquilibriumLabel,
+  strokeFitsBox,
+  TOGETHER_LESSONS,
+  type TogetherLesson,
+  type TogetherBox,
+  type TogetherStroke,
+} from '../../lib/drawTogether'
 import {
   ladderTypeForLevel,
   isHintTypeId,
@@ -19,6 +44,8 @@ import {
 import {
   createRecognizer,
   speechRecognitionSupported,
+  speechRecognitionEngine,
+  probeSTT,
   probeTTS,
   IncrementalSpeaker,
   cancelSpeech,
@@ -26,6 +53,7 @@ import {
 } from '../../lib/voiceTutor'
 import { loadMathBoard, saveMathBoard, clearMathBoard } from '../../lib/mathBoardStorage'
 import {
+  carryGraphVerdicts,
   recognizeInk,
   RecognitionUnavailableError,
   type InkModel,
@@ -53,6 +81,195 @@ import MathGuidedSpotlight, {
 
 type Tool = 'off' | 'pen' | 'eraser' | 'highlight'
 
+function equationToBoardText(tex: string): string {
+  return tex
+    .replace(/\\;\\Rightarrow\\;/g, ' ⇒ ')
+    .replace(/\\;/g, ' ')
+    .replace(/\\,/g, ' ')
+    .replace(/\\ /g, ' ')
+    .replace(/Q_d/g, 'Qd')
+    .replace(/Q_s/g, 'Qs')
+    .replace(/P_b/g, 'Pb')
+    .replace(/P_s/g, 'Ps')
+    .replace(/Q_t/g, 'Qt')
+    .replace(/\^\*/g, '*')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+let togetherOpId = 0
+
+function tutorPenStroke(
+  points: { x: number; y: number }[],
+  color: string,
+  width: number,
+  dashed = false
+): PenOp {
+  return {
+    kind: 'stroke',
+    stroke: {
+      id: `together-${togetherOpId++}`,
+      points,
+      color,
+      width,
+      ...(dashed ? { dashed: true } : {}),
+    },
+  }
+}
+
+function tutorPenLabel(
+  x: number,
+  y: number,
+  text: string,
+  color = '#2563eb',
+  size = 16
+): PenOp {
+  return {
+    kind: 'label',
+    label: { id: `together-${togetherOpId++}`, x, y, text, color, size },
+  }
+}
+
+function tutorStrokeBounds(stroke: Stroke): BoardBounds | null {
+  if (stroke.points.length === 0) return null
+  const first = stroke.points[0]
+  return stroke.points.reduce<BoardBounds>(
+    (bounds, point) => ({
+      minX: Math.min(bounds.minX, point.x),
+      minY: Math.min(bounds.minY, point.y),
+      maxX: Math.max(bounds.maxX, point.x),
+      maxY: Math.max(bounds.maxY, point.y),
+    }),
+    { minX: first.x, minY: first.y, maxX: first.x, maxY: first.y }
+  )
+}
+
+function recognitionOverrideKey(strokeIds: string[]): string {
+  return [...strokeIds].sort().join(',')
+}
+
+function overlapsTogetherBox(bounds: BoardBounds, box: TogetherBox): boolean {
+  return bounds.minX <= box.x + box.w && bounds.maxX >= box.x && bounds.minY <= box.y + box.h && bounds.maxY >= box.y
+}
+
+function tutorLabelOp(
+  preferred: { x: number; y: number },
+  text: string,
+  obstacles: TogetherStroke[],
+  color = '#2563eb',
+  size = 16
+): PenOp {
+  const position = placeLabelAwayFromStrokes(preferred, text, obstacles, size)
+  return tutorPenLabel(position.x, position.y, text, color, size)
+}
+
+function tutorLabelObstacle(label: { text: string; x: number; y: number; size: number }): TogetherStroke {
+  const width = label.text.length * label.size * 0.65
+  const top = label.y - label.size
+  const bottom = label.y + label.size * 0.25
+  return {
+    points: [
+      { x: label.x, y: top },
+      { x: label.x + width, y: top },
+      { x: label.x + width, y: bottom },
+      { x: label.x, y: bottom },
+      { x: label.x, y: top },
+    ],
+  }
+}
+
+function tutorAxesOps(
+  box: TogetherBox,
+  yLabel = 'P',
+  xLabel = 'Q',
+  obstacles: TogetherStroke[] = []
+): PenOp[] {
+  const left = box.x + 42
+  const top = box.y + 22
+  const right = box.x + box.w - 14
+  const bottom = box.y + box.h - 26
+  const axes: TogetherStroke = {
+    points: [{ x: left, y: top }, { x: left, y: bottom }, { x: right, y: bottom }],
+    width: 3,
+  }
+  const labelObstacles = [...obstacles, axes]
+  const yLabelWidth = yLabel.length * 15 * 0.65
+  return [
+    tutorPenStroke(axes.points, '#334155', 3),
+    tutorLabelOp({ x: left - yLabelWidth - 10, y: top + 5 }, yLabel, labelObstacles, '#334155', 15),
+    tutorLabelOp({ x: right + 4, y: bottom + 20 }, xLabel, labelObstacles, '#334155', 15),
+  ]
+}
+
+function tutorCurveLabel(
+  stroke: Stroke,
+  text: string,
+  obstacles: TogetherStroke[],
+  anchor?: { x: number; y: number }
+): PenOp {
+  const point = anchor ?? stroke.points.reduce((right, current) => (current.x > right.x ? current : right))
+  return tutorLabelOp({ x: point.x + 8, y: point.y + 4 }, text, obstacles)
+}
+
+function tutorEquilibriumOps(
+  box: TogetherBox,
+  point: { x: number; y: number },
+  priceLabel: string,
+  quantityLabel: string,
+  quantityOffset = -8,
+  obstacles: TogetherStroke[] = []
+): PenOp[] {
+  const left = box.x + 42
+  const bottom = box.y + box.h - 26
+  const guides: TogetherStroke[] = [
+    { points: [{ ...point }, { x: point.x, y: bottom }], width: 2 },
+    { points: [{ ...point }, { x: left, y: point.y }], width: 2 },
+  ]
+  const dot = Array.from({ length: 13 }, (_, i) => {
+    const angle = (i / 12) * Math.PI * 2
+    return { x: point.x + Math.cos(angle) * 4, y: point.y + Math.sin(angle) * 4 }
+  })
+  const labelObstacles = [...obstacles, ...guides, { points: dot, width: 2 }]
+  return [
+    tutorPenStroke(guides[0].points, '#64748b', 2, true),
+    tutorPenStroke(guides[1].points, '#64748b', 2, true),
+    tutorPenStroke(dot, '#0f172a', 2),
+    tutorLabelOp({ x: left - 31, y: point.y + 4 }, priceLabel, labelObstacles, '#475569', 13),
+    tutorLabelOp(
+      { x: point.x + quantityOffset, y: bottom + 19 },
+      quantityLabel,
+      labelObstacles,
+      '#475569',
+      13
+    ),
+  ]
+}
+
+function tutorArrowOps(
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+): PenOp[] {
+  const angle = Math.atan2(to.y - from.y, to.x - from.x)
+  const headLength = 18
+  const wing = 0.6
+  const base = {
+    x: to.x - Math.cos(angle) * headLength,
+    y: to.y - Math.sin(angle) * headLength,
+  }
+  return [
+    tutorPenStroke([from, to], '#7c3aed', 3.5),
+    tutorPenStroke(
+      [
+        { x: base.x + Math.cos(angle + wing) * headLength, y: base.y + Math.sin(angle + wing) * headLength },
+        to,
+        { x: base.x + Math.cos(angle - wing) * headLength, y: base.y + Math.sin(angle - wing) * headLength },
+      ],
+      '#7c3aed',
+      3.5
+    ),
+  ]
+}
+
 /** A single ink point. `t` (epoch ms) and `p` (pointer pressure 0–1) feed the
  * handwriting recognizer; both are optional so boards saved before they were
  * captured still load. */
@@ -70,6 +287,36 @@ interface Stroke {
   /** Width in flow units (so it scales with zoom, like ink on paper). */
   width: number
   points: InkPoint[]
+}
+
+type TogetherNeed =
+  | 'first'
+  | 'second'
+  | 'shift'
+  | 'ppf-frontier'
+  | 'inside-point'
+  | 'outside-point'
+  | 'ppf-growth'
+
+interface TogetherSession {
+  id: string
+  box: TogetherBox
+  lesson: TogetherLesson
+  step: number
+  awaiting: TogetherNeed | null
+  baselineIds: Set<string>
+  correctionOpIds: string[]
+  correctionBounds: BoardBounds[]
+  tutorLabels: Array<{ id: string; text: string; x: number; y: number; color: string; size: number }>
+  first?: Stroke
+  second?: Stroke
+  shifted?: Stroke
+  frontier?: Stroke
+  insidePoint?: Stroke
+  outsidePoint?: Stroke
+  growth?: Stroke
+  completed?: boolean
+  equilibrium?: { x: number; y: number }
 }
 
 /** A pasted / uploaded image placed on the board, in flow coordinates. */
@@ -123,7 +370,11 @@ interface HintCard {
   error?: string
   history: HintTurn[]
   followup: string
-  mode: 'hint' | 'solve' | 'generalize' | 'voice'
+  mode: 'hint' | 'solve' | 'generalize' | 'voice' | 'together'
+  togetherMode?: boolean
+  togetherStep?: number
+  togetherTitle?: string
+  togetherTotal?: number
   level: number
   hintType?: HintTypeId
   tracked: boolean
@@ -154,7 +405,10 @@ interface HintCard {
     question: string
     answer: string
     status: 'loading' | 'streaming' | 'done'
+    graph?: TutorGraphSpec
   }>
+  /** A graph the tutor drew for this reply. */
+  graph?: TutorGraphSpec
   /** Each STEP field parsed from this hint — only `steps[steps.length - 1]` may carry a write marker. */
   steps: string[]
   /** How many of `steps` are currently revealed into `text` (gated behind a check-in response). */
@@ -312,6 +566,7 @@ function speakStepAloud(speaker: IncrementalSpeaker | null, text: string) {
 }
 
 const PEN_COLORS = ['#1e293b', '#2563eb', '#dc2626', '#059669', '#d97706', '#0d9488']
+const QUICK_PEN_COLORS = ['#111111', '#2563eb', '#dc2626', '#16a34a']
 const PEN_SIZES = [2.5, 4, 7]
 const CAPTURE_BG = '#d7d7d7'
 /** How long a student can stall (no drawing) before the tutor offers help. */
@@ -595,8 +850,25 @@ export default function MathLayer({
   useEffect(() => void (adventuresRef.current = adventures), [adventures])
 
   const overlayRef = useRef<HTMLDivElement | null>(null)
+  const spaceMoveRef = useRef(false)
+  const panGestureRef = useRef<{
+    pointerId: number
+    startX: number
+    startY: number
+    viewport: { x: number; y: number; zoom: number }
+  } | null>(null)
+  const touchPointersRef = useRef(new Map<number, { x: number; y: number }>())
+  const touchGestureRef = useRef<{
+    pointerIds: [number, number]
+    startDistance: number
+    startZoom: number
+    flowAnchor: { x: number; y: number }
+  } | null>(null)
+  const touchSuppressedRef = useRef(false)
 
   const [tool, setTool] = useState<Tool>('pen')
+  const [spaceMove, setSpaceMove] = useState(false)
+  const [isPanning, setIsPanning] = useState(false)
   const [color, setColor] = useState(PEN_COLORS[0])
   const [size, setSize] = useState(PEN_SIZES[1])
   const [strokes, setStrokes] = useState<Stroke[]>([])
@@ -609,6 +881,36 @@ export default function MathLayer({
   const [hintSize, setHintSize] = useState<1 | 2 | 4>(2)
   const [sel, setSel] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
   const [prompt, setPrompt] = useState('')
+  const [lessonContext, setLessonContext] = useState('')
+  const pen = useTutorPen()
+  const togetherSessionRef = useRef<TogetherSession | null>(null)
+  const pendingTogetherRef = useRef<(() => void) | null>(null)
+  const exitTogetherRef = useRef<() => void>(() => {})
+  const [togetherStep, setTogetherStep] = useState<number | null>(null)
+  const [lessonOverrideId, setLessonOverrideId] = useState<string | null>(null)
+  const [lessonMenuOpen, setLessonMenuOpen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false)
+  const [hubOffline, setHubOffline] = useState(false)
+  const [localServices, setLocalServices] = useState({
+    bonsai: false,
+    argmax: false,
+    graphChecker: false,
+  })
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+  const statusPopoverRef = useRef<HTMLDivElement>(null)
+  const tutorPenBoundsRef = useRef<BoardBounds[]>([])
+  const equationDrawnCardIdsRef = useRef(new Set<string>())
+  const drawnGraphKeysRef = useRef(new Set<string>())
+  const [drawnGraphKeys, setDrawnGraphKeys] = useState<ReadonlySet<string>>(new Set())
+  const clearTutorPen = useCallback(() => {
+    exitTogetherRef.current()
+    pen.clear()
+    tutorPenBoundsRef.current = []
+    equationDrawnCardIdsRef.current.clear()
+    drawnGraphKeysRef.current.clear()
+    setDrawnGraphKeys(new Set())
+  }, [pen.clear])
 
   // ── Live handwriting recognition (local Bonsai vision, via the API server) ──
   // Debounced off every stroke mutation (draw, erase, undo, clear). The result
@@ -618,7 +920,31 @@ export default function MathLayer({
   // every line has been read (finished lines are cached server-side).
   const [inkModel, setInkModel] = useState<InkModel>({ lines: [] })
   const inkModelRef = useRef(inkModel)
+  const detectedLesson = pickTogetherLesson(
+    [
+      lessonContext,
+      prompt,
+      ...inkModel.lines.filter((line) => !line.graph).map((line) => line.latex),
+    ].join('\n')
+  )
+  const selectedLesson =
+    (lessonOverrideId
+      ? TOGETHER_LESSONS.find((lesson) => lesson.id === lessonOverrideId)
+      : undefined) ?? detectedLesson
   useEffect(() => void (inkModelRef.current = inkModel), [inkModel])
+  const [recognitionOverrides, setRecognitionOverrides] = useState<Record<string, string>>({})
+  const recognitionOverridesRef = useRef(recognitionOverrides)
+  useEffect(() => void (recognitionOverridesRef.current = recognitionOverrides), [recognitionOverrides])
+  const [editingRecognitionKey, setEditingRecognitionKey] = useState<string | null>(null)
+  const [editingRecognitionText, setEditingRecognitionText] = useState('')
+  const saveRecognitionOverride = useCallback((key: string, text: string) => {
+    const next = { ...recognitionOverridesRef.current }
+    if (text.trim()) next[key] = text.trim()
+    else delete next[key]
+    recognitionOverridesRef.current = next
+    setRecognitionOverrides(next)
+    setEditingRecognitionKey(null)
+  }, [])
   const [glowStrokeIds, setGlowStrokeIds] = useState<ReadonlySet<string>>(new Set())
   const recognitionOffRef = useRef(false) // set when the server has no recognizer
   const recognitionSeqRef = useRef(0)
@@ -638,7 +964,7 @@ export default function MathLayer({
       void recognizeInk(strokes.map((s) => ({ id: s.id, points: s.points })))
         .then((model) => {
           if (recognitionSeqRef.current !== seq) return
-          setInkModel(model)
+          setInkModel((prev) => carryGraphVerdicts(prev, model))
           // Some lines are still unread (model busy with a hint, or starting up).
           if (model.pending && attempts < 12) timer = setTimeout(run, 4000)
         })
@@ -654,6 +980,22 @@ export default function MathLayer({
       if (timer) clearTimeout(timer)
     }
   }, [strokes])
+
+  useEffect(() => {
+    const lessonBox = togetherSessionRef.current?.box
+    for (const line of inkModel.lines) {
+      if (lessonBox && overlapsTogetherBox(line.bounds, lessonBox)) continue
+      const graph = line.graph
+      if (!graph || graph.status !== 'mistake') continue
+      const key = `${[...line.strokeIds].sort().join(',')}|${graph.mistake ?? ''}`
+      if (drawnGraphKeysRef.current.has(key)) continue
+      const ops = correctionOps(graph)
+      if (ops.length === 0) continue
+      drawnGraphKeysRef.current.add(key)
+      setDrawnGraphKeys(new Set(drawnGraphKeysRef.current))
+      pen.enqueue(ops)
+    }
+  }, [inkModel.lines, pen.enqueue, togetherStep])
 
   /**
    * Glow the strokes behind the given recognized line numbers. Stays lit
@@ -671,12 +1013,219 @@ export default function MathLayer({
     setGlowStrokeIds(ids)
   }, [])
 
+  const rememberTutorPenBounds = useCallback((ops: PenOp[]) => {
+    let bounds: BoardBounds | null = null
+    const add = (r: BoardBounds) => {
+      bounds = bounds ? unionBounds(bounds, r) : r
+    }
+    for (const op of ops) {
+      if (op.kind === 'stroke') {
+        for (const point of op.stroke.points) {
+          const pad = op.stroke.width / 2
+          add({ minX: point.x - pad, minY: point.y - pad, maxX: point.x + pad, maxY: point.y + pad })
+        }
+      } else {
+        add({
+          minX: op.label.x,
+          minY: op.label.y - op.label.size,
+          maxX: op.label.x + op.label.text.length * op.label.size * 0.65,
+          maxY: op.label.y,
+        })
+      }
+    }
+    if (bounds) tutorPenBoundsRef.current.push(bounds)
+    return bounds
+  }, [])
+
+  const placeTutorContent = useCallback(
+    (w: number, h: number, fitViewport = true) => {
+      let content: BoardBounds | null = null
+      const add = (r: BoardBounds) => {
+        content = content ? unionBounds(content, r) : r
+      }
+      for (const stroke of strokesRef.current) {
+        const pad = stroke.width / 2
+        for (const point of stroke.points) {
+          add({
+            minX: point.x - pad,
+            minY: point.y - pad,
+            maxX: point.x + pad,
+            maxY: point.y + pad,
+          })
+        }
+      }
+      for (const image of imagesRef.current) {
+        add({ minX: image.x, minY: image.y, maxX: image.x + image.w, maxY: image.y + image.h })
+      }
+      for (const drawing of tutorPenBoundsRef.current) add(drawing)
+      const pane = overlayRef.current?.getBoundingClientRect()
+      if (pane) {
+        for (const chip of document.querySelectorAll<HTMLElement>('.math-ocr-read-chip')) {
+          const rect = chip.getBoundingClientRect()
+          const topLeft = rf.screenToFlowPosition({ x: rect.left, y: rect.top })
+          const bottomRight = rf.screenToFlowPosition({ x: rect.right, y: rect.bottom })
+          add({
+            minX: topLeft.x,
+            minY: topLeft.y,
+            maxX: bottomRight.x,
+            maxY: bottomRight.y,
+          })
+        }
+      }
+
+      const contentBounds = content as BoardBounds | null
+      let x: number
+      let y: number
+      if (contentBounds) {
+        x = contentBounds.maxX + 160
+        y = contentBounds.minY
+      } else if (pane) {
+        const center = rf.screenToFlowPosition({ x: pane.left + pane.width / 2, y: pane.top + pane.height / 2 })
+        x = center.x - w / 2
+        y = center.y - h / 2
+      } else {
+        x = 0
+        y = 0
+      }
+
+      if (pane && fitViewport) {
+        const tl = rf.flowToScreenPosition({ x, y })
+        const br = rf.flowToScreenPosition({ x: x + w, y: y + h })
+        const visible =
+          tl.x >= pane.left + 8 && tl.y >= pane.top + 96 && br.x <= pane.right - 8 && br.y <= pane.bottom - 70
+        if (!window.matchMedia('(max-width: 600px)').matches) {
+          const viewport = rf.getViewport()
+          const frameCenter = rf.flowToScreenPosition({ x: x + w / 2, y: y + h / 2 })
+          const targetCenter = { x: pane.left + pane.width * 0.36, y: pane.top + pane.height * 0.46 }
+          void rf.setViewport(
+            {
+              x: viewport.x + targetCenter.x - frameCenter.x,
+              y: viewport.y + targetCenter.y - frameCenter.y,
+              zoom: viewport.zoom,
+            },
+            { duration: 450 }
+          )
+        } else if (!visible) {
+          const minX = Math.min(contentBounds?.minX ?? x, x)
+          const minY = Math.min(contentBounds?.minY ?? y, y)
+          const maxX = x + w
+          const maxY = Math.max(contentBounds?.maxY ?? y + h, y + h)
+          rf.fitBounds(
+            { x: minX - 40, y: minY - 150, width: maxX - minX + 80, height: maxY - minY + 260 },
+            { duration: 450 }
+          )
+        }
+      }
+      return { x, y, w, h }
+    },
+    [rf]
+  )
+
+  const fitMobileLessonFrame = useCallback(
+    async (box: TogetherBox, lesson: TogetherLesson) => {
+      if (!window.matchMedia('(max-width: 600px)').matches) return
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+      const pane = overlayRef.current?.getBoundingClientRect()
+      if (!pane) return
+      const rect = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector)
+        return element && getComputedStyle(element).display !== 'none'
+          ? element.getBoundingClientRect()
+          : null
+      }
+      const toolbar = toolbarRef.current?.getBoundingClientRect()
+      const tutorCard = rect('.math-tutor-presence')
+      const top = Math.max(
+        pane.top,
+        rect('.econ-float')?.bottom ?? pane.top,
+        rect('.math-local-status')?.bottom ?? pane.top,
+        rect('.math-hub-offline')?.bottom ?? pane.top
+      ) + 12
+      const bottom = Math.min(
+        pane.bottom,
+        toolbar?.top ?? pane.bottom - 96,
+        tutorCard?.top ?? pane.bottom - 230
+      ) - 12
+      const yLabelWidth = lesson.yLabel.length * 15 * 0.65
+      const xLabelWidth = lesson.xLabel.length * 15 * 0.65
+      const bounds = {
+        minX: box.x - yLabelWidth - 12,
+        maxX: box.x + box.w + xLabelWidth + 16,
+        minY: box.y - 16,
+        maxY: box.y + box.h + 36,
+      }
+      const contentWidth = bounds.maxX - bounds.minX
+      const contentHeight = bounds.maxY - bounds.minY
+      const availableWidth = Math.max(120, pane.width - 24)
+      const availableHeight = Math.max(120, bottom - top)
+      const zoom = Math.max(
+        0.35,
+        Math.min(
+          1.1,
+          availableWidth / contentWidth,
+          availableHeight / contentHeight
+        )
+      )
+      const center = { x: (bounds.minX + bounds.maxX) / 2, y: (bounds.minY + bounds.maxY) / 2 }
+      const centerX = pane.left + pane.width / 2
+      const centerY = (top + bottom) / 2
+      return rf.setViewport(
+        {
+          x: centerX - pane.left - center.x * zoom,
+          y: centerY - pane.top - center.y * zoom,
+          zoom,
+        },
+        { duration: 220 }
+      )
+    },
+    [rf]
+  )
+
+  const drawOnBoard = useCallback(
+    (spec: TutorGraphSpec) => {
+      const box = placeTutorContent(380, 320)
+      const ops = specToPenOps(spec, box)
+      rememberTutorPenBounds(ops)
+      pen.enqueue(ops)
+    },
+    [pen.enqueue, placeTutorContent, rememberTutorPenBounds]
+  )
+
+  const writeEquationsOnBoard = useCallback(
+    (cardId: string, equations: string[]) => {
+      if (equationDrawnCardIdsRef.current.has(cardId)) return
+      const lines = equations.map(equationToBoardText).filter(Boolean)
+      if (lines.length === 0) return
+      const width = Math.max(380, Math.min(900, Math.max(...lines.map((line) => line.length * 10 + 24))))
+      const box = placeTutorContent(width, lines.length * 30 + 20)
+      const id = uid()
+      const ops: PenOp[] = lines.map((text, index) => ({
+        kind: 'label',
+        label: {
+          id: `${id}-equation-${index}`,
+          x: box.x,
+          y: box.y + 24 + index * 30,
+          text,
+          color: '#2563eb',
+          size: 18,
+        },
+      }))
+      equationDrawnCardIdsRef.current.add(cardId)
+      rememberTutorPenBounds(ops)
+      pen.enqueue(ops)
+    },
+    [pen.enqueue, placeTutorContent, rememberTutorPenBounds]
+  )
+
   /** Numbered LaTeX transcript for the hint request (lines the recognizer could label). */
   const recognizedLinesPayload = useCallback(
     () =>
       inkModelRef.current.lines
         .filter((l) => !!l.latex)
-        .map((l) => ({ n: l.n, latex: l.latex as string })),
+        .map((l) => ({
+          n: l.n,
+          latex: recognitionOverridesRef.current[recognitionOverrideKey(l.strokeIds)] ?? (l.latex as string),
+        })),
     []
   )
 
@@ -685,6 +1234,85 @@ export default function MathLayer({
   const speakerRef = useRef<IncrementalSpeaker | null>(null)
   const [hintSpeakingId, setHintSpeakingId] = useState<string | null>(null)
   const [speakerOn, setSpeakerOn] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    const refreshServices = async () => {
+      try {
+        const response = await fetch('/api/health', { cache: 'no-store' })
+        if (!response.ok) throw new Error('Hub health check failed')
+        const health = (await response.json()) as {
+          bonsai?: { reachable?: boolean }
+          graphChecker?: { state?: string }
+          stt?: string | { ready?: boolean; reachable?: boolean }
+        }
+        let argmax = health.stt === 'argmax' || health.stt === 'ready' || health.stt === 'on'
+        try {
+          const voiceResponse = await fetch('/api/econ/voice/status', { cache: 'no-store' })
+          if (voiceResponse.ok) {
+            const voice = (await voiceResponse.json()) as {
+              stt?: string
+              ready?: boolean
+              reachable?: boolean
+            }
+            argmax =
+              argmax ||
+              voice.ready === true ||
+              voice.reachable === true ||
+              voice.stt === 'argmax' ||
+              voice.stt === 'ready' ||
+              voice.stt === 'on'
+          }
+        } catch {
+          // The health endpoint still indicates whether the rest of the hub is available.
+        }
+        if (!active) return
+        setHubOffline(false)
+        setLocalServices({
+          bonsai: health.bonsai?.reachable === true,
+          argmax,
+          graphChecker: health.graphChecker?.state === 'ready',
+        })
+      } catch {
+        if (!active) return
+        setHubOffline(true)
+        setLocalServices({ bonsai: false, argmax: false, graphChecker: false })
+      }
+    }
+    void refreshServices()
+    const timer = window.setInterval(() => void refreshServices(), 15000)
+    const onOffline = () => {
+      setHubOffline(true)
+      setLocalServices({ bonsai: false, argmax: false, graphChecker: false })
+    }
+    const onOnline = () => void refreshServices()
+    window.addEventListener('offline', onOffline)
+    window.addEventListener('online', onOnline)
+    return () => {
+      active = false
+      window.clearInterval(timer)
+      window.removeEventListener('offline', onOffline)
+      window.removeEventListener('online', onOnline)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!moreMenuOpen) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!moreMenuRef.current?.contains(event.target as Node)) setMoreMenuOpen(false)
+    }
+    window.addEventListener('pointerdown', closeOutside)
+    return () => window.removeEventListener('pointerdown', closeOutside)
+  }, [moreMenuOpen])
+
+  useEffect(() => {
+    if (!statusPopoverOpen) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!statusPopoverRef.current?.contains(event.target as Node)) setStatusPopoverOpen(false)
+    }
+    window.addEventListener('pointerdown', closeOutside)
+    return () => window.removeEventListener('pointerdown', closeOutside)
+  }, [statusPopoverOpen])
 
   // Wait for the workspace store to hydrate before touching board storage —
   // pre-hydration the app runs with a throwaway default adventure id, and
@@ -704,6 +1332,8 @@ export default function MathLayer({
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const promptRef = useRef(prompt)
   useEffect(() => void (promptRef.current = prompt), [prompt])
+  const lessonContextRef = useRef(lessonContext)
+  useEffect(() => void (lessonContextRef.current = lessonContext), [lessonContext])
 
   const flushBoardPersist = useCallback((adventureOverride?: string) => {
     const id = adventureOverride ?? boardAdventureRef.current
@@ -711,13 +1341,26 @@ export default function MathLayer({
     const strokes = strokesRef.current
     const images = imagesRef.current
     const promptValue = promptRef.current
+    const savedLessonContext = lessonContextRef.current
+    const savedRecognitionOverrides = recognitionOverridesRef.current
     // StrictMode / remount races can flush empty refs right after restore and
     // upload that empty snapshot to the cloud — wiping real work on refresh.
     // Skip empty flushes when storage still has ink (intentional Clear ink
     // calls clearMathBoard first, so this guard won't block a real clear).
-    if (strokes.length === 0 && images.length === 0 && !promptValue?.trim()) {
+    if (
+      strokes.length === 0 &&
+      images.length === 0 &&
+      !promptValue?.trim() &&
+      !savedLessonContext?.trim()
+    ) {
       const existing = loadMathBoard(id, [], { adoptOrphans: false })
-      if (existing && (existing.strokes.length > 0 || existing.images.length > 0 || existing.prompt)) {
+      if (
+        existing &&
+        (existing.strokes.length > 0 ||
+          existing.images.length > 0 ||
+          existing.prompt ||
+          existing.lessonContext)
+      ) {
         return
       }
     }
@@ -725,6 +1368,8 @@ export default function MathLayer({
       strokes,
       images,
       prompt: promptValue,
+      lessonContext: savedLessonContext,
+      recognitionOverrides: savedRecognitionOverrides,
     })
   }, [])
 
@@ -732,6 +1377,7 @@ export default function MathLayer({
   useEffect(() => {
     const boardReady = competition || storeHydrated
     if (!adventureId || !boardReady) return
+    clearTutorPen()
     boardHydratedRef.current = false
     boardAdventureRef.current = adventureId
 
@@ -744,12 +1390,16 @@ export default function MathLayer({
       setStrokes(snap.strokes)
       setImages(snap.images)
       setPrompt(snap.prompt ?? '')
+      setLessonContext(snap.lessonContext ?? snap.prompt ?? '')
+      setRecognitionOverrides(snap.recognitionOverrides ?? {})
+      recognitionOverridesRef.current = snap.recognitionOverrides ?? {}
       // Sync the persist refs NOW, not on next render — otherwise an immediate
       // unmount (StrictMode remount, fast adventure switch, dev reload) flushes
       // the stale empty refs back over the snapshot we just loaded = data loss.
       strokesRef.current = snap.strokes
       imagesRef.current = snap.images
       promptRef.current = snap.prompt ?? ''
+      lessonContextRef.current = snap.lessonContext ?? snap.prompt ?? ''
       setSelectedImageId(null)
       setCards([])
       setDraft(null)
@@ -764,9 +1414,13 @@ export default function MathLayer({
       setStrokes([])
       setImages([])
       setPrompt('')
+      setLessonContext('')
+      setRecognitionOverrides({})
+      recognitionOverridesRef.current = {}
       strokesRef.current = []
       imagesRef.current = []
       promptRef.current = ''
+      lessonContextRef.current = ''
       setSelectedImageId(null)
       setCards([])
       setDraft(null)
@@ -789,7 +1443,7 @@ export default function MathLayer({
       flushBoardPersist(adventureId)
       boardHydratedRef.current = false
     }
-  }, [adventureId, storeHydrated, competition, flushBoardPersist])
+  }, [adventureId, storeHydrated, competition, flushBoardPersist, clearTutorPen])
 
   useEffect(() => {
     if (!adventureId || !boardHydratedRef.current) return
@@ -800,7 +1454,7 @@ export default function MathLayer({
     return () => {
       if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
     }
-  }, [adventureId, strokes, images, prompt, flushBoardPersist])
+  }, [adventureId, strokes, images, prompt, lessonContext, recognitionOverrides, flushBoardPersist])
 
   useEffect(() => {
     const onUnload = () => flushBoardPersist()
@@ -843,7 +1497,13 @@ export default function MathLayer({
   }, [markProblemSet])
 
   // Tell the host the moment there's any drawing/content so the empty state can hide.
-  const hasContent = strokes.length > 0 || images.length > 0 || cards.length > 0 || !!draft
+  const hasContent =
+    strokes.length > 0 ||
+    images.length > 0 ||
+    pen.strokes.length > 0 ||
+    pen.labels.length > 0 ||
+    cards.length > 0 ||
+    !!draft
   useEffect(() => {
     onHasContentChange?.(hasContent)
   }, [hasContent, onHasContentChange])
@@ -916,6 +1576,15 @@ export default function MathLayer({
       const t = e.target as HTMLElement | null
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return
 
+      if (e.code === 'Space') {
+        e.preventDefault()
+        if (!spaceMoveRef.current) {
+          spaceMoveRef.current = true
+          setSpaceMove(true)
+        }
+        return
+      }
+
       if (e.key === 'Escape') {
         setSelectedImageId(null)
         return
@@ -940,11 +1609,63 @@ export default function MathLayer({
         redo()
       }
     }
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code !== 'Space') return
+      spaceMoveRef.current = false
+      setSpaceMove(false)
+    }
+    const onBlur = () => {
+      spaceMoveRef.current = false
+      setSpaceMove(false)
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', onBlur)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', onBlur)
+    }
   }, [undo, redo, selectedImageId, pushHistory])
 
   const paneRect = () => overlayRef.current?.getBoundingClientRect() ?? null
+
+  useEffect(() => {
+    const overlay = overlayRef.current
+    if (!overlay) return
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const viewport = rf.getViewport()
+      const rect = overlay.getBoundingClientRect()
+      const multiplier = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? rect.height : 1
+      const dx = e.deltaX * multiplier
+      const dy = e.deltaY * multiplier
+      if (e.ctrlKey) {
+        const point = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+        const nextZoom = Math.max(0.15, Math.min(2, viewport.zoom * Math.exp(-dy * 0.0015)))
+        const flowPoint = {
+          x: (point.x - viewport.x) / viewport.zoom,
+          y: (point.y - viewport.y) / viewport.zoom,
+        }
+        void rf.setViewport(
+          {
+            x: point.x - flowPoint.x * nextZoom,
+            y: point.y - flowPoint.y * nextZoom,
+            zoom: nextZoom,
+          },
+          { duration: 0 }
+        )
+      } else {
+        void rf.setViewport(
+          { x: viewport.x - dx, y: viewport.y - dy, zoom: viewport.zoom },
+          { duration: 0 }
+        )
+      }
+    }
+    overlay.addEventListener('wheel', handleWheel, { passive: false })
+    return () => overlay.removeEventListener('wheel', handleWheel)
+  }, [rf])
 
   // Fixed UI chrome the hint card must never cover: the top toolbar, the
   // bottom mic/voice bar, and React Flow's own zoom controls + minimap.
@@ -957,6 +1678,23 @@ export default function MathLayer({
   const [toolbarDragging, setToolbarDragging] = useState(false)
   const [toolbarSnapping, setToolbarSnapping] = useState(false)
   const [toolbarSnapDock, setToolbarSnapDock] = useState<ToolbarDock | null>(null)
+  const [showGestureHint, setShowGestureHint] = useState(() => {
+    try {
+      return typeof window !== 'undefined' && window.localStorage.getItem('econcoach-board-gesture-hint-v1') !== '1'
+    } catch {
+      return false
+    }
+  })
+  useEffect(() => {
+    if (!showGestureHint) return
+    try {
+      window.localStorage.setItem('econcoach-board-gesture-hint-v1', '1')
+    } catch {
+      /* local storage may be unavailable */
+    }
+    const timer = window.setTimeout(() => setShowGestureHint(false), 9000)
+    return () => window.clearTimeout(timer)
+  }, [showGestureHint])
   // Freeze side/top layout for the whole drag so the bar doesn't reshape
   // under the cursor the moment you grab it.
   const [toolbarDragVertical, setToolbarDragVertical] = useState(false)
@@ -1118,6 +1856,10 @@ export default function MathLayer({
       const flowRoot = overlayRef.current?.closest('.react-flow')
       add(flowRoot?.querySelector('.react-flow__controls') ?? null)
       add(flowRoot?.querySelector('.react-flow__minimap') ?? null)
+      // The app's own corner controls (logo + board picker, Saved pill + avatar):
+      // tutor cards must not land on top of them either.
+      add(document.querySelector('.econ-float-left'))
+      add(document.querySelector('.econ-float-right'))
       setChromeRects(rects)
     }
     update()
@@ -1132,6 +1874,63 @@ export default function MathLayer({
 
   // ── Pointer handling ──
   const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'touch') {
+      const touchPointers = touchPointersRef.current
+      touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (touchPointers.size >= 2) {
+        e.preventDefault()
+        e.stopPropagation()
+        try {
+          ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+        } catch {
+          /* some browsers do not expose pointer capture for touch */
+        }
+        if (!touchGestureRef.current) {
+          const pointerIds = [...touchPointers.keys()].slice(0, 2) as [number, number]
+          const first = touchPointers.get(pointerIds[0])!
+          const second = touchPointers.get(pointerIds[1])!
+          const midX = (first.x + second.x) / 2
+          const midY = (first.y + second.y) / 2
+          const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y))
+          touchGestureRef.current = {
+            pointerIds,
+            startDistance: distance,
+            startZoom: rf.getViewport().zoom,
+            flowAnchor: rf.screenToFlowPosition({ x: midX, y: midY }),
+          }
+        }
+        touchSuppressedRef.current = true
+        if (drawing.current && toolRef.current === 'pen') {
+          if (past.current.length > 0) past.current.pop()
+          setHistTick((tick) => tick + 1)
+        }
+        drawing.current = false
+        draftRef.current = null
+        setDraft(null)
+        selStart.current = null
+        selRef.current = null
+        setSel(null)
+        setIsPanning(true)
+        return
+      }
+    }
+    if (e.button === 1 || (e.button === 0 && spaceMoveRef.current)) {
+      e.preventDefault()
+      e.stopPropagation()
+      try {
+        ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      } catch {
+        /* some pointer sources do not expose capture */
+      }
+      panGestureRef.current = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        viewport: rf.getViewport(),
+      }
+      setIsPanning(true)
+      return
+    }
     if (e.button !== 0) return
     const t = toolRef.current
     if (t === 'off') return
@@ -1170,6 +1969,42 @@ export default function MathLayer({
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
+    if (e.pointerType === 'touch' && touchPointersRef.current.has(e.pointerId)) {
+      touchPointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      const gesture = touchGestureRef.current
+      if (gesture) {
+        const first = touchPointersRef.current.get(gesture.pointerIds[0])
+        const second = touchPointersRef.current.get(gesture.pointerIds[1])
+        const pane = paneRect()
+        if (!first || !second || !pane) return
+        const midX = (first.x + second.x) / 2 - pane.left
+        const midY = (first.y + second.y) / 2 - pane.top
+        const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y))
+        const nextZoom = Math.max(0.35, Math.min(2.5, gesture.startZoom * (distance / gesture.startDistance)))
+        void rf.setViewport(
+          {
+            x: midX - gesture.flowAnchor.x * nextZoom,
+            y: midY - gesture.flowAnchor.y * nextZoom,
+            zoom: nextZoom,
+          },
+          { duration: 0 }
+        )
+        return
+      }
+      if (touchSuppressedRef.current) return
+    }
+    const pan = panGestureRef.current
+    if (pan?.pointerId === e.pointerId) {
+      void rf.setViewport(
+        {
+          x: pan.viewport.x + e.clientX - pan.startX,
+          y: pan.viewport.y + e.clientY - pan.startY,
+          zoom: pan.viewport.zoom,
+        },
+        { duration: 0 }
+      )
+      return
+    }
     const t = toolRef.current
     if (t === 'highlight') {
       if (!selStart.current) return
@@ -1201,7 +2036,33 @@ export default function MathLayer({
     setDraft((d) => (d ? { ...d, points: [...d.points, pt] } : d))
   }
 
-  const onPointerUp = () => {
+  const onPointerUp = (e?: React.PointerEvent) => {
+    if (e && (e.type === 'pointerup' || e.type === 'pointercancel') && e.pointerType === 'touch') {
+      const wasSuppressed = touchSuppressedRef.current
+      touchPointersRef.current.delete(e.pointerId)
+      if (touchGestureRef.current && touchPointersRef.current.size < 2) {
+        touchGestureRef.current = null
+        setIsPanning(false)
+      }
+      if (wasSuppressed) {
+        if (touchPointersRef.current.size === 0) touchSuppressedRef.current = false
+        return
+      }
+      if (e.type === 'pointercancel' && drawing.current && toolRef.current === 'pen') {
+        if (past.current.length > 0) past.current.pop()
+        setHistTick((tick) => tick + 1)
+        draftRef.current = null
+        setDraft(null)
+        drawing.current = false
+        return
+      }
+    }
+    const pan = panGestureRef.current
+    if (pan && (!e || pan.pointerId === e.pointerId)) {
+      panGestureRef.current = null
+      setIsPanning(false)
+      return
+    }
     const t = toolRef.current
     if (t === 'highlight') {
       const rect = selRef.current
@@ -1641,6 +2502,7 @@ export default function MathLayer({
                 ...c,
                 status: 'loading',
                 text: '',
+                equations: undefined,
                 error: undefined,
                 mode: opts.mode,
                 level: opts.level,
@@ -1708,11 +2570,16 @@ export default function MathLayer({
           gridImage,
           problemImages: problemImages(),
           recognizedLines: recognizedLinesPayload(),
+          boardEmpty: strokesRef.current.length === 0 && imagesRef.current.length === 0,
           prompt: opts.prompt,
           history: opts.history,
           hintLevel: opts.level,
           mode: opts.mode,
           apiKey,
+          onEquations: (equations) => {
+            setCards((cs) => cs.map((c) => (c.id === cardId ? { ...c, equations } : c)))
+            writeEquationsOnBoard(cardId, equations)
+          },
         },
         (chunk) => {
           acc += chunk
@@ -1895,7 +2762,7 @@ export default function MathLayer({
         (hl) => highlightRecognizedLines(hl.lines)
       )
     },
-    [apiKey, ttsOK, gridCapture, problemImages, fitAllWork, recognizedLinesPayload, highlightRecognizedLines, panToWriteBox]
+    [apiKey, ttsOK, gridCapture, problemImages, fitAllWork, recognizedLinesPayload, highlightRecognizedLines, panToWriteBox, writeEquationsOnBoard]
   )
 
   const createHintFromRect = useCallback(
@@ -1909,8 +2776,8 @@ export default function MathLayer({
 
       if (phaseRef.current === 'awaiting_problem') markProblemSet()
 
-      setCards((cs) => [
-        ...cs,
+      setCards(() => [
+        // One Adam at a time: a new card replaces any that are open, so they never stack or cover each other.
         {
           id,
           anchor,
@@ -1985,8 +2852,8 @@ export default function MathLayer({
       const userPrompt =
         prompt.trim() ||
         `Re-read my latest work. Give a ${ladderTypeForLevel(level)} hint for my very next move from the equations I already wrote — not a new approach.`
-      setCards((cs) => [
-        ...cs,
+      setCards(() => [
+        // One Adam at a time: a new card replaces any that are open, so they never stack or cover each other.
         {
           id,
           anchor,
@@ -2043,8 +2910,8 @@ export default function MathLayer({
         prompt.trim() ||
         `Read my work first: what strategy have I started and what step am I on? Then give ONE ${ladderTypeForLevel(level)} hint for my very next move from the equations I already wrote — not a shortcut from a different approach.`
       if (phaseRef.current === 'awaiting_problem') markProblemSet()
-      setCards((cs) => [
-        ...cs,
+      setCards(() => [
+        // One Adam at a time: a new card replaces any that are open, so they never stack or cover each other.
         {
           id,
           anchor,
@@ -2106,8 +2973,8 @@ export default function MathLayer({
       x: wrapRect.left + wrapRect.width * 0.5,
       y: wrapRect.top + wrapRect.height * 0.3,
     })
-    setCards((cs) => [
-      ...cs,
+    setCards(() => [
+      // One Adam at a time: a new card replaces any that are open, so they never stack or cover each other.
       {
         id,
         anchor,
@@ -2441,11 +3308,16 @@ export default function MathLayer({
             regionImage: cap.region,
             boardImage: cap.boardImage,
             problemImages: problemImages(),
+            boardEmpty: strokesRef.current.length === 0 && imagesRef.current.length === 0,
             prompt: `REEXPLAIN STEP: the student is confused by this part of your last hint: "${confusingStep}". Re-explain ONLY this one idea a different way, still just ONE short step. Do NOT include a write box marker.`,
             history: card.history,
             hintLevel: card.level,
             mode: 'hint',
             apiKey,
+            onEquations: (equations) => {
+              setCards((cs) => cs.map((c) => (c.id === cardId ? { ...c, equations } : c)))
+              writeEquationsOnBoard(cardId, equations)
+            },
           },
           (chunk) => {
             acc += chunk
@@ -2505,7 +3377,7 @@ export default function MathLayer({
         )
       })()
     },
-    [apiKey, problemImages, refreshCardCapture, ttsOK, highlightRecognizedLines]
+    [apiKey, problemImages, refreshCardCapture, ttsOK, highlightRecognizedLines, writeEquationsOnBoard]
   )
 
   const runClarifyHint = useCallback(
@@ -2516,7 +3388,7 @@ export default function MathLayer({
       // at call time — so two concurrent streams interleave into one audio
       // queue, and the voice reads a scramble of both answers while each
       // bubble's own text stays correct. One clarify/voice turn at a time.
-      if (voiceBusyRef.current) return
+      // A new question interrupts the reply in progress (see streamMathHint) instead of being dropped.
       const card = cardsRef.current.find((c) => c.id === cardId)
       if (!card || !question.trim()) {
         return
@@ -2575,11 +3447,17 @@ export default function MathLayer({
             gridImage,
             problemImages: problemImages(),
             recognizedLines: recognizedLinesPayload(),
+            boardEmpty: strokesRef.current.length === 0 && imagesRef.current.length === 0,
             prompt: `Clarifying question about your last hint: ${question.trim()}`,
             history: card.history,
             hintLevel: card.level,
             mode: 'clarify',
             apiKey,
+            onGraph: drawOnBoard,
+            onEquations: (equations) => {
+              setCards((cs) => cs.map((c) => (c.id === cardId ? { ...c, equations } : c)))
+              writeEquationsOnBoard(cardId, equations)
+            },
           },
           (chunk) => {
             acc += chunk
@@ -2647,10 +3525,470 @@ export default function MathLayer({
         )
       })()
     },
-    [apiKey, gridCapture, problemImages, refreshCardCapture, ttsOK, recognizedLinesPayload, highlightRecognizedLines]
+    [apiKey, drawOnBoard, gridCapture, problemImages, refreshCardCapture, ttsOK, recognizedLinesPayload, highlightRecognizedLines, writeEquationsOnBoard]
   )
 
+  const speakTogetherStep = useCallback(
+    (id: string, text: string) => {
+      if (!speakerOn || !ttsOK) return
+      speakerRef.current?.cancel()
+      const speaker = new IncrementalSpeaker((talking) =>
+        setHintSpeakingId(talking ? id : null)
+      )
+      speakerRef.current = speaker
+      speaker.pushSentence(text)
+    },
+    [speakerOn, ttsOK]
+  )
+
+  const updateTogetherCard = useCallback((id: string, step: number, text: string) => {
+    setTogetherStep(step)
+    const session = togetherSessionRef.current
+    setCards((current) =>
+      current.map((card) =>
+        card.id === id
+          ? {
+              ...card,
+              togetherStep: step,
+              togetherTitle: session?.id === id ? session.lesson.title : card.togetherTitle,
+              togetherTotal:
+                session?.id === id ? session.lesson.steps.length : card.togetherTotal,
+              text,
+              status: 'done',
+            }
+          : card
+      )
+    )
+  }, [])
+
+  const endDrawWithAdam = useCallback(() => {
+    const session = togetherSessionRef.current
+    if (!session) return
+    togetherSessionRef.current = null
+    pendingTogetherRef.current = null
+    setTogetherStep(null)
+    setLessonMenuOpen(false)
+    setCards((current) => current.filter((card) => card.id !== session.id))
+    speakerRef.current?.cancel()
+    speakerRef.current = null
+    setHintSpeakingId(null)
+  }, [])
+
+  useEffect(() => {
+    exitTogetherRef.current = endDrawWithAdam
+  }, [endDrawWithAdam])
+
+  const getTogetherObstacles = useCallback(
+    (extra: Stroke[] = [], includeLabels = true): TogetherStroke[] => {
+      const labels = includeLabels ? togetherSessionRef.current?.tutorLabels ?? [] : []
+      return [
+        ...strokesRef.current.map((stroke) => ({ points: stroke.points, width: stroke.width })),
+        ...pen.strokes.map((stroke) => ({ points: stroke.points, width: stroke.width })),
+        ...extra.map((stroke) => ({ points: stroke.points, width: stroke.width })),
+        ...labels.map(tutorLabelObstacle),
+      ]
+    },
+    [pen.strokes]
+  )
+
+  const reflowTogetherLabels = useCallback(
+    (session: TogetherSession, extra: Stroke[] = []) => {
+      const ink = getTogetherObstacles(extra, false)
+      for (const label of session.tutorLabels) {
+        const labelObstacles = session.tutorLabels
+          .filter((other) => other.id !== label.id)
+          .map(tutorLabelObstacle)
+        const position = placeLabelAwayFromStrokes(
+          { x: label.x, y: label.y },
+          label.text,
+          [...ink, ...labelObstacles],
+          label.size
+        )
+        if (position.x === label.x && position.y === label.y) continue
+        pen.remove([label.id])
+        const op: PenOp = {
+          kind: 'label',
+          label: {
+            id: label.id,
+            x: position.x,
+            y: position.y,
+            text: label.text,
+            color: label.color,
+            size: label.size,
+          },
+        }
+        label.id = pen.enqueue([op])[0]
+        label.x = position.x
+        label.y = position.y
+        rememberTutorPenBounds([op])
+      }
+    },
+    [getTogetherObstacles, pen.enqueue, pen.remove, rememberTutorPenBounds]
+  )
+
+  const runTogetherOps = useCallback(
+    (ops: PenOp[], after: () => void): { ids: string[]; bounds: BoardBounds | null } => {
+      if (ops.length === 0) {
+        after()
+        return { ids: [], bounds: null }
+      }
+      const bounds = rememberTutorPenBounds(ops)
+      pendingTogetherRef.current = after
+      const ids = pen.enqueue(ops)
+      const session = togetherSessionRef.current
+      if (session) {
+        ops.forEach((op, index) => {
+          if (op.kind !== 'label') return
+          session.tutorLabels.push({
+            id: ids[index],
+            text: op.label.text,
+            x: op.label.x,
+            y: op.label.y,
+            color: op.label.color,
+            size: op.label.size,
+          })
+        })
+      }
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ) {
+        pendingTogetherRef.current = null
+        after()
+      }
+      return { ids, bounds }
+    },
+    [pen.enqueue, rememberTutorPenBounds]
+  )
+
+  const clearTogetherCorrectionInk = useCallback(
+    (session: TogetherSession) => {
+      if (session.correctionOpIds.length) pen.remove(session.correctionOpIds)
+      const removedBounds = new Set(session.correctionBounds)
+      tutorPenBoundsRef.current = tutorPenBoundsRef.current.filter((bounds) => !removedBounds.has(bounds))
+      session.correctionOpIds = []
+      session.correctionBounds = []
+    },
+    [pen.remove]
+  )
+
+  const beginTogetherStudentTurn = useCallback(
+    (step: number) => {
+      const session = togetherSessionRef.current
+      const lessonStep = session?.lesson.steps[step - 1]
+      if (!session || !lessonStep || lessonStep.who !== 'student') return
+      const need: TogetherNeed | null =
+        lessonStep.action === 'first'
+          ? 'first'
+          : lessonStep.action === 'second'
+            ? 'second'
+            : lessonStep.action === 'shift'
+              ? 'shift'
+              : lessonStep.action === 'ppf-frontier'
+                ? 'ppf-frontier'
+                : lessonStep.action === 'inside-point'
+                  ? 'inside-point'
+                  : lessonStep.action === 'outside-point'
+                    ? 'outside-point'
+                    : lessonStep.action === 'ppf-growth'
+                      ? 'ppf-growth'
+                      : null
+      if (!need) return
+      session.step = step
+      session.awaiting = need
+      session.baselineIds = new Set(strokesRef.current.map((stroke) => stroke.id))
+      updateTogetherCard(session.id, step, lessonStep.say)
+    },
+    [updateTogetherCard]
+  )
+
+  const runTogetherAdamStep = useCallback(
+    (step: number, ops: PenOp[], sayOverride?: string) => {
+      const session = togetherSessionRef.current
+      const lessonStep = session?.lesson.steps[step - 1]
+      if (!session || !lessonStep) return
+      const say = sayOverride ?? lessonStep.say
+      session.step = step
+      session.awaiting = null
+      session.completed = false
+      updateTogetherCard(session.id, step, say)
+      runTogetherOps(ops, () => {
+        if (togetherSessionRef.current !== session) return
+        speakTogetherStep(session.id, say)
+        if (step >= session.lesson.steps.length) {
+          session.completed = true
+          pen.hideCursor()
+          return
+        }
+        if (session.lesson.steps[step]?.who === 'student') beginTogetherStudentTurn(step + 1)
+      })
+    },
+    [beginTogetherStudentTurn, pen.hideCursor, runTogetherOps, speakTogetherStep, updateTogetherCard]
+  )
+
+  const handleTogetherStudentStroke = useCallback(
+    (stroke: Stroke) => {
+      const session = togetherSessionRef.current
+      const need = session?.awaiting
+      if (!session || !need) return
+      session.awaiting = null
+      reflowTogetherLabels(session, [stroke])
+      const step = session.step
+      let feedback = ''
+      if (session.lesson.kind === 'market') {
+        const curve =
+          need === 'first'
+            ? session.lesson.first
+            : need === 'second'
+              ? session.lesson.second
+              : need === 'shift'
+                ? session.lesson.shift.curve === 'first'
+                  ? session.lesson.first
+                  : session.lesson.second
+                : null
+        if (curve && !strokeFitsBox(stroke, session.box)) {
+          feedback = 'Keep the curve mostly inside the graph and make it span at least a third of the width.'
+        } else if (curve && !isValidCurveStroke(stroke, session.box, curve.slope)) {
+          feedback = curve.wrongMsg
+        } else if (need === 'shift') {
+          const original =
+            session.lesson.shift.curve === 'first' ? session.first : session.second
+          if (
+            original &&
+            !isCurveShifted(original, stroke, session.lesson.shift.dir, session.box)
+          ) {
+            feedback = session.lesson.shift.wrongMsg
+          }
+        }
+      } else if (need === 'ppf-frontier' && !isPpfCurve(stroke, session.box)) {
+        feedback = session.lesson.wrongMessages.bowed
+      } else if (
+        need === 'inside-point' &&
+        (!session.frontier ||
+          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'inside'))
+      ) {
+        feedback = session.lesson.wrongMessages.inside
+      } else if (
+        need === 'outside-point' &&
+        (!session.frontier ||
+          !isPointRelativeToCurve(stroke, session.frontier, session.box, 'outside'))
+      ) {
+        feedback = session.lesson.wrongMessages.outside
+      } else if (
+        need === 'ppf-growth' &&
+        (!session.frontier || !isPpfGrowth(session.frontier, stroke, session.box))
+      ) {
+        feedback = session.lesson.wrongMessages.growth
+      }
+
+      if (feedback) {
+        updateTogetherCard(session.id, step, feedback)
+        const strokeBounds = tutorStrokeBounds(stroke)
+        const correction = runTogetherOps(strokeBounds ? circleOps(strokeBounds) : [], () => {
+          if (togetherSessionRef.current !== session) return
+          speakTogetherStep(session.id, feedback)
+          session.baselineIds = new Set(strokesRef.current.map((item) => item.id))
+          session.awaiting = need
+        })
+        session.correctionOpIds.push(...correction.ids)
+        if (correction.bounds) session.correctionBounds.push(correction.bounds)
+        return
+      }
+
+      clearTogetherCorrectionInk(session)
+      if (session.lesson.kind === 'market') {
+        if (need === 'first') {
+          session.first = stroke
+          runTogetherAdamStep(
+            3,
+            [tutorCurveLabel(stroke, session.lesson.first.label, getTogetherObstacles([stroke]))]
+          )
+          return
+        }
+        if (need === 'second') {
+          session.second = stroke
+          const crossing =
+            session.first &&
+            (polylineIntersection(session.first.points, stroke.points) ??
+              nearestPolylineApproach(session.first.points, stroke.points))
+          const equilibrium =
+            crossing ?? {
+              x: session.box.x + session.box.w / 2,
+              y: session.box.y + session.box.h / 2,
+            }
+          session.equilibrium = equilibrium
+          runTogetherAdamStep(5, [
+            tutorCurveLabel(stroke, session.lesson.second.label, getTogetherObstacles([stroke])),
+            ...tutorEquilibriumOps(
+              session.box,
+              equilibrium,
+              session.lesson.eqLabels.y,
+              session.lesson.eqLabels.x,
+              -8,
+              getTogetherObstacles([stroke])
+            ),
+          ])
+          return
+        }
+
+        if (need === 'shift') {
+          session.shifted = stroke
+          const shiftedCurve =
+            session.lesson.shift.curve === 'first' ? stroke : session.first
+          const steadyCurve =
+            session.lesson.shift.curve === 'first' ? session.second : stroke
+          const crossing =
+            shiftedCurve &&
+            steadyCurve &&
+            (polylineIntersection(shiftedCurve.points, steadyCurve.points) ??
+              nearestPolylineApproach(shiftedCurve.points, steadyCurve.points))
+          const newEquilibrium =
+            crossing ?? {
+              x: session.box.x + session.box.w / 2,
+              y: session.box.y + session.box.h / 2,
+            }
+          const oldEquilibrium = session.equilibrium
+          session.equilibrium = newEquilibrium
+          runTogetherAdamStep(7, [
+            tutorCurveLabel(stroke, session.lesson.shift.newLabel, getTogetherObstacles([stroke])),
+            ...(oldEquilibrium ? tutorArrowOps(oldEquilibrium, newEquilibrium) : []),
+            ...tutorEquilibriumOps(
+              session.box,
+              newEquilibrium,
+              shiftedEquilibriumLabel(session.lesson.eqLabels.y),
+              shiftedEquilibriumLabel(session.lesson.eqLabels.x),
+              24,
+              getTogetherObstacles([stroke])
+            ),
+          ])
+        }
+        return
+      }
+
+      if (need === 'ppf-frontier') {
+        session.frontier = stroke
+        const start = stroke.points[0]
+        runTogetherAdamStep(
+          3,
+          [
+            tutorCurveLabel(stroke, 'PPF', getTogetherObstacles([stroke]), {
+              x: start.x + 4,
+              y: start.y - 28,
+            }),
+          ]
+        )
+      } else if (need === 'inside-point') {
+        session.insidePoint = stroke
+        runTogetherAdamStep(
+          5,
+          [tutorCurveLabel(stroke, 'A: inefficient', getTogetherObstacles([stroke]))]
+        )
+      } else if (need === 'outside-point') {
+        session.outsidePoint = stroke
+        runTogetherAdamStep(
+          6,
+          [tutorCurveLabel(stroke, 'B: unattainable for now', getTogetherObstacles([stroke]))],
+          'Now show economic growth: draw the new PPF.'
+        )
+      } else if (need === 'ppf-growth') {
+        session.growth = stroke
+        const oldBulge = session.frontier && ppfBulgePoint(session.frontier)
+        const newBulge = ppfBulgePoint(stroke)
+        runTogetherAdamStep(8, [
+          tutorCurveLabel(stroke, 'PPF₂', getTogetherObstacles([stroke])),
+          ...(oldBulge && newBulge ? tutorArrowOps(oldBulge, newBulge) : []),
+        ])
+      }
+    },
+    [
+      clearTogetherCorrectionInk,
+      getTogetherObstacles,
+      isValidCurveStroke,
+      reflowTogetherLabels,
+      runTogetherAdamStep,
+      runTogetherOps,
+      speakTogetherStep,
+      updateTogetherCard,
+    ]
+  )
+
+  useEffect(() => {
+    if (pen.busy) return
+    const pending = pendingTogetherRef.current
+    if (!pending) return
+    pendingTogetherRef.current = null
+    pending()
+  }, [pen.busy])
+
+  useEffect(() => {
+    const session = togetherSessionRef.current
+    if (!session?.awaiting) return
+    const next = strokes.find((stroke) => !session.baselineIds.has(stroke.id))
+    if (!next) return
+    session.baselineIds.add(next.id)
+    handleTogetherStudentStroke(next)
+  }, [handleTogetherStudentStroke, strokes])
+
+  const startDrawWithAdam = useCallback(async (lesson: TogetherLesson = selectedLesson) => {
+    clearTutorPen()
+    speakerRef.current?.cancel()
+    hintSpeakerRef.current?.cancel()
+    setHintSpeakingId(null)
+    setLessonMenuOpen(false)
+    const phone = window.matchMedia('(max-width: 600px)').matches
+    const box = placeTutorContent(360, 280, !phone)
+    const id = uid()
+    togetherSessionRef.current = {
+      id,
+      box,
+      lesson,
+      step: 1,
+      awaiting: null,
+      baselineIds: new Set(strokesRef.current.map((stroke) => stroke.id)),
+      correctionOpIds: [],
+      correctionBounds: [],
+      tutorLabels: [],
+    }
+    setTool('pen')
+    setTogetherStep(1)
+    setCards([
+      {
+        id,
+        anchor: { x: box.x + box.w + 24, y: box.y },
+        boardBounds: { minX: box.x, minY: box.y, maxX: box.x + box.w, maxY: box.y + box.h },
+        text: lesson.steps[0].say,
+        status: 'done',
+        history: [],
+        followup: '',
+        mode: 'together',
+        togetherMode: true,
+        togetherStep: 1,
+        togetherTitle: lesson.title,
+        togetherTotal: lesson.steps.length,
+        level: 1,
+        tracked: false,
+        firedMarkers: 0,
+        writeStates: {},
+        writeBoxes: {},
+        steps: [],
+        revealedSteps: 1,
+        reexplainCounts: {},
+      },
+    ])
+    await fitMobileLessonFrame(box, lesson)
+    if (togetherSessionRef.current?.id !== id) return
+    const boardStrokes = strokesRef.current.map((stroke) => ({
+      points: stroke.points,
+      width: stroke.width,
+    }))
+    runTogetherAdamStep(1, tutorAxesOps(box, lesson.yLabel, lesson.xLabel, boardStrokes))
+  }, [clearTutorPen, fitMobileLessonFrame, placeTutorContent, runTogetherAdamStep, selectedLesson])
+
   const closeCard = (id: string) => {
+    if (togetherSessionRef.current?.id === id) {
+      endDrawWithAdam()
+      return
+    }
     if (hintSpeakingId === id) {
       hintSpeakerRef.current?.cancel()
       setHintSpeakingId(null)
@@ -2659,7 +3997,21 @@ export default function MathLayer({
   }
 
   // ── Voice tutor (typed or mic in, spoken out; answered by the local Bonsai model) ──
-  const sttOK = speechRecognitionSupported()
+  // The mic appears once the local Argmax speech server answers; keep checking
+  // so it shows up (or goes away) without a reload when that server starts or stops.
+  const [sttOK, setSttOK] = useState(speechRecognitionSupported())
+  useEffect(() => {
+    let alive = true
+    const check = () => void probeSTT().then((ok) => alive && setSttOK(ok))
+    check()
+    const timer = setInterval(check, 8000)
+    return () => {
+      alive = false
+      clearInterval(timer)
+    }
+  }, [])
+  /** True between "stop" and the words coming back from the speech model. */
+  const [transcribing, setTranscribing] = useState(false)
   const [recording, setRecording] = useState(false)
   const [listening, setListening] = useState(false)
   const [speaking, setSpeaking] = useState(false)
@@ -2688,7 +4040,7 @@ export default function MathLayer({
 
   const askVoiceTutor = useCallback(
     async (text: string) => {
-      if (voiceBusyRef.current) return
+      // A new question interrupts the reply in progress (see streamMathHint) instead of being dropped.
       const trimmed = text.trim()
       if (trimmed.length < 2) return
 
@@ -2716,8 +4068,8 @@ export default function MathLayer({
         ? { x: wrapRect.width * 0.55, y: wrapRect.height * 0.2 }
         : { x: 420, y: 120 }
 
-      setCards((cs) => [
-        ...cs,
+      setCards(() => [
+        // One Adam at a time: a new card replaces any that are open, so they never stack or cover each other.
         {
           id,
           anchor,
@@ -2777,10 +4129,16 @@ export default function MathLayer({
           gridImage,
           problemImages: problemImages(),
           recognizedLines: recognizedLinesPayload(),
+          boardEmpty: strokesRef.current.length === 0 && imagesRef.current.length === 0,
           prompt: trimmed,
           history,
           mode: 'voice',
           apiKey,
+          onGraph: drawOnBoard,
+          onEquations: (equations) => {
+            setCards((cs) => cs.map((c) => (c.id === id ? { ...c, equations } : c)))
+            writeEquationsOnBoard(id, equations)
+          },
         },
         (chunk) => {
           if (acc === '') setThinking(false)
@@ -2852,10 +4210,13 @@ export default function MathLayer({
       highlightRecognizedLines,
       runClarifyHint,
       paneRect,
+      drawOnBoard,
+      writeEquationsOnBoard,
     ]
   )
 
   const deliverRecording = useCallback(() => {
+    setTranscribing(false)
     const text = `${pendingTranscriptRef.current} ${interimRef.current}`.trim()
     pendingTranscriptRef.current = ''
     interimRef.current = ''
@@ -2878,14 +4239,20 @@ export default function MathLayer({
     setRecording(false)
     setListening(false)
     finishRecordingRef.current = true
+    // Argmax transcribes after the recording ends, so the words take a moment.
+    const slow = !!recognizerRef.current?.slowStop
+    if (slow) setTranscribing(true)
     recognizerRef.current?.stop()
-    // Fallback if the browser never fires onend after stop().
-    setTimeout(() => {
-      if (!finishRecordingRef.current) return
-      finishRecordingRef.current = false
-      recognizerRef.current = null
-      deliverRecording()
-    }, 450)
+    // Fallback if the recognizer never reports that it has finished.
+    setTimeout(
+      () => {
+        if (!finishRecordingRef.current) return
+        finishRecordingRef.current = false
+        recognizerRef.current = null
+        deliverRecording()
+      },
+      slow ? 65000 : 450
+    )
   }, [deliverRecording])
 
   const cleanupVoice = useCallback(() => {
@@ -2893,6 +4260,7 @@ export default function MathLayer({
     finishRecordingRef.current = false
     voiceBusyRef.current = false
     setRecording(false)
+    setTranscribing(false)
     setListening(false)
     setInterim('')
     setThinking(false)
@@ -2908,10 +4276,10 @@ export default function MathLayer({
 
   const startRecording = useCallback(() => {
     if (!sttOK) {
-      setVoiceError('Voice input needs a Chromium browser (Chrome/Edge).')
+      setVoiceError('Voice input needs the Argmax speech server running on this computer.')
       return
     }
-    if (voiceBusyRef.current) return
+    // A new question interrupts the reply in progress (see streamMathHint) instead of being dropped.
     recordingPurposeRef.current = 'voice'
     clarifyCardIdRef.current = null
     setClarifyRecordingId(null)
@@ -2937,6 +4305,7 @@ export default function MathLayer({
           setVoiceError('Microphone permission was blocked.')
           cleanupVoice()
         } else if (e !== 'no-speech' && e !== 'aborted') {
+          setTranscribing(false)
           setVoiceError(e)
         }
       },
@@ -3029,7 +4398,10 @@ export default function MathLayer({
 
   const submitPrompt = useCallback(() => {
     const q = prompt.trim()
-    if (!q || voiceBusyRef.current || recordingRef.current) return
+    if (!q || recordingRef.current) return
+    const context = [lessonContextRef.current, q].filter(Boolean).join('\n').slice(-4000)
+    lessonContextRef.current = context
+    setLessonContext(context)
     setPrompt('')
     void askVoiceTutor(q)
   }, [prompt, askVoiceTutor])
@@ -3048,8 +4420,15 @@ export default function MathLayer({
 
   useEffect(() => cleanupVoice, [cleanupVoice]) // stop mic/speech on unmount
 
-  const cursor =
-    tool === 'pen' || tool === 'highlight' ? 'crosshair' : tool === 'eraser' ? 'cell' : 'default'
+  const cursor = isPanning
+    ? 'grabbing'
+    : spaceMove
+      ? 'grab'
+      : tool === 'pen' || tool === 'highlight'
+        ? 'crosshair'
+        : tool === 'eraser'
+          ? 'cell'
+          : 'default'
 
   const toolBtn = (t: Tool, label: string) => (
     <button
@@ -3062,7 +4441,7 @@ export default function MathLayer({
         alignItems: 'center',
         fontSize: 12,
         padding: '6px 10px',
-        ...(tool === t ? ACTIVE_GLASS : {}),
+        ...(tool === t || (t === 'off' && spaceMove) ? ACTIVE_GLASS : {}),
       }}
     >
       {label}
@@ -3072,14 +4451,6 @@ export default function MathLayer({
   const toolbarVertical = toolbarDragging
     ? toolbarDragVertical
     : toolbarDock === 'left' || toolbarDock === 'right'
-  const toolbarGroupStyle: CSSProperties = {
-    display: 'flex',
-    gap: 4,
-    alignItems: toolbarVertical ? 'stretch' : 'center',
-    flexDirection: toolbarVertical ? 'column' : 'row',
-  }
-  // No max clamp — horizontal bar grows to fit every control on one line.
-  const toolbarMaxWidth = 'none'
 
   const onToolbarDragStart = (e: React.PointerEvent) => {
     if (e.button !== 0) return
@@ -3285,13 +4656,18 @@ export default function MathLayer({
   // Minimal floating live-transcript pill above the mic — just what the
   // student is saying (or an error), liquid glass, nothing else. Adam's
   // own reply already appears in the coach card that pops up separately.
-  const voiceTranscriptText = voiceError || interim || voiceUser || (thinking ? 'Thinking…' : recording ? 'Listening…' : '')
+  const voiceTranscriptText =
+    voiceError ||
+    interim ||
+    voiceUser ||
+    (transcribing ? 'Transcribing on this Mac…' : thinking ? 'Thinking…' : recording ? 'Listening… tap the mic when you are done' : '')
   const voicePanel =
     !clarifyRecordingId &&
-    (recording || thinking || voiceError) &&
+    (recording || transcribing || thinking || voiceError) &&
     voiceTranscriptText && (
       <div
         data-html2canvas-ignore
+        className="math-voice-panel"
         style={{
           position: 'absolute',
           left: '50%',
@@ -3325,6 +4701,8 @@ export default function MathLayer({
     ...(active ? ACTIVE_GLASS : {}),
     ...(active ? { color: activeColor } : {}),
   })
+  const secureMicContext = typeof window === 'undefined' || window.isSecureContext
+  const micAvailable = sttOK && secureMicContext
 
   return (
     <>
@@ -3446,6 +4824,32 @@ export default function MathLayer({
               strokeLinejoin="round"
             />
           )}
+          {pen.strokes.map((stroke) => (
+            <path
+              key={stroke.id}
+              d={pointsToPath(stroke.points)}
+              fill="none"
+              stroke={stroke.color}
+              strokeWidth={stroke.width}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray={stroke.dashed ? '6 5' : undefined}
+              opacity={0.95}
+            />
+          ))}
+          {pen.labels.map((label) => (
+            <text
+              key={label.id}
+              x={label.x + INK_OFFSET}
+              y={label.y + INK_OFFSET}
+              fill={label.color}
+              fontSize={label.size}
+              fontFamily='"Marker Felt", "Chalkboard SE", "Comic Sans MS", cursive'
+              opacity={0.95}
+            >
+              {label.text}
+            </text>
+          ))}
         </svg>
 
         {cards.flatMap((card) =>
@@ -3475,10 +4879,17 @@ export default function MathLayer({
       {/* Interaction overlay — only captures pointers when a math tool is active */}
       <div
         ref={overlayRef}
+        data-together-step={togetherStep ?? undefined}
+        data-together-box={
+          togetherSessionRef.current
+            ? `${togetherSessionRef.current.box.x},${togetherSessionRef.current.box.y},${togetherSessionRef.current.box.w},${togetherSessionRef.current.box.h}`
+            : undefined
+        }
         data-html2canvas-ignore
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         onPointerLeave={onPointerUp}
         style={{
           position: 'absolute',
@@ -3506,6 +4917,153 @@ export default function MathLayer({
           />
         )}
       </div>
+
+      {/* Graph recognition: a small tag on each graph the checker identified */}
+      <div
+        data-html2canvas-ignore
+        className="math-graph-tags"
+        style={{ position: 'absolute', inset: 0, zIndex: 44, pointerEvents: 'none' }}
+      >
+        {(() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          const lessonBox = togetherSessionRef.current?.box
+          return inkModel.lines.flatMap((line) => {
+            if (lessonBox && overlapsTogetherBox(line.bounds, lessonBox)) return []
+            const g = line.graph
+            if (!g) return []
+            const tl = rf.flowToScreenPosition({ x: line.bounds.minX, y: line.bounds.minY })
+            const graphKey = `${[...line.strokeIds].sort().join(',')}|${g.mistake ?? ''}`
+            const replayable = g.status === 'mistake' && correctionOps(g).length > 0
+            const label =
+              g.status === 'mistake'
+                ? `${g.name}: check ${g.mistake ?? 'this graph'}`
+                : g.status === 'unknown'
+                  ? 'Graph'
+                  : g.name
+            const tip =
+              g.status === 'mistake'
+                ? [g.explanation, g.fix, replayable ? 'Click to draw the correction again.' : ''].filter(Boolean).join(' ')
+                : g.status === 'recognized' && g.checked
+                  ? 'Checked: demand slopes down, supply slopes up, and the labels are on the right curves.'
+                  : g.status === 'recognized'
+                    ? `Recognized as a ${g.name} graph. No mistakes flagged, though the checker can miss some.`
+                  : 'The graph checker could not tell what kind of graph this is.'
+            const out = [
+              <div
+                key={`gtag-${line.strokeIds[0]}`}
+                className={`math-graph-tag is-${g.status}${g.checked ? ' is-checked' : ''}${replayable ? ' is-replayable' : ''}`}
+                title={tip}
+                onClick={replayable ? () => pen.enqueue(correctionOps(g)) : undefined}
+                style={{ left: Math.max(4, tl.x - wrap.left), top: Math.max(4, tl.y - wrap.top - 30) }}
+              >
+                {g.status === 'mistake' ? (
+                  <AlertTriangle size={12} strokeWidth={2.5} />
+                ) : g.checked ? (
+                  <Check size={12} strokeWidth={3} />
+                ) : (
+                  <LineChart size={12} strokeWidth={2.5} />
+                )}
+                <span>{label}</span>
+              </div>,
+            ]
+            if (g.status === 'mistake' && g.errorBox && !drawnGraphKeys.has(graphKey)) {
+              const a = rf.flowToScreenPosition({ x: g.errorBox.minX, y: g.errorBox.minY })
+              const b = rf.flowToScreenPosition({ x: g.errorBox.maxX, y: g.errorBox.maxY })
+              const pad = 14
+              out.push(
+                <div
+                  key={`gerr-${line.strokeIds[0]}`}
+                  className="math-graph-error-ring"
+                  style={{
+                    left: a.x - wrap.left - pad,
+                    top: a.y - wrap.top - pad,
+                    width: b.x - a.x + pad * 2,
+                    height: b.y - a.y + pad * 2,
+                  }}
+                />
+              )
+            }
+            return out
+          })
+        })()}
+      </div>
+
+      <div
+        data-html2canvas-ignore
+        className="math-ocr-read-layer"
+        style={{ position: 'absolute', inset: 0, zIndex: 47, pointerEvents: 'none' }}
+      >
+        {(() => {
+          const wrap = paneRect()
+          if (!wrap) return null
+          return inkModel.lines.flatMap((line) => {
+            if (!line.latex || line.graph) return []
+            const key = recognitionOverrideKey(line.strokeIds)
+            const text = recognitionOverrides[key] ?? line.latex
+            const point = rf.flowToScreenPosition({ x: line.bounds.minX, y: line.bounds.maxY + 8 })
+            return [
+              <div
+                key={`ocr-read-${key}`}
+                className="math-ocr-read-chip"
+                style={{ left: point.x - wrap.left, top: point.y - wrap.top }}
+              >
+                {editingRecognitionKey === key ? (
+                  <input
+                    autoFocus
+                    aria-label="Correct recognized handwriting"
+                    maxLength={120}
+                    value={editingRecognitionText}
+                    onChange={(event) => setEditingRecognitionText(event.target.value)}
+                    onBlur={() => saveRecognitionOverride(key, editingRecognitionText)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        saveRecognitionOverride(key, editingRecognitionText)
+                      } else if (event.key === 'Escape') {
+                        setEditingRecognitionKey(null)
+                      }
+                    }}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    title={`Adam read: ${text}`}
+                    onClick={() => {
+                      setEditingRecognitionText(text)
+                      setEditingRecognitionKey(key)
+                    }}
+                  >
+                    Adam read: {text} ✎
+                  </button>
+                )}
+              </div>,
+            ]
+          })
+        })()}
+      </div>
+
+      {pen.cursor?.visible &&
+        (() => {
+          const cursor = pen.cursor
+          const wrap = paneRect()
+          if (!cursor || !wrap) return null
+          const point = rf.flowToScreenPosition({ x: cursor.x, y: cursor.y })
+          return (
+            <div
+              data-html2canvas-ignore
+              className="math-adam-cursor-layer"
+              style={{ position: 'absolute', inset: 0, zIndex: 46, pointerEvents: 'none' }}
+            >
+              <div className="math-adam-cursor" style={{ left: point.x - wrap.left, top: point.y - wrap.top }}>
+                <span className="math-adam-cursor__badge">
+                  <PenLine size={15} strokeWidth={2.4} />
+                </span>
+                {cursor.drawing && <span className="math-adam-cursor__name">Adam</span>}
+              </div>
+            </div>
+          )
+        })()}
 
       {/* Write-box submit ✓ — screen-space so it stays tappable above the ink overlay */}
       <div
@@ -3591,6 +5149,7 @@ export default function MathLayer({
         onGeneralize={() => void requestGeneralize()}
         onAdvanceStep={advanceStep}
         onReexplainStep={reexplainStep}
+        onEndTogether={endDrawWithAdam}
       />
 
       {/* Dock preview — faint silhouette of where the bar will land */}
@@ -3600,6 +5159,42 @@ export default function MathLayer({
         className={`math-toolbar-dock-ghost${toolbarSnapDock ? ' is-visible' : ''}`}
         aria-hidden
       />
+
+      <div className="math-local-status" data-html2canvas-ignore ref={statusPopoverRef}>
+        <button
+          type="button"
+          className="math-local-status__pill"
+          aria-haspopup="dialog"
+          aria-expanded={statusPopoverOpen}
+          onClick={() => setStatusPopoverOpen((open) => !open)}
+        >
+          <span className="math-local-status__pulse" aria-hidden />
+          On-device · works offline
+        </button>
+        {statusPopoverOpen && (
+          <div className="math-local-status__popover" role="dialog" aria-label="On-device services">
+            {[
+              ['bonsai', 'Bonsai-2 4B (tutor)'],
+              ['argmax', 'Argmax (speech)'],
+              ['graphChecker', 'Graph checker (vision model)'],
+            ].map(([key, label]) => (
+              <div className="math-local-status__service" key={key}>
+                <span
+                  className={`math-local-status__dot${localServices[key as keyof typeof localServices] ? ' is-ready' : ''}`}
+                  aria-hidden
+                />
+                <span>{label}</span>
+              </div>
+            ))}
+            <p>All AI runs on this laptop. No cloud or data-center calls, and it works with no internet.</p>
+          </div>
+        )}
+      </div>
+      {hubOffline && (
+        <div className="math-hub-offline" role="status">
+          Hub offline: lessons still work. Graph checking and Bonsai need the hub.
+        </div>
+      )}
 
       {/* Toolbar */}
       <div
@@ -3624,178 +5219,272 @@ export default function MathLayer({
           title="Move toolbar"
           onPointerDown={onToolbarDragStart}
         />
-        <div
-          className="card math-toolbar-body"
-          style={{
-            display: 'flex',
-            alignItems: toolbarVertical ? 'stretch' : 'center',
-            gap: 10,
-            padding: '8px 10px',
-            flexWrap: 'nowrap',
-            flexDirection: toolbarVertical ? 'column' : 'row',
-            width: toolbarVertical ? undefined : 'max-content',
-            maxWidth: toolbarVertical ? 'none' : toolbarMaxWidth,
-            maxHeight: toolbarVertical ? 'calc(100vh - 140px)' : undefined,
-            overflow: toolbarVertical ? 'auto' : 'visible',
-          }}
-        >
-        <div style={toolbarGroupStyle}>
-          {toolBtn('off', 'Move')}
-          {toolBtn('pen', 'Pen')}
-          {toolBtn('eraser', 'Eraser')}
-          {toolBtn('highlight', 'Hint select')}
-        </div>
+        <div className="card math-toolbar-body">
+          <div className="math-toolbar-main">
+            <div className="math-toolbar-main-tools">
+              {toolBtn('pen', 'Pen')}
+              {toolBtn('eraser', 'Eraser')}
+              <button
+                type="button"
+                className="btn-ghost"
+                title="Undo (Ctrl+Z)"
+                onClick={undo}
+                disabled={past.current.length === 0}
+                style={{ fontSize: 12, padding: '6px 10px', opacity: past.current.length === 0 ? 0.4 : 1 }}
+              >
+                Undo
+              </button>
+              <button
+                type="button"
+                className="btn-ghost"
+                title="Redo (Ctrl+Y)"
+                onClick={redo}
+                disabled={future.current.length === 0}
+                style={{ fontSize: 12, padding: '6px 10px', opacity: future.current.length === 0 ? 0.4 : 1 }}
+              >
+                Redo
+              </button>
+            </div>
 
-        <div className="math-hint-toolbar" style={toolbarGroupStyle}>
-          {HINT_SIZES.map((s) => (
-            <button
-              key={s.level}
-              type="button"
-              className="btn-ghost math-hint-size-btn"
-              title={s.title}
-              onClick={() => setHintSize(s.level)}
-              style={{
-                fontSize: 11,
-                padding: '5px 8px',
-                ...(hintSize === s.level ? ACTIVE_GLASS : {}),
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
-          <button
-            type="button"
-            className="btn-ghost math-hint-go-btn"
-            title="Get a hint on your work"
-            disabled={strokes.length === 0 && images.length === 0}
-            onClick={() => void requestBoardHint(hintSize)}
-            style={{
-              fontSize: 12,
-              padding: '6px 10px',
-              opacity: strokes.length === 0 && images.length === 0 ? 0.45 : 1,
-            }}
-          >
-            Hint
-          </button>
-          <button
-            type="button"
-            className="btn-ghost math-hint-go-btn"
-            title="Step back: learn the general approach for this TYPE of problem"
-            disabled={strokes.length === 0 && images.length === 0}
-            onClick={() => void requestGeneralize()}
-            style={{
-              fontSize: 12,
-              padding: '6px 10px',
-              opacity: strokes.length === 0 && images.length === 0 ? 0.45 : 1,
-            }}
-          >
-            Generalize
-          </button>
-        </div>
+            <div className="math-toolbar-quick-colors" aria-label="Pen colors">
+              {QUICK_PEN_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    setColor(c)
+                    if (tool !== 'pen') setTool('pen')
+                  }}
+                  title={c === '#111111' ? 'Black' : c}
+                  aria-label={`Pen color ${c === '#111111' ? 'black' : c}`}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: c,
+                    border: color === c ? '2px solid #111' : '2px solid #fff',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                />
+              ))}
+            </div>
 
-        <div style={{ ...toolbarGroupStyle, gap: 5 }}>
-          {PEN_COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => {
-                setColor(c)
-                if (tool !== 'pen') setTool('pen')
-              }}
-              title={c}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: c,
-                border: color === c ? '2px solid #111' : '2px solid #fff',
-                boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            />
-          ))}
-        </div>
+            <div className="math-draw-together-group">
+              <button
+                type="button"
+                className="btn-ghost math-draw-together-btn"
+                title={`Draw ${selectedLesson.title} with Adam`}
+                aria-pressed={togetherStep !== null}
+                onClick={() => startDrawWithAdam()}
+              >
+                <PenLine size={14} />
+                Draw with Adam
+              </button>
+              <button
+                type="button"
+                className="btn-ghost math-draw-together-menu-button"
+                aria-label="Choose a Draw with Adam lesson"
+                aria-haspopup="menu"
+                aria-expanded={lessonMenuOpen}
+                onClick={() => setLessonMenuOpen((open) => !open)}
+              >
+                <ChevronDown size={13} />
+              </button>
+              {lessonMenuOpen && (
+                <div className="math-draw-together-menu" role="menu">
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={lessonOverrideId === null}
+                    onClick={() => {
+                      setLessonOverrideId(null)
+                      setLessonMenuOpen(false)
+                    }}
+                  >
+                    Automatic · {detectedLesson.title}
+                  </button>
+                  {TOGETHER_LESSONS.map((lesson) => (
+                    <button
+                      key={lesson.id}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={lessonOverrideId === lesson.id}
+                      onClick={() => {
+                        setLessonOverrideId(lesson.id)
+                        setLessonMenuOpen(false)
+                      }}
+                    >
+                      {lesson.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        <div style={toolbarGroupStyle}>
-          {PEN_SIZES.map((sVal) => (
-            <button
-              key={sVal}
-              type="button"
-              onClick={() => setSize(sVal)}
-              title={`${sVal}px`}
-              className="btn-ghost"
-              style={{
-                width: 28,
-                height: 28,
-                display: 'grid',
-                placeItems: 'center',
-                padding: 0,
-                ...(size === sVal ? ACTIVE_GLASS : {}),
-              }}
-            >
-              <span
-                style={{ width: sVal + 3, height: sVal + 3, borderRadius: '50%', background: '#111', display: 'block' }}
-              />
-            </button>
-          ))}
-        </div>
-
-        <div style={toolbarGroupStyle}>
-          <button
-            type="button"
-            className="btn-ghost"
-            title="Undo (Ctrl+Z)"
-            onClick={undo}
-            disabled={past.current.length === 0}
-            style={{ fontSize: 12, padding: '6px 10px', opacity: past.current.length === 0 ? 0.4 : 1 }}
-          >
-            Undo
-          </button>
-          <button
-            type="button"
-            className="btn-ghost"
-            title="Redo (Ctrl+Y)"
-            onClick={redo}
-            disabled={future.current.length === 0}
-            style={{ fontSize: 12, padding: '6px 10px', opacity: future.current.length === 0 ? 0.4 : 1 }}
-          >
-            Redo
-          </button>
-        </div>
-
-        <div style={toolbarGroupStyle}>
-          <label
-            className="btn-ghost"
-            title="Upload image"
-            style={{ fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}
-          >
-            Image
-            <input type="file" accept="image/*" hidden onChange={onUpload} />
-          </label>
-          <button
-            type="button"
-            className="btn-ghost"
-            title="Clear ink and images"
-            onClick={() => {
-              if (strokesRef.current.length === 0 && imagesRef.current.length === 0) return
-              pushHistory()
-              strokesRef.current = []
-              imagesRef.current = []
-              setStrokes([])
-              setImages([])
-              setSelectedImageId(null)
-              if (boardAdventureRef.current) clearMathBoard(boardAdventureRef.current)
-              // Persist the clear to cloud (storage already emptied above).
-              if (boardAdventureRef.current) {
-                saveMathBoard(boardAdventureRef.current, { strokes: [], images: [] })
-              }
-            }}
-            style={{ fontSize: 12, padding: '6px 10px' }}
-          >
-            Clear ink
-          </button>
-        </div>
+            <div className="math-toolbar-more-wrap" ref={moreMenuRef}>
+              <button
+                type="button"
+                className="btn-ghost math-toolbar-more-button"
+                aria-haspopup="dialog"
+                aria-expanded={moreMenuOpen}
+                onClick={() => setMoreMenuOpen((open) => !open)}
+              >
+                ⋯ More
+              </button>
+              {moreMenuOpen && (
+                <div
+                  className="math-toolbar-more-menu"
+                  role="dialog"
+                  aria-label="More drawing tools"
+                  onClick={(event) => {
+                    if ((event.target as HTMLElement).closest('button, label')) setMoreMenuOpen(false)
+                  }}
+                >
+                  <div className="math-toolbar-more-section">
+                    {toolBtn('off', 'Move')}
+                    {toolBtn('highlight', 'Hint select')}
+                  </div>
+                  <div className="math-toolbar-more-section">
+                    <span className="math-toolbar-more-label">Pen size</span>
+                    {PEN_SIZES.map((sVal) => (
+                      <button
+                        key={sVal}
+                        type="button"
+                        onClick={() => setSize(sVal)}
+                        title={`${sVal}px`}
+                        className="btn-ghost"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          display: 'grid',
+                          placeItems: 'center',
+                          padding: 0,
+                          ...(size === sVal ? ACTIVE_GLASS : {}),
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: sVal + 3,
+                            height: sVal + 3,
+                            borderRadius: '50%',
+                            background: '#111',
+                            display: 'block',
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="math-toolbar-more-section">
+                    <span className="math-toolbar-more-label">Other colors</span>
+                    {PEN_COLORS.filter((c) => !QUICK_PEN_COLORS.includes(c)).map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => {
+                          setColor(c)
+                          if (tool !== 'pen') setTool('pen')
+                        }}
+                        title={c}
+                        aria-label={`Pen color ${c}`}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          background: c,
+                          border: color === c ? '2px solid #111' : '2px solid #fff',
+                          boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+                          cursor: 'pointer',
+                          padding: 0,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="math-toolbar-more-section">
+                    {HINT_SIZES.map((s) => (
+                      <button
+                        key={s.level}
+                        type="button"
+                        className="btn-ghost math-hint-size-btn"
+                        title={s.title}
+                        onClick={() => setHintSize(s.level)}
+                        style={{
+                          fontSize: 11,
+                          padding: '5px 8px',
+                          ...(hintSize === s.level ? ACTIVE_GLASS : {}),
+                        }}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className="btn-ghost math-hint-go-btn"
+                      title="Get a hint on your work"
+                      disabled={strokes.length === 0 && images.length === 0}
+                      onClick={() => void requestBoardHint(hintSize)}
+                    >
+                      Hint
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-ghost math-hint-go-btn"
+                      title="Step back: learn the general approach for this TYPE of problem"
+                      disabled={strokes.length === 0 && images.length === 0}
+                      onClick={() => void requestGeneralize()}
+                    >
+                      Generalize
+                    </button>
+                  </div>
+                  <div className="math-toolbar-more-section">
+                    <label className="btn-ghost math-toolbar-more-action" title="Upload image">
+                      Image
+                      <input type="file" accept="image/*" hidden onChange={onUpload} />
+                    </label>
+                    {(pen.strokes.length > 0 || pen.labels.length > 0) && (
+                      <button type="button" className="math-adam-clear" onClick={clearTutorPen}>
+                        Clear Adam&apos;s ink
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="btn-ghost math-toolbar-more-action"
+                      title="Clear ink and images"
+                      onClick={() => {
+                        clearTutorPen()
+                        setRecognitionOverrides({})
+                        recognitionOverridesRef.current = {}
+                        setLessonContext('')
+                        lessonContextRef.current = ''
+                        if (strokesRef.current.length === 0 && imagesRef.current.length === 0) {
+                          if (boardAdventureRef.current) clearMathBoard(boardAdventureRef.current)
+                          return
+                        }
+                        pushHistory()
+                        strokesRef.current = []
+                        imagesRef.current = []
+                        setStrokes([])
+                        setImages([])
+                        setSelectedImageId(null)
+                        if (boardAdventureRef.current) clearMathBoard(boardAdventureRef.current)
+                        if (boardAdventureRef.current) {
+                          saveMathBoard(boardAdventureRef.current, { strokes: [], images: [] })
+                        }
+                      }}
+                    >
+                      Clear ink
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          {showGestureHint && (
+            <div className="math-board-gesture-hint" role="status">
+              Scroll or two-finger drag to move the board · pinch to zoom · hold Space to drag
+            </div>
+          )}
         </div>
       </div>
 
@@ -3803,12 +5492,13 @@ export default function MathLayer({
           (pops the coach card); speaker toggles whether replies are read
           aloud. Voice input is off by default (see voiceTutor.ts), in which
           case the typed question box below is shown instead. */}
-      {competition && sttOK ? (
+      {competition && micAvailable ? (
         <div
           ref={(el) => {
             micBarRef.current = el
           }}
           data-html2canvas-ignore
+          className="math-mic-bar"
           style={{
             position: 'absolute',
             bottom: 16,
@@ -3873,7 +5563,7 @@ export default function MathLayer({
             micBarRef.current = el
           }}
           data-html2canvas-ignore
-          className="card"
+          className={`card math-prompt-bar${togetherStep !== null ? ' is-together' : ''}`}
           style={{
             position: 'absolute',
             bottom: 16,
@@ -3897,6 +5587,7 @@ export default function MathLayer({
               }
             }}
             placeholder="Ask Adam a question about this problem"
+            title={competition && !secureMicContext ? 'Voice input needs a secure HTTPS connection.' : undefined}
             style={{
               flex: 1,
               minWidth: 0,
@@ -3908,16 +5599,31 @@ export default function MathLayer({
               outline: 'none',
             }}
           />
-          {sttOK && (
+          {competition && !secureMicContext && (
+            <span
+              className="math-mic-secure-note"
+              title="Browsers only allow microphone access over HTTPS or localhost."
+            >
+              Mic needs HTTPS
+            </span>
+          )}
+          {micAvailable && (
             <button
               type="button"
               onClick={toggleRecording}
-              title={recording ? 'Stop recording' : 'Record voice'}
+              title={
+                recording
+                  ? 'Stop and send your question'
+                  : speechRecognitionEngine() === 'argmax'
+                    ? 'Ask out loud (transcribed on this computer by Argmax)'
+                    : 'Record voice'
+              }
+              aria-label={recording ? 'Stop recording' : 'Ask out loud'}
               className="btn-ghost"
-              disabled={thinking}
+              disabled={thinking || transcribing}
               style={{
                 ...iconBtnStyle(recording),
-                opacity: !thinking ? 1 : 0.4,
+                opacity: !thinking && !transcribing ? 1 : 0.4,
               }}
             >
               {recording ? <MicOff size={16} /> : <Mic size={16} />}

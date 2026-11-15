@@ -22,7 +22,7 @@ export function fmt(n) {
  * Parse "100 - 2P", "20+2P", "3P", "-10 + 0.5 P" as const + coef * VAR.
  * Returns { c, k } or null when the expression is not that simple.
  */
-function parseLinear(expr, variable) {
+export function parseLinear(expr, variable) {
   let s = expr.replace(DASHES, '-').replace(/\s+/g, '').replace(/\*/g, '')
   if (!s) return null
   if (!/^[+-]/.test(s)) s = `+${s}`
@@ -84,7 +84,7 @@ export function findCurves(text) {
   return { demand, supply }
 }
 
-function findTax(text) {
+export function findTax(text) {
   const s = String(text || '')
   const m =
     s.match(new RegExp(`tax\\s+of\\s+\\$?\\s*(${NUM})`, 'i')) ||
@@ -148,6 +148,45 @@ export function solveLinearMarket(problemText, workText = '') {
     }
   }
   return out
+}
+
+function linearExpression(intercept, coefficient) {
+  const constant = fmt(intercept)
+  const magnitude = Math.abs(coefficient)
+  const term = `${magnitude === 1 ? '' : fmt(magnitude)}P`
+  if (intercept === 0) return coefficient < 0 ? `-${term}` : term
+  return `${constant} ${coefficient < 0 ? '-' : '+'} ${term}`
+}
+
+export function solutionLatex(sol, { reveal = false } = {}) {
+  if (!sol || typeof sol.demand !== 'string' || typeof sol.supply !== 'string') return []
+  const { demand, supply } = findCurves(`${sol.demand}\n${sol.supply}`)
+  if (!demand || !supply) return []
+
+  const demandExpr = linearExpression(demand.a, demand.b)
+  const supplyExpr = linearExpression(supply.a, supply.b)
+  const equations = [
+    `Q_d = ${demandExpr}`,
+    `Q_s = ${supplyExpr}`,
+    `Q_d = Q_s \\;\\Rightarrow\\; ${demandExpr} = ${supplyExpr}`,
+  ]
+  if (!reveal) return equations
+
+  const collected = demand.a - supply.a
+  equations.push(`${fmt(supply.b - demand.b)}P = ${fmt(collected)}`)
+  equations.push(`P^* = ${fmt(sol.P)}`)
+  const quantityTerm = `${fmt(Math.abs(demand.b))}(${fmt(sol.P)})`
+  const quantityExpr =
+    demand.b < 0
+      ? `${fmt(demand.a)} - ${quantityTerm}`
+      : `${fmt(demand.a)} + ${quantityTerm}`
+  equations.push(`Q^* = ${quantityExpr} = ${fmt(sol.Q)}`)
+  if (sol.tax) {
+    equations.push(
+      `P_b = ${fmt(sol.tax.Pb)},\\; P_s = ${fmt(sol.tax.Ps)},\\; Q_t = ${fmt(sol.tax.Q)}`
+    )
+  }
+  return equations
 }
 
 /** Private notes handed to the model so its coaching is grounded in the right numbers. */

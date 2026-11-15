@@ -3,10 +3,46 @@
  * solver. No model or server needed:  node scripts/selftest.mjs
  */
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import ts from 'typescript'
 import { __test } from '../server/math.js'
-import { solveLinearMarket, workShowsAnswer } from '../server/econSolver.js'
+import { solveLinearMarket, solutionLatex, workShowsAnswer } from '../server/econSolver.js'
+import {
+  chooseEconReading,
+  clusterLines,
+  groupGraphs,
+  mergeGraphResults,
+  normalizeEconLine,
+  rasterizeGraph,
+  scoreEconReading,
+  __test as recognizeTest,
+} from '../server/recognize.js'
+import { checkMarketGraph, labelMeaning, readGraphGeometry } from '../server/graphRules.js'
+import { describeGraph, graphTranscriptLine } from '../server/graphCheck.js'
+import { linesToStrokes, toRecognizePayload } from './strokeFont.mjs'
+import { supplyDemandStrokes } from './graphFixture.mjs'
 
 const { HintStream, ProseCleaner, classify } = __test
+const drawTogetherSource = await readFile(new URL('../src/lib/drawTogether.ts', import.meta.url), 'utf8')
+const drawTogetherJs = ts.transpileModule(drawTogetherSource, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText
+const {
+  hasStrokeSlope,
+  isBowedOut,
+  isCurveShifted,
+  isPointRelativeToCurve,
+  isPpfCurve,
+  isPpfGrowth,
+  labelOverlapsStroke,
+  placeLabelAwayFromStrokes,
+  polylineIntersection,
+  pickTogetherLesson,
+  ppfBulgePoint,
+  shiftedEquilibriumLabel,
+  SUPPLY_DEMAND_LESSON,
+  TOGETHER_LESSONS,
+} = await import(`data:text/javascript;base64,${Buffer.from(drawTogetherJs).toString('base64')}`)
 
 /** Feed `raw` in chunks of `size` characters, like a token stream. */
 function runHint(raw, opts = {}, size = 3) {
@@ -142,6 +178,301 @@ check('linear market solver', () => {
   const plain = solveLinearMarket('Qd = 100 - 2P, Qs = 20 + 2P')
   assert.equal(workShowsAnswer(plain, 'line 1: P = 20\nline 2: Q = 60'), true)
   assert.equal(workShowsAnswer(plain, 'line 1: P = 200\nline 2: Q = 60'), false)
+})
+
+check('solver generates hidden and revealed equations', () => {
+  const solution = solveLinearMarket('Qd = 100 - 2P and Qs = 20 + 2P')
+  const hidden = solutionLatex(solution)
+  assert.equal(hidden.length, 3)
+  assert.ok(!hidden.some((equation) => equation.startsWith('P^*')))
+  const revealed = solutionLatex(solution, { reveal: true })
+  assert.ok(revealed.includes('4P = 80'))
+  assert.ok(revealed.includes('P^* = 20'))
+  assert.ok(revealed.includes('Q^* = 100 - 2(20) = 60'))
+
+  const negativeIntercept = solveLinearMarket('Qd = 100 - 2P and Qs = -10 + 3P')
+  assert.ok(solutionLatex(negativeIntercept).includes('Q_s = -10 + 3P'))
+  assert.deepEqual(solutionLatex(null), [])
+
+  const taxed = solveLinearMarket('Qd = 100 - 2P and Qs = 20 + 2P. A tax of $4 per unit.')
+  assert.ok(solutionLatex(taxed, { reveal: true }).includes('P_b = 22,\\; P_s = 18,\\; Q_t = 56'))
+})
+
+check('economics handwriting normalization and scoring', () => {
+  assert.equal(normalizeEconLine('60-2p=2p-2d'), '60-2P=2P-20')
+  assert.equal(normalizeEconLine('ID0 = 4P'), '100 = 4P')
+  assert.equal(normalizeEconLine('IDU = 4P'), '100 = 4P')
+  assert.equal(normalizeEconLine('Q5=2-30'), 'Qs=2-30')
+  assert.equal(normalizeEconLine('Q_5 = 2P - 30'), 'Qs = 2P - 30')
+  assert.equal(normalizeEconLine('Qd=120-3P'), 'Qd=120-3P')
+  assert.equal(normalizeEconLine('D'), 'D')
+  assert.equal(normalizeEconLine('MR = MC'), 'MR = MC')
+  assert.ok(scoreEconReading('80-2P=2P-20') > scoreEconReading('80-2P=2P-2⊙'))
+  assert.equal(chooseEconReading('80-2P=2P-2⊙', '80-2P=2P-20'), '80-2P=2P-20')
+  assert.equal(recognizeTest.isNonTextReading('\\int x^2 dx', '∫x²dx'), true)
+  assert.equal(recognizeTest.isNonTextReading('y=mx+b', 'y=mx+b'), true)
+  assert.equal(recognizeTest.isNonTextReading('', 'MR = MC'), false)
+})
+
+check('prices are not math, bare LaTeX becomes plain text', () => {
+  const run = (raw, size = 4) => {
+    const c = new ProseCleaner({})
+    let out = ''
+    for (let i = 0; i < raw.length; i += size) out += c.push(raw.slice(i, i + size))
+    return (out + c.flush()).replace(/\s+/g, ' ').trim()
+  }
+  for (const size of [1, 3, 7, 200]) {
+    assert.equal(
+      run('Draw the line at $6 on the vertical axis and see where the $6 horizontal line meets demand.', size),
+      'Draw the line at $6 on the vertical axis and see where the $6 horizontal line meets demand.'
+    )
+    assert.equal(run('The tax is \\$2, so price rises from \\$10.', size), 'The tax is $2, so price rises from $10.')
+    assert.equal(run('Elasticity is \\frac{10}{5} here, so 3 \\times 4 is next.', size), 'Elasticity is (10)/(5) here, so 3 x 4 is next.')
+    assert.equal(run('Set $Q_d = Q_s$ first.', size), 'Set Qd = Qs first.')
+  }
+})
+
+await (async () => {
+  const text = toRecognizePayload(linesToStrokes(['Qd = 100 - 2P', 'Qs = 20 + 2P'], { x: 60, y: 120 }).strokes).strokes
+  const graph = supplyDemandStrokes()
+  const c = clusterLines(recognizeTest.cleanStrokes([...text, ...graph]))
+  const g = groupGraphs(c.lines, c.drawings)
+  const png = g.graphs[0] ? (await rasterizeGraph(g.graphs[0].strokes)).png : null
+  check('a drawn graph is separated from the handwriting, labels included', () => {
+    assert.equal(g.graphs.length, 1)
+    assert.equal(g.lines.length, 2)
+    assert.equal(g.graphs[0].strokes.length, graph.length)
+    assert.ok(png && png.length > 1000)
+    // Text alone, or a single long underline, is never a graph.
+    const only = clusterLines(recognizeTest.cleanStrokes(text))
+    assert.equal(groupGraphs(only.lines, only.drawings).graphs.length, 0)
+  })
+})()
+
+check('graph checker output is only reported when it is confident', () => {
+  const ok = describeGraph({ graph_type: 'supply_demand_equilibrium', graph_type_conf: 0.97, verdict: 'correct', p_incorrect: 0.01 })
+  assert.equal(ok.status, 'recognized')
+  assert.equal(graphTranscriptLine(ok), 'Graph of supply and demand. The graph checker flagged no mistakes.')
+  const vague = describeGraph({ graph_type: 'isoquant_isocost', graph_type_conf: 0.6, verdict: 'correct', p_incorrect: 0 })
+  assert.equal(vague.status, 'unknown')
+  assert.doesNotMatch(graphTranscriptLine(vague), /isoquant/)
+  const bad = describeGraph({
+    graph_type: 'monopoly', graph_type_conf: 1, verdict: 'incorrect', p_incorrect: 0.98, error_type: 'price_read_from_mr',
+    error_bbox: [10, 20, 30, 40], explanation: 'x', fix: 'Read the price off the demand curve.',
+  })
+  assert.equal(bad.status, 'mistake')
+  assert.match(graphTranscriptLine(bad), /^Graph of monopoly\. The graph checker flagged a likely mistake: price read from mr\. Fix: Read/)
+  const weak = describeGraph({ graph_type: 'monopoly', graph_type_conf: 1, verdict: 'incorrect', p_incorrect: 0.6, error_type: 'price_read_from_mr' })
+  assert.equal(weak.status, 'recognized')
+})
+
+check('measured graph checks catch the classic supply and demand mistakes', () => {
+  /** Cluster a fixture graph and "read" its labels from the fixture's stroke ids. */
+  const analyze = (kind, seed = 3, size = 320) => {
+    const c = clusterLines(recognizeTest.cleanStrokes(supplyDemandStrokes({ kind, seed, size })))
+    const g = groupGraphs(c.lines, c.drawings).graphs[0]
+    assert.ok(g, `${kind}: graph found`)
+    const labels = g.labels.map((ls) => {
+      const letter = ls[0].id.match(/^g_l([sdpq])/)?.[1]?.toUpperCase() ?? '?'
+      const xs = ls.flatMap((s) => [s.minX, s.maxX])
+      const ys = ls.flatMap((s) => [s.minY, s.maxY])
+      return { text: letter, bounds: { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) } }
+    })
+    return { graph: g, rules: checkMarketGraph(g.bigStrokes, labels) }
+  }
+  const run = (...args) => analyze(...args).rules
+  for (const seed of [3, 11, 29]) {
+    for (const size of [220, 320, 460]) {
+      assert.deepEqual(run('correct', seed, size).mistakes, [], `correct graph, seed ${seed}, size ${size}`)
+      assert.match(run('demand_up', seed, size).mistakes[0].mistake, /demand curve slopes upward/)
+      assert.match(run('labels_swapped', seed, size).mistakes[0].mistake, /wrong curves/)
+      assert.match(run('axes_swapped', seed, size).mistakes[0].mistake, /wrong axes/)
+    }
+  }
+  const demandUp = analyze('demand_up')
+  const demandMistake = demandUp.rules.mistakes[0]
+  assert.deepEqual(demandMistake.correction.lines[0].pts, [
+    [demandMistake.box[0], demandMistake.box[1]],
+    [demandMistake.box[2], demandMistake.box[3]],
+  ])
+  const swapped = analyze('labels_swapped')
+  const swappedCorrection = swapped.rules.mistakes.find((m) => /wrong curves/.test(m.mistake)).correction
+  const swappedCurves = readGraphGeometry(swapped.graph.bigStrokes).curves
+  const curveUp = swappedCurves.find((c) => c.direction === 'up')
+  const curveDown = swappedCurves.find((c) => c.direction === 'down')
+  assert.deepEqual(swappedCorrection.labels, [
+    { text: 'S', x: Math.round(curveUp.ends[1][0] + 14), y: Math.round(curveUp.ends[1][1]) },
+    { text: 'D', x: Math.round(curveDown.ends[1][0] + 14), y: Math.round(curveDown.ends[1][1]) },
+  ])
+  const axesSwapped = analyze('axes_swapped')
+  const axesFrame = readGraphGeometry(axesSwapped.graph.bigStrokes).frame
+  assert.deepEqual(axesSwapped.rules.mistakes[0].correction.labels, [
+    { text: 'P', x: Math.round(axesFrame.minX - 18), y: Math.round(axesFrame.minY + 10) },
+    { text: 'Q', x: Math.round(axesFrame.maxX + 12), y: Math.round(axesFrame.maxY + 20) },
+  ])
+  // No readable S or D label: nothing is claimed.
+  const c = clusterLines(recognizeTest.cleanStrokes(supplyDemandStrokes()))
+  assert.equal(checkMarketGraph(groupGraphs(c.lines, c.drawings).graphs[0].bigStrokes, []), null)
+  assert.equal(labelMeaning(' d1 '), 'D')
+  assert.equal(labelMeaning('Supply'), 'S')
+  assert.equal(labelMeaning('MC'), null)
+  // A measured mistake outranks the model; a measured pass names the graph even if the model could not.
+  const bad = mergeGraphResults({ status: 'recognized', name: 'supply and demand' }, demandUp.rules)
+  assert.equal(bad.status, 'mistake')
+  assert.deepEqual(bad.correction.lines, demandMistake.correction.lines)
+  assert.match(graphTranscriptLine(bad), /^Graph of supply and demand\. It has a mistake: the demand curve slopes upward\. Fix: /)
+  const combined = mergeGraphResults(
+    { status: 'unknown', name: '' },
+    {
+      name: 'supply and demand',
+      mistakes: [
+        { mistake: 'first', explanation: 'first', fix: 'first', box: [0, 0, 1, 1], correction: { lines: [{ label: 'D', pts: [[0, 0], [1, 1]] }] } },
+        { mistake: 'second', explanation: 'second', fix: 'second', box: [1, 1, 2, 2], correction: { labels: [{ text: 'S', x: 3, y: 4 }] } },
+      ],
+    }
+  )
+  assert.deepEqual(combined.correction, {
+    lines: [{ label: 'D', pts: [[0, 0], [1, 1]] }],
+    labels: [{ text: 'S', x: 3, y: 4 }],
+  })
+  const fine = mergeGraphResults({ status: 'unknown', name: '' }, run('correct'))
+  assert.equal(fine.status, 'recognized')
+  assert.equal(fine.checked, true)
+  assert.match(graphTranscriptLine(fine), /Measured: demand slopes down/)
+})
+
+check('draw-together direction checks use the screen-space right endpoint', () => {
+  const down = { points: [{ x: 0, y: 0 }, { x: 100, y: 60 }] }
+  const reversedDown = { points: [{ x: 100, y: 60 }, { x: 0, y: 0 }] }
+  const up = { points: [{ x: 0, y: 60 }, { x: 100, y: 0 }] }
+  assert.equal(hasStrokeSlope(down, 'down'), true)
+  assert.equal(hasStrokeSlope(reversedDown, 'down'), true)
+  assert.equal(hasStrokeSlope(up, 'down'), false)
+})
+
+check('draw-together finds polyline intersections', () => {
+  assert.deepEqual(
+    polylineIntersection(
+      [{ x: 0, y: 0 }, { x: 10, y: 10 }],
+      [{ x: 0, y: 10 }, { x: 10, y: 0 }]
+    ),
+    { x: 5, y: 5 }
+  )
+})
+
+check('draw-together lesson configs and problem picker cover all five graph types', () => {
+  assert.equal(TOGETHER_LESSONS.length, 5)
+  assert.deepEqual(
+    TOGETHER_LESSONS.filter((lesson) => lesson.kind === 'market').map((lesson) => lesson.id),
+    ['supply-demand', 'fx', 'loanable-funds', 'bonds']
+  )
+  for (const lesson of TOGETHER_LESSONS.filter((entry) => entry.kind === 'market')) {
+    assert.ok(lesson.first.label && lesson.second.label)
+    assert.ok(['up', 'down'].includes(lesson.first.slope))
+    assert.ok(['up', 'down'].includes(lesson.second.slope))
+    assert.ok(lesson.eqLabels.y && lesson.eqLabels.x)
+    assert.equal(lesson.steps.length, 7)
+  }
+  assert.deepEqual(SUPPLY_DEMAND_LESSON.steps.map((step) => step.say), [
+    "I'll draw the axes. Your turn: draw the demand curve.",
+    'Draw demand from the upper left to the lower right.',
+    'Now draw supply.',
+    'Draw supply from the lower left to the upper right.',
+    'They cross at the equilibrium. Now show what happens if demand increases: draw the new demand curve.',
+    'Draw a new demand curve shifted to the right or above the first one.',
+    'Price and quantity both rise. Nice work!',
+  ])
+  const fxLesson = TOGETHER_LESSONS.find((lesson) => lesson.id === 'fx')
+  assert.deepEqual(
+    [fxLesson.yLabel, fxLesson.xLabel, fxLesson.eqLabels, fxLesson.shift.newLabel],
+    ['€ per $', 'Q of $', { y: 'e*', x: 'Q*' }, 'D₂']
+  )
+  const loanableLesson = TOGETHER_LESSONS.find((lesson) => lesson.id === 'loanable-funds')
+  assert.deepEqual(
+    [loanableLesson.yLabel, loanableLesson.xLabel, loanableLesson.eqLabels, loanableLesson.shift.dir],
+    ['r', 'Q of loanable funds', { y: 'r*', x: 'Q*' }, 'left']
+  )
+  const bondLesson = TOGETHER_LESSONS.find((lesson) => lesson.id === 'bonds')
+  assert.deepEqual(
+    [bondLesson.yLabel, bondLesson.xLabel, bondLesson.eqLabels, bondLesson.shift.doneMsg],
+    ['Price of bonds', 'Q of bonds', { y: 'Pb*', x: 'Qb*' }, 'Bond prices rise, so interest rates fall.']
+  )
+  assert.equal(TOGETHER_LESSONS.find((lesson) => lesson.id === 'ppf').steps.length, 8)
+  assert.equal(pickTogetherLesson('Draw a PPF for production possibilities').id, 'ppf')
+  assert.equal(pickTogetherLesson('Explain how the exchange rate affects the euro').id, 'fx')
+  assert.equal(pickTogetherLesson('A budget deficit reduces national saving').id, 'loanable-funds')
+  assert.equal(pickTogetherLesson('The Fed buys bonds').id, 'bonds')
+  assert.equal(pickTogetherLesson('Find the market equilibrium').id, 'supply-demand')
+  assert.equal(pickTogetherLesson('exchange rate and bonds').id, 'fx')
+})
+
+check('draw-together shift tests require a six-percent horizontal move', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const original = { points: [{ x: 100, y: 20 }, { x: 160, y: 80 }] }
+  const right = { points: [{ x: 140, y: 20 }, { x: 200, y: 80 }] }
+  const left = { points: [{ x: 60, y: 20 }, { x: 120, y: 80 }] }
+  const tooSmall = { points: [{ x: 110, y: 20 }, { x: 170, y: 80 }] }
+  assert.equal(isCurveShifted(original, right, 'right', box), true)
+  assert.equal(isCurveShifted(original, left, 'left', box), true)
+  assert.equal(isCurveShifted(original, tooSmall, 'right', box), false)
+  assert.equal(isCurveShifted(original, right, 'left', box), false)
+})
+
+check('draw-together distinguishes shifted equilibrium labels', () => {
+  assert.deepEqual(
+    ['P*', 'Q*', 'e*', 'r*', 'Pb*', 'Qb*'].map(shiftedEquilibriumLabel),
+    ['P₂', 'Q₂', 'e₂', 'r₂', 'Pb₂', 'Qb₂']
+  )
+})
+
+check('draw-together validates bowed-out PPFs and inside/outside points', () => {
+  const box = { x: 0, y: 0, w: 360, h: 280 }
+  const bowedOut = {
+    points: [{ x: 42, y: 22 }, { x: 194, y: 95 }, { x: 346, y: 254 }],
+  }
+  const straight = {
+    points: [{ x: 42, y: 22 }, { x: 194, y: 138 }, { x: 346, y: 254 }],
+  }
+  const bowedIn = {
+    points: [{ x: 42, y: 22 }, { x: 194, y: 180 }, { x: 346, y: 254 }],
+  }
+  const inside = { points: [{ x: 180, y: 160 }] }
+  const outside = { points: [{ x: 180, y: 60 }] }
+  const outsideAxes = { points: [{ x: 20, y: 60 }] }
+  const tooLong = { points: [{ x: 100, y: 100 }, { x: 140, y: 100 }] }
+  const grown = {
+    points: [{ x: 42, y: 22 }, { x: 194, y: 55 }, { x: 346, y: 254 }],
+  }
+  assert.equal(isBowedOut(bowedOut, box), true)
+  assert.equal(isBowedOut(straight, box), false)
+  assert.equal(isBowedOut(bowedIn, box), false)
+  assert.equal(isPpfCurve(bowedOut, box), true)
+  assert.equal(isPpfGrowth(bowedOut, grown, box), true)
+  assert.ok(ppfBulgePoint(bowedOut))
+  assert.equal(isPointRelativeToCurve(inside, bowedOut, box, 'inside'), true)
+  assert.equal(isPointRelativeToCurve(inside, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(outside, bowedOut, box, 'outside'), true)
+  assert.equal(isPointRelativeToCurve(outsideAxes, bowedOut, box, 'outside'), false)
+  assert.equal(isPointRelativeToCurve(tooLong, bowedOut, box, 'inside'), false)
+})
+
+check('draw-together places labels clear of intersecting strokes', () => {
+  const stroke = { points: [{ x: 20, y: 10 }, { x: 130, y: 10 }] }
+  const preferred = { x: 40, y: 10 }
+  const placed = placeLabelAwayFromStrokes(preferred, 'PPF', [stroke], 16)
+  assert.notDeepEqual(placed, preferred)
+  assert.equal(labelOverlapsStroke(placed, 'PPF', stroke, 16), false)
+})
+
+check('draw-together caps label nudging when all nearby candidates collide', () => {
+  const preferred = { x: 60, y: 60 }
+  const strokes = Array.from({ length: 14 }, (_, index) => {
+    const y = preferred.y - 52 + index * 8
+    return { points: [{ x: -500, y }, { x: 500, y }] }
+  })
+  const placed = placeLabelAwayFromStrokes(preferred, 'A', strokes, 12)
+  const cap = 3 * Math.max(10, 12 * 0.85)
+  assert.ok(Math.hypot(placed.x - preferred.x, placed.y - preferred.y) <= cap)
 })
 
 console.log(`\n${n} checks passed`)

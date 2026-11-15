@@ -4,6 +4,7 @@ import katex from 'katex'
 import type { ReactFlowInstance } from 'reactflow'
 import TalkingHead from './TalkingHead'
 import Markdown from '../Markdown'
+import type { TutorGraphSpec } from '../../lib/mathHint'
 import {
   boundsFromPoints,
   computeHintPlacement,
@@ -26,11 +27,16 @@ export interface TutorSession {
   boardBounds?: BoardBounds
   /** Raw SAY narration (may contain [[...]] markers + inline LaTeX). */
   text: string
+  equations?: string[]
   strategy?: string
   step?: string
   status: 'loading' | 'streaming' | 'done' | 'error'
   error?: string
-  mode: 'hint' | 'solve' | 'generalize' | 'voice'
+  mode: 'hint' | 'solve' | 'generalize' | 'voice' | 'together'
+  togetherMode?: boolean
+  togetherStep?: number
+  togetherTitle?: string
+  togetherTotal?: number
   hintType?: HintTypeId
   level: number
   tracked: boolean
@@ -51,7 +57,11 @@ export interface TutorSession {
     question: string
     answer: string
     status: 'loading' | 'streaming' | 'done'
+    /** A graph the tutor drew for this answer. */
+    graph?: TutorGraphSpec
   }>
+  /** A graph the tutor drew for this reply (spoken or typed questions). */
+  graph?: TutorGraphSpec
   /** Each STEP field parsed from this hint — only the last one may carry a write marker. */
   steps?: string[]
   /** How many of `steps` are currently revealed into `text`. */
@@ -244,6 +254,7 @@ function CoachCard({
   onClarifyMic,
   onAdvanceStep,
   onReexplainStep,
+  onEndTogether,
 }: {
   session: TutorSession
   talking: boolean
@@ -261,6 +272,7 @@ function CoachCard({
   onClarifyMic: () => void
   onAdvanceStep: () => void
   onReexplainStep: () => void
+  onEndTogether: () => void
 }) {
   const [revealing, setRevealing] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -328,6 +340,15 @@ function CoachCard({
               Generalized
             </span>
           )}
+          {session.togetherMode && (
+            <span
+              className="math-coach-type"
+              style={{ color: '#4f46e5' }}
+              title="Draw together, one turn at a time"
+            >
+              {session.togetherTitle ?? 'Draw with Adam'} · Step {session.togetherStep ?? 1} of {session.togetherTotal ?? 7}
+            </span>
+          )}
           <span className="math-coach-grip" aria-hidden>
             <span /><span /><span />
           </span>
@@ -369,6 +390,14 @@ function CoachCard({
             )
           )}
 
+          {session.equations?.length ? (
+            <div className="math-coach-equations">
+              {session.equations.map((equation, index) => (
+                <div key={index} dangerouslySetInnerHTML={{ __html: renderTex(equation, true) }} />
+              ))}
+            </div>
+          ) : null}
+
           {(session.clarifications?.length ?? 0) > 0 && (
             <div className="math-coach-clarifications">
               {session.clarifications!.map((cl) => (
@@ -397,6 +426,11 @@ function CoachCard({
         </div>
 
         <div className="math-coach-footer">
+          {session.togetherMode && (
+            <button type="button" className="math-coach-end-together" onClick={onEndTogether}>
+              End
+            </button>
+          )}
           {session.status === 'done' && (session.mode === 'hint' || session.mode === 'voice') && (
             <button
               type="button"
@@ -557,6 +591,7 @@ export function MathTutorScreenLayer({
   onClarifyMic,
   onAdvanceStep,
   onReexplainStep,
+  onEndTogether,
 }: {
   sessions: TutorSession[]
   rf: ReactFlowInstance
@@ -582,6 +617,7 @@ export function MathTutorScreenLayer({
   onClarifyMic: (id: string) => void
   onAdvanceStep: (id: string) => void
   onReexplainStep: (id: string) => void
+  onEndTogether: () => void
 }) {
   const [pane, setPane] = useState<DOMRect | null>(null)
   /** Manual drag offsets per card — once the user moves a bubble, we respect it. */
@@ -847,6 +883,7 @@ export function MathTutorScreenLayer({
               onClarifyMic={() => onClarifyMic(session.id)}
               onAdvanceStep={() => onAdvanceStep(session.id)}
               onReexplainStep={() => onReexplainStep(session.id)}
+              onEndTogether={onEndTogether}
             />
           </div>
         )

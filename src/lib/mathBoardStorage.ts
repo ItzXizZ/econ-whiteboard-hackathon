@@ -19,6 +19,8 @@ export interface MathBoardSnapshot {
   strokes: StoredStroke[]
   images: StoredImage[]
   prompt?: string
+  lessonContext?: string
+  recognitionOverrides?: Record<string, string>
   savedAt: number
 }
 
@@ -85,6 +87,17 @@ function isImage(x: unknown): x is StoredImage {
   )
 }
 
+function validRecognitionOverrides(value: unknown): Record<string, string> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
+  const overrides: Record<string, string> = {}
+  for (const [key, text] of Object.entries(value)) {
+    if (key && key.length <= 20000 && typeof text === 'string' && text.length <= 120) {
+      overrides[key] = text
+    }
+  }
+  return Object.keys(overrides).length ? overrides : undefined
+}
+
 function parseSnapshot(raw: string | null): MathBoardSnapshot | null {
   if (!raw) return null
   try {
@@ -95,11 +108,20 @@ function parseSnapshot(raw: string | null): MathBoardSnapshot | null {
     const strokes = Array.isArray(snap.strokes) ? snap.strokes.filter(isStroke) : []
     const images = Array.isArray(snap.images) ? snap.images.filter(isImage) : []
     const prompt = typeof snap.prompt === 'string' ? snap.prompt : undefined
-    if (strokes.length === 0 && images.length === 0 && !prompt) return null
+    const lessonContext =
+      typeof snap.lessonContext === 'string' ? snap.lessonContext.slice(-4000) : undefined
+    const recognitionOverrides = validRecognitionOverrides(snap.recognitionOverrides)
+    if (
+      strokes.length === 0 &&
+      images.length === 0 &&
+      !prompt &&
+      !lessonContext &&
+      !recognitionOverrides
+    ) return null
     // Missing savedAt must be 0, not Date.now() — a fabricated "now" lets a
     // stale cloud snapshot beat real local ink on every refresh.
     const savedAt = typeof snap.savedAt === 'number' && Number.isFinite(snap.savedAt) ? snap.savedAt : 0
-    return { v: 1, strokes, images, prompt, savedAt }
+    return { v: 1, strokes, images, prompt, lessonContext, recognitionOverrides, savedAt }
   } catch {
     return null
   }
@@ -250,7 +272,13 @@ export function loadMathBoard(
 
 export function saveMathBoard(
   adventureId: string,
-  data: { strokes: StoredStroke[]; images: StoredImage[]; prompt?: string }
+  data: {
+    strokes: StoredStroke[]
+    images: StoredImage[]
+    prompt?: string
+    lessonContext?: string
+    recognitionOverrides?: Record<string, string>
+  }
 ): boolean {
   if (!adventureId) return false
   const snap: MathBoardSnapshot = {
@@ -258,6 +286,8 @@ export function saveMathBoard(
     strokes: data.strokes,
     images: data.images,
     prompt: data.prompt?.trim() || undefined,
+    lessonContext: data.lessonContext?.trim().slice(-4000) || undefined,
+    recognitionOverrides: validRecognitionOverrides(data.recognitionOverrides),
     savedAt: Date.now(),
   }
   const key = storageKey(adventureId)

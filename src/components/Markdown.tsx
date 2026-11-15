@@ -8,6 +8,8 @@ import remarkMath from 'remark-math'
 
 import rehypeKatex from 'rehype-katex'
 
+import { escapeCurrencyDollars } from '../lib/mathText'
+
 /** Models often run a heading or list item onto the previous line; restore the breaks. */
 function repairMarkdownLineBreaks(text: string): string {
   return text
@@ -45,16 +47,12 @@ interface MarkdownProps {
  */
 
 function normalizeMath(input: string): string {
-
-  return input
-
+  const delimited = input
     .replace(/\\\[([\s\S]+?)\\\]/g, (_, body) => `\n$$\n${body.trim()}\n$$\n`)
-
     .replace(/\\\(([\s\S]+?)\\\)/g, (_, body) => `$${body.trim()}$`)
-
+  // Prices like "$6" must not open a math span ("$6 ... $8" would swallow the sentence).
+  return escapeCurrencyDollars(delimited)
 }
-
-
 
 function MarkdownImpl({ children, className = '', size = 'text-sm', onLinkClick }: MarkdownProps) {
 

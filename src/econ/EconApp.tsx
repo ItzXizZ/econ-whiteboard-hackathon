@@ -279,6 +279,10 @@ function EconBoardCanvas({ boardId }: { boardId: string }) {
         nodesDraggable={false}
         nodesConnectable={false}
         minZoom={0.15}
+        panOnDrag={[0, 1]}
+        panOnScroll
+        zoomOnScroll={false}
+        zoomOnPinch
         // Board content persists per boardId — remount cleanly on switch.
         key={boardId}
       >
@@ -289,10 +293,9 @@ function EconBoardCanvas({ boardId }: { boardId: string }) {
       {!hasContent && (
         <div className="econ-empty">
           <div className="econ-empty-inner">
-            <p className="econ-empty-title">Paste your problem</p>
+            <p className="econ-empty-title">Start with a graph or equation</p>
             <p className="econ-empty-sub">
-              Ctrl+V to paste a screenshot of an economics problem. Highlight your work for
-              hints, or Generalize when done.
+              Draw a graph or write an equation. Or tap Draw with Adam and draw it together.
             </p>
           </div>
         </div>

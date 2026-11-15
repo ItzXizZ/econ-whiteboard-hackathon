@@ -18,6 +18,7 @@
  */
 
 import type { NormBox } from './mathBoardManifest'
+import { splitDollarMath } from './mathText'
 
 export type MarkerRole = 'confirmed' | 'focus' | 'suggestion' | 'error' | 'write' | 'highlight'
 
@@ -95,8 +96,19 @@ function incompleteTailStart(s: string, _done: boolean): number {
   if (lastDisplay !== -1 && s.indexOf('\\]', lastDisplay) === -1) candidates.push(lastDisplay)
   // Trailing lone backslash (start of \( arriving next chunk).
   if (/\\$/.test(s)) candidates.push(s.length - 1)
-  const dollarCount = (s.match(/\$/g) || []).length
-  if (dollarCount % 2 === 1) candidates.push(s.lastIndexOf('$'))
+  // A trailing "$" may open a math span whose partner has not streamed in yet.
+  // Only wait briefly: a price ("$6 on the axis") never gets a partner, and
+  // holding for it would freeze the rest of the sentence until the reply ends.
+  const lastDollar = s.lastIndexOf('$')
+  if (lastDollar !== -1 && s[lastDollar - 1] !== '\\') {
+    const before = s.slice(0, lastDollar)
+    const lineStart = before.lastIndexOf('\n') + 1
+    const openOnLine = (before.slice(lineStart).match(/(?<!\\)\$/g) || []).length % 2 === 0
+    const after = s.slice(lastDollar + 1)
+    const couldBeMath =
+      openOnLine && after.length <= 40 && !after.includes('\n') && !/^\d[\d,.]*\s+[A-Za-z]{2,}/.test(after) && !/^\s/.test(after)
+    if (couldBeMath && !_done) candidates.push(lastDollar)
+  }
 
   return candidates.length ? Math.min(...candidates) : s.length
 }
@@ -137,18 +149,26 @@ export function parseNarration(raw: string, done: boolean): ParsedNarration {
   return { tokens, markers, pendingTail }
 }
 
-const MATH_RE = /\\\(([\s\S]+?)\\\)|\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/
+const MATH_RE = /\\\(([\s\S]+?)\\\)|\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$/
+
+/** Single-dollar spans: real formulas become math tokens, prices stay text. */
+function pushDollarText(tokens: NarrationToken[], text: string) {
+  for (const piece of splitDollarMath(text)) {
+    if (piece.kind === 'math') tokens.push({ kind: 'math', tex: piece.tex, display: false })
+    else if (piece.text) tokens.push({ kind: 'text', text: piece.text })
+  }
+}
 
 function pushTextAndMath(tokens: NarrationToken[], text: string) {
   let rest = text
   while (rest.length) {
     const m = rest.match(MATH_RE)
     if (!m) {
-      tokens.push({ kind: 'text', text: rest })
+      pushDollarText(tokens, rest)
       return
     }
-    if (m.index) tokens.push({ kind: 'text', text: rest.slice(0, m.index) })
-    const tex = m[1] ?? m[2] ?? m[3] ?? m[4] ?? ''
+    if (m.index) pushDollarText(tokens, rest.slice(0, m.index))
+    const tex = m[1] ?? m[2] ?? m[3] ?? ''
     tokens.push({ kind: 'math', tex: tex.trim(), display: !!(m[2] ?? m[3]) })
     rest = rest.slice(m.index! + m[0].length)
   }

@@ -36,7 +36,8 @@ import {
   streamChat,
 } from './llm.js'
 import { transcribeImage } from './recognize.js'
-import { solveLinearMarket, tutorNotes, workShowsAnswer } from './econSolver.js'
+import { solveLinearMarket, solutionLatex, tutorNotes, workShowsAnswer } from './econSolver.js'
+import { describeDrawnGraph, graphForRequest } from './graphDraw.js'
 
 const TUTOR = 'Adam'
 
@@ -88,6 +89,7 @@ Rules:
 - End by telling them exactly what to write next.
 - Plain text math like Qd = 100 - 2P. No LaTeX, no markdown, no lists.
 - If the request asks for 2 steps, add a line "STEP 2:". STEP 1 explains the idea, STEP 2 says what to write.
+- A WORK line that starts with "Graph" describes a graph the student drew, as read by an automatic graph checker. If it reports a mistake, make your hint about fixing the graph (TYPE corrective) and point at that line. If it says the graph was measured and is fine, you may say so. Otherwise do not say the graph is right or wrong, because the checker can miss mistakes.
 - If the request is to check what they wrote in the answer box: say whether it is right. If right, praise briefly and give the next thing to write. If wrong, say what is off and ask them to redo it.
 - TUTOR NOTES are private. Use them to check the work, never quote their numbers.
 
@@ -114,6 +116,8 @@ Rules:
 - Answer in 1 or 2 short sentences. Be direct and kind.
 - Guide, do not solve: never give the final answer. If they ask whether a number is right, tell them.
 - When you point at their work, say which line, for example "line 2".
+- A WORK line that starts with "Graph" describes a graph the student drew, as read by an automatic graph checker. Use it when they ask about their graph: say what kind of graph it is and, if a mistake is reported, what to fix. If it says the graph was measured and is fine, you may say so. Otherwise do not promise the graph is correct, because the checker can miss mistakes.
+- If you are told a graph has just been drawn for the student, talk about that graph. Never say you cannot draw.
 - Plain text math like Qd = 100 - 2P. No LaTeX, no markdown, no lists.
 - TUTOR NOTES are private. Use them to check the work, never quote their numbers.
 
@@ -360,11 +364,17 @@ class ProseCleaner {
     const bold = [...s.matchAll(/\*\*/g)].map((m) => m.index)
     if (bold.length % 2 === 1) hold(bold[bold.length - 1], 160)
 
+    // A bare LaTeX command still arriving ("\fra", "\frac{1}", "\text{su").
+    const cmd = s.match(/\\[a-zA-Z]*(?:\s*\{[^{}]*(?:\}\s*(?:\{[^{}]*)?)?)?$/)
+    if (cmd) hold(cmd.index, 80)
+
     // A single trailing character that may begin a construct ("[[", "\(", "**").
     if (/(?:\[|\\|(?<!\*)\*)$/.test(s)) hold(s.length - 1, 1)
     // "line 1" may still become "line 12".
     const lineRef = s.match(/\b(?:lines?\s*\d{0,2}|l|li|lin)$/i)
     if (lineRef) hold(lineRef.index, 12)
+    // Never split an escape ("\$", "\(") from its backslash.
+    if (cut > 0 && cut < s.length && s[cut - 1] === '\\') cut -= 1
     return cut
   }
 
@@ -401,6 +411,16 @@ class ProseCleaner {
     s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_a, body) => ` ${latexToPlain(body)} `)
     s = s.replace(/\$\$([^$]+?)\$\$/g, (_a, body) => latexToPlain(body))
     s = s.replace(/\$([^$\n]{1,60}?)\$/g, (all, body) => (looksLikeMath(body) ? latexToPlain(body) : all))
+
+    // Bare LaTeX outside any delimiter ("\frac{1}{2}", "3 \times 4") reads as plain text too.
+    if (/\\[a-zA-Z]/.test(s)) {
+      s = s.replace(
+        /\\(?:d|t)?frac\s*\{[^{}]*\}\s*\{[^{}]*\}|\\[a-zA-Z]+(?:\s*\{[^{}]*\})?/g,
+        (m) => ` ${latexToPlain(m)} `
+      )
+    }
+    // "\$6" is the model escaping a price.
+    s = s.replace(/\\\$/g, '$')
 
     // A dash between a term and a number is a minus sign; otherwise it is punctuation.
     s = s
@@ -777,7 +797,11 @@ function transcriptOf(recognizedLines) {
   return (Array.isArray(recognizedLines) ? recognizedLines : [])
     .filter((l) => l && Number.isInteger(l.n) && l.n > 0 && typeof l.latex === 'string' && l.latex.trim())
     .slice(0, 30)
-    .map((l) => ({ n: l.n, text: l.latex.replace(/\s+/g, ' ').trim().slice(0, 120) }))
+    .map((l) => {
+      const text = l.latex.replace(/\s+/g, ' ').trim()
+      // Graph descriptions from the graph checker are longer than a line of handwriting.
+      return { n: l.n, text: text.slice(0, /^Graph\b/.test(text) ? 240 : 120) }
+    })
 }
 
 // ── SSE plumbing ────────────────────────────────────────────────────────────
@@ -798,6 +822,12 @@ function openSse(res) {
     },
     highlight: (h) => {
       if (!res.writableEnded) res.write(`data: ${JSON.stringify({ highlight: h })}\n\n`)
+    },
+    graph: (g) => {
+      if (!res.writableEnded) res.write(`data: ${JSON.stringify({ graph: g })}\n\n`)
+    },
+    equations: (list) => {
+      if (!res.writableEnded) res.write(`data: ${JSON.stringify({ equations: list })}\n\n`)
     },
     error: (message) => {
       if (!res.writableEnded) res.write(`data: ${JSON.stringify({ error: message })}\n\n`)
@@ -820,7 +850,7 @@ function openSse(res) {
 
 async function handleHint(req, res) {
   const body = req.body || {}
-  const { regionImage, boardImage, gridImage, problemImages, recognizedLines, history, hintLevel } = body
+  const { regionImage, boardImage, gridImage, problemImages, recognizedLines, history, hintLevel, boardEmpty } = body
   const level = Math.min(Math.max(Number(hintLevel) || 1, 1), 4)
 
   if (!regionImage && !boardImage && !gridImage && !body.prompt) {
@@ -868,7 +898,7 @@ async function handleHint(req, res) {
         images.push(img)
         workNote = 'The attached image is the answer box the student just wrote in. Read it carefully first.'
       }
-    } else if (!transcript.length) {
+    } else if (!transcript.length && boardEmpty !== true) {
       const source = gridImage || regionImage || boardImage
       const img = source ? await shrinkImage(source, { maxEdge: 640, maxTokens: 200 }) : null
       if (img) {
@@ -884,15 +914,24 @@ async function handleHint(req, res) {
     const notes = tutorNotes(solution)
 
     const sections = []
-    sections.push(`PROBLEM: ${problem || '(no problem text was pasted; infer it from the work)'}`)
+    sections.push(`PROBLEM: ${problem || '(no problem text was pasted. This is an economics problem; infer it from the work)'}`)
     if (workText) sections.push(`WORK:\n${workText}`)
     else if (workNote) sections.push(`WORK: ${workNote}`)
     else sections.push('WORK: (nothing readable yet)')
+    if (!workText && (!workNote || boardEmpty === true)) {
+      sections.push('The board is empty: the student has not written anything yet. Do not mention line numbers or say their work is correct.')
+    }
     if (workText && workNote) sections.push(workNote)
     if (notes) sections.push(`TUTOR NOTES (private):\n${notes}`)
 
     const previous = lastTutorProse(history)
     const kind = req_.kind
+    const revealSolution = !!(transcript.length && workShowsAnswer(solution, workText))
+    if (solution && ['hint', 'followup', 'check', 'voice', 'clarify'].includes(kind)) {
+      sse.equations(solutionLatex(solution, { reveal: revealSolution }))
+    } else if (solution && kind === 'solve') {
+      sse.equations(solutionLatex(solution, { reveal: true }))
+    }
     let system
     let slot
     let maxTokens
@@ -945,6 +984,17 @@ async function handleHint(req, res) {
         sections.push(
           `STUDENT ${kind === 'clarify' ? 'ASKS' : 'SAYS'}: ${req_.studentText || 'Help me with the very next step from where I am.'}`
         )
+        // "Can you draw it?": the graph itself is drawn by code and sent ahead of the words.
+        const drawn = graphForRequest({
+          studentText: req_.studentText,
+          problem,
+          workText,
+          showAnswer: !!(solution && transcript.length && workShowsAnswer(solution, workText)),
+        })
+        if (drawn) {
+          sse.graph(drawn)
+          sections.push(describeDrawnGraph(drawn))
+        }
       }
       system = CHAT_SYSTEM
       slot = SLOT.chat
